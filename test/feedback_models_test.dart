@@ -1,6 +1,6 @@
-import 'package:almasjid/presentation/feedback/data/models/feedback_model.dart';
-import 'package:almasjid/presentation/feedback/data/models/feedback_reply_model.dart';
-import 'package:almasjid/presentation/feedback/data/models/feedback_thread.dart';
+import 'package:aqim/presentation/feedback/data/models/feedback_model.dart';
+import 'package:aqim/presentation/feedback/data/models/feedback_reply_model.dart';
+import 'package:aqim/presentation/feedback/data/models/feedback_thread.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

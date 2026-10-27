@@ -1,4 +1,4 @@
-import 'package:almasjid/core/utils/helpers/app_router.dart';
+import 'package:aqim/core/utils/helpers/app_router.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';

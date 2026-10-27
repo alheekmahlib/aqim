@@ -1,4 +1,4 @@
-name: almasjid
+name: aqim
 description: "A Prayer and qibla application."
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -66,6 +66,7 @@ dependencies:
   intl: ^0.20.2
   just_audio: ^0.10.6
   latlong2: ^0.10.1
+  liquid_glass_plus: ^0.3.2
   lottie: ^3.5.1
   multi_store_review:
     git:

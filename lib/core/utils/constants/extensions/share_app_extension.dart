@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:almasjid/core/utils/constants/api_constants.dart';
+import 'package:aqim/core/utils/constants/api_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -10,8 +10,9 @@ import 'package:share_plus/share_plus.dart';
 extension ShareAppExtension on void {
   Future<void> shareApp() async {
     final box = Get.context!.findRenderObject() as RenderBox?;
-    final ByteData bytes =
-        await rootBundle.load('assets/images/aqim_banner.png');
+    final ByteData bytes = await rootBundle.load(
+      'assets/images/aqim_banner.png',
+    );
     final Uint8List list = bytes.buffer.asUint8List();
 
     final tempDir = await getTemporaryDirectory();

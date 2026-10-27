@@ -326,6 +326,21 @@
     "placeholders": {}
   },
   "themeTitle": "أختر المظهر",
+  "oldMode": "الوضع الحالي",
+  "@oldMode": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "darkMode": "الوضع الداكن",
+  "@darkMode": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "liquidGlassMode": "الزجاج السائل",
+  "@liquidGlassMode": {
+    "type": "text",
+    "placeholders": {}
+  },
   "@themeTitle": {
     "type": "text",
     "placeholders": {}

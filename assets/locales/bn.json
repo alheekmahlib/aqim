@@ -326,6 +326,21 @@
     "placeholders": {}
   },
   "themeTitle": "থিম নির্বাচন করুন",
+  "oldMode": "ক্লাসিক",
+  "@oldMode": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "darkMode": "ডার্ক",
+  "@darkMode": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "liquidGlassMode": "লিকুইড গ্লাস",
+  "@liquidGlassMode": {
+    "type": "text",
+    "placeholders": {}
+  },
   "@themeTitle": {
     "type": "text",
     "placeholders": {}

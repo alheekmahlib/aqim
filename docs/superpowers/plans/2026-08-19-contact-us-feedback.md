@@ -103,9 +103,9 @@ git commit -m "ADD: image_picker dependency for feedback media attachments"
 أنشئ `test/feedback_models_test.dart`:
 
 ```dart
-import 'package:almasjid/presentation/feedback/data/models/feedback_model.dart';
-import 'package:almasjid/presentation/feedback/data/models/feedback_reply_model.dart';
-import 'package:almasjid/presentation/feedback/data/models/feedback_thread.dart';
+import 'package:aqim/presentation/feedback/data/models/feedback_model.dart';
+import 'package:aqim/presentation/feedback/data/models/feedback_reply_model.dart';
+import 'package:aqim/presentation/feedback/data/models/feedback_thread.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -3052,9 +3052,9 @@ git commit -m "ADD: feedback conversation screen, notification tap routing, back
 ```dart
 import 'dart:io' show Directory;
 
-import 'package:almasjid/core/widgets/container_button_widget.dart';
-import 'package:almasjid/presentation/feedback/controller/feedback_controller.dart';
-import 'package:almasjid/presentation/feedback/screens/feedback_thread_screen.dart';
+import 'package:aqim/core/widgets/container_button_widget.dart';
+import 'package:aqim/presentation/feedback/controller/feedback_controller.dart';
+import 'package:aqim/presentation/feedback/screens/feedback_thread_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';

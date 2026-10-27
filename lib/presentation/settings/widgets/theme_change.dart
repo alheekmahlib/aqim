@@ -1,4 +1,4 @@
-import 'package:almasjid/core/utils/constants/extensions/svg_extensions.dart';
+import 'package:aqim/core/utils/constants/extensions/svg_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:get/get.dart';
@@ -34,12 +34,16 @@ class ThemeChange extends StatelessWidget {
             ),
             const Gap(4),
             Container(
+              width: Get.width,
               decoration: BoxDecoration(
-                  border: Border.all(
-                      color: context.theme.highlightColor, width: 1.5),
-                  borderRadius: BorderRadius.circular(16)),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+                border: Border.all(
+                  color: context.theme.highlightColor,
+                  width: 1.5,
+                ),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Wrap(
+                alignment: WrapAlignment.center,
                 children: List.generate(
                   themeList.length,
                   (index) => ButtonWithNewStyle(
@@ -57,12 +61,18 @@ class ThemeChange extends StatelessWidget {
                     child: Container(
                       height: 60,
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 8),
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(8),
-                        color: index.isOdd
+                        color: AppTheme.dark == themeList[index]['name']
                             ? context.theme.colorScheme.primary
-                            : context.theme.canvasColor,
+                            : AppTheme.blue == themeList[index]['name']
+                            ? context.theme.canvasColor
+                            : context.theme.colorScheme.primary.withValues(
+                                alpha: .4,
+                              ),
                       ),
                       child: customSvgWithCustomColor(
                         SvgPath.svgLogoAqemLogo,

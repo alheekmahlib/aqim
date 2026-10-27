@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:almasjid/core/services/local_notifications_service.dart';
+import 'package:aqim/core/services/local_notifications_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -131,7 +131,9 @@ void main() {
         equals('saqqaf_athan.aiff'),
       );
       expect(
-        LocalNotificationsService.macBundledReciterSoundFile(selectedIndex: '4'),
+        LocalNotificationsService.macBundledReciterSoundFile(
+          selectedIndex: '4',
+        ),
         equals('qatami_athan.aiff'),
       );
     });

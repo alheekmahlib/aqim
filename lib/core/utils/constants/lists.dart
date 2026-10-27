@@ -15,21 +15,21 @@ final List screensList = [
     'svgUrl': 'assets/svg/logo/zad_muslim_white.svg',
     'imagePath': 'assets/images/home.png',
     'route': () => Get.toNamed(AppRouter.homeScreen),
-    'width': 240.0
+    'width': 240.0,
   },
   {
     'name': 'prayer',
     'svgUrl': 'assets/svg/prayer_logo.svg',
     'imagePath': 'assets/images/prayer.png',
     'route': () => Get.toNamed(AppRouter.prayerScreen),
-    'width': 240.0
+    'width': 240.0,
   },
   {
     'name': 'qibla',
     'svgUrl': 'assets/svg/qebla_logo.svg',
     'imagePath': 'assets/images/qibla.jpeg',
     'route': () => Get.toNamed(AppRouter.qiblaScreen),
-    'width': 70.0
+    'width': 70.0,
   },
   // {
   //   'name': 'calender',
@@ -50,7 +50,12 @@ const List themeList = [
     'name': AppTheme.dark,
     'title': 'darkMode',
     'svgUrl': 'assets/svg/theme/theme2.svg',
-  }
+  },
+  {
+    'name': AppTheme.liquidGlass,
+    'title': 'liquidGlassMode',
+    'svgUrl': 'assets/svg/theme/theme3.svg',
+  },
 ];
 
 const List<Map<String, dynamic>> prayerHadithsList = [
@@ -122,22 +127,10 @@ const List<Map<String, dynamic>> prayerHadithsList = [
 ];
 
 List<Map<String, dynamic>> notificationOptions = [
-  {
-    'title': 'nothing',
-    'icon': Icons.cancel_outlined,
-  },
-  {
-    'title': 'silent',
-    'icon': Icons.music_off_outlined,
-  },
-  {
-    'title': 'bell',
-    'icon': Icons.notifications_active,
-  },
-  {
-    'title': 'sound',
-    'icon': Icons.volume_up_rounded,
-  },
+  {'title': 'nothing', 'icon': Icons.cancel_outlined},
+  {'title': 'silent', 'icon': Icons.music_off_outlined},
+  {'title': 'bell', 'icon': Icons.notifications_active},
+  {'title': 'sound', 'icon': Icons.volume_up_rounded},
 ];
 
 List<Map<String, dynamic>> prohibitionTimesList = [
@@ -182,7 +175,7 @@ final prayerList = [
   AdhanController.instance.getMaghribName,
   'Isha',
   'middleOfTheNight',
-  'lastThirdOfTheNight'
+  'lastThirdOfTheNight',
 ];
 
 final prayerListList = [
@@ -193,7 +186,7 @@ final prayerListList = [
   AdhanController.instance.getMaghribName.tr,
   'Isha'.tr,
   'middleOfTheNight'.tr,
-  'lastThirdOfTheNight'.tr
+  'lastThirdOfTheNight'.tr,
 ];
 
 final prayerColorList = [
@@ -204,7 +197,7 @@ final prayerColorList = [
   const Color(0xffF17148),
   const Color(0xff0a0f29),
   const Color(0xff0a0f29),
-  const Color(0xff0a0f29)
+  const Color(0xff0a0f29),
 ];
 
 const List<String> weekDaysFullName = [

@@ -484,6 +484,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.9.3"
+  flutter_shaders:
+    dependency: transitive
+    description:
+      name: flutter_shaders
+      sha256: "16cd456daf2fd6ed7ac0c5168716c5e2fe18f91d82631b775f1af9100fb3f586"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.5"
   flutter_svg:
     dependency: "direct main"
     description:
@@ -815,6 +823,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.1.1"
+  liquid_glass_plus:
+    dependency: "direct main"
+    description:
+      name: liquid_glass_plus
+      sha256: "7acc48c867168bb878246f7a679ec9ea40e1ffb56b05e31d04c4013b50840f7e"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.2"
   logger:
     dependency: transitive
     description:
@@ -879,6 +895,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.0"
+  motor:
+    dependency: transitive
+    description:
+      name: motor
+      sha256: cbd49f21b00e568c2b1a55f134ed803614a107782f4fea7769693bca32940c58
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.0"
   multi_store_review:
     dependency: "direct main"
     description:

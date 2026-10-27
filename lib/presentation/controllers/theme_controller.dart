@@ -5,7 +5,7 @@ import 'package:get_storage/get_storage.dart';
 import '../../core/utils/constants/shared_preferences_constants.dart';
 import '../../core/utils/helpers/app_themes.dart';
 
-enum AppTheme { blue, dark }
+enum AppTheme { blue, dark, liquidGlass }
 
 class ThemeController extends GetxController {
   static ThemeController get instance =>
@@ -31,6 +31,9 @@ class ThemeController extends GetxController {
       case AppTheme.dark:
         initialThemeData = darkTheme;
         break;
+      case AppTheme.liquidGlass:
+        initialThemeData = liquidGlassTheme;
+        break;
       default:
         initialThemeData = blueTheme;
     }
@@ -54,6 +57,9 @@ class ThemeController extends GetxController {
       case AppTheme.dark:
         newThemeData = darkTheme;
         break;
+      case AppTheme.liquidGlass:
+        newThemeData = liquidGlassTheme;
+        break;
     }
 
     Get.changeTheme(newThemeData);
@@ -70,6 +76,8 @@ class ThemeController extends GetxController {
         return blueTheme;
       case AppTheme.dark:
         return darkTheme;
+      case AppTheme.liquidGlass:
+        return liquidGlassTheme;
     }
   }
 
@@ -77,4 +85,5 @@ class ThemeController extends GetxController {
 
   bool get isBlueMode => _currentTheme.value == AppTheme.blue;
   bool get isDarkMode => _currentTheme.value == AppTheme.dark;
+  bool get isLiquidGlass => _currentTheme.value == AppTheme.liquidGlass;
 }

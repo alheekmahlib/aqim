@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:adhan/adhan.dart';
-import 'package:almasjid/presentation/prayers/prayers.dart';
+import 'package:aqim/presentation/prayers/prayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
@@ -36,10 +36,10 @@ void main() {
   });
 
   PrayerTimes buildPrayerTimes() => PrayerTimes(
-        Coordinates(21.4225, 39.8262),
-        DateComponents.from(DateTime.now()),
-        CalculationMethod.umm_al_qura.getParameters(),
-      );
+    Coordinates(21.4225, 39.8262),
+    DateComponents.from(DateTime.now()),
+    CalculationMethod.umm_al_qura.getParameters(),
+  );
 
   testWidgets(
     'قراءة prohibitionTimesBool أثناء البناء لا تستدعي update (لا setState during build)',
@@ -76,29 +76,36 @@ void main() {
     },
   );
 
-  test('prohibitionTimesBool نقي: يعيد قيمة متسقة ويضبط الفهرس دون إشعارات',
-      () {
-    final controller = _TestAdhanController();
-    controller.state.prayerTimes = buildPrayerTimes();
+  test(
+    'prohibitionTimesBool نقي: يعيد قيمة متسقة ويضبط الفهرس دون إشعارات',
+    () {
+      final controller = _TestAdhanController();
+      controller.state.prayerTimes = buildPrayerTimes();
 
-    var notified = false;
-    void listener() => notified = true;
-    controller.addListenerId('prohibitionTimes', listener);
-    addTearDown(() => controller.removeListenerId('prohibitionTimes', listener));
+      var notified = false;
+      void listener() => notified = true;
+      controller.addListenerId('prohibitionTimes', listener);
+      addTearDown(
+        () => controller.removeListenerId('prohibitionTimes', listener),
+      );
 
-    final visible = controller.prohibitionTimesBool;
+      final visible = controller.prohibitionTimesBool;
 
-    expect(visible, isA<bool>());
-    // إن كنا داخل وقت نهي فالفهرس 0-2 وإلا فهو -1
-    if (visible) {
-      expect(controller.state.prohibitionTimesIndex.value, inInclusiveRange(0, 2));
-    } else {
-      expect(controller.state.prohibitionTimesIndex.value, -1);
-    }
-    expect(
-      notified,
-      isFalse,
-      reason: 'الـ getter يجب ألا يستدعي update أثناء قراءته في مرحلة البناء',
-    );
-  });
+      expect(visible, isA<bool>());
+      // إن كنا داخل وقت نهي فالفهرس 0-2 وإلا فهو -1
+      if (visible) {
+        expect(
+          controller.state.prohibitionTimesIndex.value,
+          inInclusiveRange(0, 2),
+        );
+      } else {
+        expect(controller.state.prohibitionTimesIndex.value, -1);
+      }
+      expect(
+        notified,
+        isFalse,
+        reason: 'الـ getter يجب ألا يستدعي update أثناء قراءته في مرحلة البناء',
+      );
+    },
+  );
 }

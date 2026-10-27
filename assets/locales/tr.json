@@ -326,6 +326,21 @@
     "placeholders": {}
   },
   "themeTitle": "Tema Seç",
+  "oldMode": "Klasik",
+  "@oldMode": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "darkMode": "Koyu",
+  "@darkMode": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "liquidGlassMode": "Sıvı Cam",
+  "@liquidGlassMode": {
+    "type": "text",
+    "placeholders": {}
+  },
   "@themeTitle": {
     "type": "text",
     "placeholders": {}

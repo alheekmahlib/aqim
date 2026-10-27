@@ -1,9 +1,9 @@
 import 'dart:convert' show jsonDecode;
 import 'dart:io' show Directory;
 
-import 'package:almasjid/core/widgets/container_button_widget.dart';
-import 'package:almasjid/presentation/feedback/controller/feedback_controller.dart';
-import 'package:almasjid/presentation/feedback/screens/feedback_thread_screen.dart';
+import 'package:aqim/core/widgets/container_button_widget.dart';
+import 'package:aqim/presentation/feedback/controller/feedback_controller.dart';
+import 'package:aqim/presentation/feedback/screens/feedback_thread_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';

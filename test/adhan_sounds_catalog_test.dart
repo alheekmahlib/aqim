@@ -1,9 +1,9 @@
 import 'dart:convert';
 
+import 'package:aqim/core/utils/constants/api_constants.dart';
+import 'package:aqim/presentation/prayers/data/model/adhan_data.dart';
+import 'package:aqim/presentation/prayers/prayers.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:almasjid/core/utils/constants/api_constants.dart';
-import 'package:almasjid/presentation/prayers/data/model/adhan_data.dart';
-import 'package:almasjid/presentation/prayers/prayers.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

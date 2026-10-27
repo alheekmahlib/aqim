@@ -326,6 +326,21 @@
     "placeholders": {}
   },
   "themeTitle": "Elegir tema",
+  "oldMode": "Clásico",
+  "@oldMode": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "darkMode": "Oscuro",
+  "@darkMode": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "liquidGlassMode": "Cristal líquido",
+  "@liquidGlassMode": {
+    "type": "text",
+    "placeholders": {}
+  },
   "@themeTitle": {
     "type": "text",
     "placeholders": {}

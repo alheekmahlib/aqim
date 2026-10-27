@@ -1,8 +1,8 @@
 import 'dart:io';
 
 import 'package:adhan/adhan.dart';
-import 'package:almasjid/core/utils/constants/shared_preferences_constants.dart';
-import 'package:almasjid/presentation/prayers/prayers.dart';
+import 'package:aqim/core/utils/constants/shared_preferences_constants.dart';
+import 'package:aqim/presentation/prayers/prayers.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';

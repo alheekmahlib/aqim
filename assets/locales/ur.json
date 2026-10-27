@@ -326,6 +326,21 @@
     "placeholders": {}
   },
   "themeTitle": "تھیم منتخب کریں",
+  "oldMode": "کلاسک",
+  "@oldMode": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "darkMode": "ڈارک",
+  "@darkMode": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "liquidGlassMode": "لیکوڈ گلاس",
+  "@liquidGlassMode": {
+    "type": "text",
+    "placeholders": {}
+  },
   "@themeTitle": {
     "type": "text",
     "placeholders": {}

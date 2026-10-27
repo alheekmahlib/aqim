@@ -5,8 +5,8 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
-import 'package:almasjid/core/services/languages/dependency_inj.dart' as dep;
-import 'package:almasjid/my_app.dart';
+import 'package:aqim/core/services/languages/dependency_inj.dart' as dep;
+import 'package:aqim/my_app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -14,9 +14,7 @@ void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     Map<String, Map<String, String>> languages = await dep.init();
     // Build our app and trigger a frame.
-    await tester.pumpWidget(MyApp(
-      languages: languages,
-    ));
+    await tester.pumpWidget(MyApp(languages: languages));
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);

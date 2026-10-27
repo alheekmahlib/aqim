@@ -1,15 +1,14 @@
 import 'dart:io';
 
 import 'package:adhan/adhan.dart';
+import 'package:aqim/core/utils/constants/shared_preferences_constants.dart';
+import 'package:aqim/presentation/prayers/prayers.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
-
-import 'package:almasjid/core/utils/constants/shared_preferences_constants.dart';
-import 'package:almasjid/presentation/prayers/prayers.dart';
 
 /// نسخة اختبارية تتجاوز onInit لتفادي سلاسل GeneralController/الخلفيات،
 /// فالاختبار يقرأ prayerNameList فقط ولا يعتمد على دورة حياة GetX.
@@ -28,9 +27,9 @@ void main() {
     // محاكاة قناة path_provider لتعمل GetStorage داخل بيئة الاختبار.
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(
-      const MethodChannel('plugins.flutter.io/path_provider'),
-      (MethodCall call) async => tempDir.path,
-    );
+          const MethodChannel('plugins.flutter.io/path_provider'),
+          (MethodCall call) async => tempDir.path,
+        );
     await GetStorage.init();
     await GetStorage.init('iqamaUnit');
     // DateFormatter يعتمد intl؛ في التطبيق تهيئه localizationsDelegates فقط.
@@ -134,25 +133,27 @@ void main() {
       );
     });
 
-    test('fixes the latent Ramadan overflow (70 > 64) by shrinking to 6 days',
-        () {
-      expect(
-        IqamaSchedulePolicy.adhanDaysForIOS(
-          enabledAdhanCount: 5,
-          iqamaEnabled: true,
-          ramadanActive: true,
-        ),
-        6,
-      );
-      expect(
-        IqamaSchedulePolicy.adhanDaysForIOS(
-          enabledAdhanCount: 5,
-          iqamaEnabled: false,
-          ramadanActive: true,
-        ),
-        8,
-      );
-    });
+    test(
+      'fixes the latent Ramadan overflow (70 > 64) by shrinking to 6 days',
+      () {
+        expect(
+          IqamaSchedulePolicy.adhanDaysForIOS(
+            enabledAdhanCount: 5,
+            iqamaEnabled: true,
+            ramadanActive: true,
+          ),
+          6,
+        );
+        expect(
+          IqamaSchedulePolicy.adhanDaysForIOS(
+            enabledAdhanCount: 5,
+            iqamaEnabled: false,
+            ramadanActive: true,
+          ),
+          8,
+        );
+      },
+    );
 
     test('never goes below the minimum horizon', () {
       expect(
@@ -168,51 +169,52 @@ void main() {
 
   group('iqama fields in prayer list', () {
     test(
-        'iqama time = adhan time + per-prayer offset for the five prayers only',
-        () {
-      final ctrl = _TestAdhanController();
-      Get.put<AdhanController>(ctrl);
-      addTearDown(() => Get.delete<AdhanController>());
+      'iqama time = adhan time + per-prayer offset for the five prayers only',
+      () {
+        final ctrl = _TestAdhanController();
+        Get.put<AdhanController>(ctrl);
+        addTearDown(() => Get.delete<AdhanController>());
 
-      final state = ctrl.state;
-      state.params = CalculationMethod.other.getParameters();
-      state.iqamaOffsets = IqamaOffsets(
-        fajr: 25,
-        dhuhr: 15,
-        asr: 15,
-        maghrib: 10,
-        isha: 15,
-      );
+        final state = ctrl.state;
+        state.params = CalculationMethod.other.getParameters();
+        state.iqamaOffsets = IqamaOffsets(
+          fajr: 25,
+          dhuhr: 15,
+          asr: 15,
+          maghrib: 10,
+          isha: 15,
+        );
 
-      final coordinates = Coordinates(21.4225, 39.8262);
-      final prayerTimes = PrayerTimes(
-        coordinates,
-        DateComponents.from(DateTime(2026, 8, 18, 12)),
-        state.params,
-      );
-      state.prayerTimes = prayerTimes;
-      state.sunnahTimes = SunnahTimes(prayerTimes);
+        final coordinates = Coordinates(21.4225, 39.8262);
+        final prayerTimes = PrayerTimes(
+          coordinates,
+          DateComponents.from(DateTime(2026, 8, 18, 12)),
+          state.params,
+        );
+        state.prayerTimes = prayerTimes;
+        state.sunnahTimes = SunnahTimes(prayerTimes);
 
-      final list = ctrl.prayerNameList;
-      expect(list.length, 8);
+        final list = ctrl.prayerNameList;
+        expect(list.length, 8);
 
-      expect(
-        list[0]['iqamaDateTime'],
-        prayerTimes.fajr.add(const Duration(minutes: 25)),
-      );
-      expect(
-        list[2]['iqamaDateTime'],
-        prayerTimes.dhuhr.add(const Duration(minutes: 15)),
-      );
-      expect(
-        list[5]['iqamaDateTime'],
-        prayerTimes.isha.add(const Duration(minutes: 15)),
-      );
+        expect(
+          list[0]['iqamaDateTime'],
+          prayerTimes.fajr.add(const Duration(minutes: 25)),
+        );
+        expect(
+          list[2]['iqamaDateTime'],
+          prayerTimes.dhuhr.add(const Duration(minutes: 15)),
+        );
+        expect(
+          list[5]['iqamaDateTime'],
+          prayerTimes.isha.add(const Duration(minutes: 15)),
+        );
 
-      // الشروق ومنتصف الليل والثلث الأخير بلا إقامة.
-      expect(list[1].containsKey('iqamaDateTime'), isFalse);
-      expect(list[6].containsKey('iqamaDateTime'), isFalse);
-      expect(list[7].containsKey('iqamaDateTime'), isFalse);
-    });
+        // الشروق ومنتصف الليل والثلث الأخير بلا إقامة.
+        expect(list[1].containsKey('iqamaDateTime'), isFalse);
+        expect(list[6].containsKey('iqamaDateTime'), isFalse);
+        expect(list[7].containsKey('iqamaDateTime'), isFalse);
+      },
+    );
   });
 }

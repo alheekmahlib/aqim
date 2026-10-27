@@ -326,6 +326,21 @@
     "placeholders": {}
   },
   "themeTitle": "ڕووکار هەڵبژێرە",
+  "oldMode": "کلاسیک",
+  "@oldMode": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "darkMode": "تاریک",
+  "@darkMode": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "liquidGlassMode": "شوشەی شل",
+  "@liquidGlassMode": {
+    "type": "text",
+    "placeholders": {}
+  },
   "@themeTitle": {
     "type": "text",
     "placeholders": {}

@@ -47,7 +47,9 @@ class TeachingPrayerScreen extends StatelessWidget {
                                   'noData'.trParams({'x': 'TeachingPrayer'}),
                                   style: TextStyle(
                                     color: context
-                                        .theme.colorScheme.inversePrimary,
+                                        .theme
+                                        .colorScheme
+                                        .inversePrimary,
                                     fontFamily: 'cairo',
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -81,7 +83,9 @@ class TeachingPrayerScreen extends StatelessWidget {
                                         Text(
                                           'understanding'.tr,
                                           style: TextStyle(
-                                            color: context.theme.colorScheme
+                                            color: context
+                                                .theme
+                                                .colorScheme
                                                 .inversePrimary
                                                 .withValues(alpha: .9),
                                             fontWeight: FontWeight.w900,
@@ -100,14 +104,18 @@ class TeachingPrayerScreen extends StatelessWidget {
                                 shrinkWrap: true,
                                 physics: const BouncingScrollPhysics(),
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 16.0),
+                                  horizontal: 16.0,
+                                ),
                                 itemCount: sections.length,
                                 itemBuilder: (context, index) {
                                   final section = sections[index];
-                                  final title =
-                                      section.resolveName(ctrl.currentLang);
+                                  final title = section.resolveName(
+                                    ctrl.currentLang,
+                                  );
                                   return _SectionCard(
-                                      title: title, index: index);
+                                    title: title,
+                                    index: index,
+                                  );
                                 },
                               ),
                               const Gap(80),
@@ -116,12 +124,13 @@ class TeachingPrayerScreen extends StatelessWidget {
                         },
                       ),
                       FloatingMenuWidget(
-                          ctrl: ctrl,
-                          currentMonth: currentMonth,
-                          controller: controller)
+                        ctrl: ctrl,
+                        currentMonth: currentMonth,
+                        controller: controller,
+                      ),
                     ],
                   ),
-                )
+                ),
               ],
             ),
           ),
@@ -156,180 +165,177 @@ class FloatingMenuWidget extends StatelessWidget {
       //   return const SizedBox.shrink();
       // }
       return FloatingMenuExpendable(
-          controller: controller,
-          panelWidth: isEmpty ? 130 : 460,
-          panelHeight: isEmpty ? 52 : 360,
-          handleWidth: 130,
-          handleHeight: 52,
-          expandPanelFromHandle: true,
-          initialPosition: const Offset(12, 12),
-          openMode: FloatingMenuExpendableOpenMode.vertical,
-          style: FloatingMenuExpendableStyle(
-            // Background barrier
-            showBarrierWhenOpen: isEmpty ? false : true,
-            barrierDismissible: isEmpty ? false : true,
-            barrierColor: context.theme.colorScheme.primaryContainer
-                .withValues(alpha: 0.3),
-            barrierBlurSigmaX: 10,
-            barrierBlurSigmaY: 10,
-            panelDecoration: BoxDecoration(
-              color: context.theme.colorScheme.surface.withValues(alpha: 0.1),
-              borderRadius: const BorderRadius.all(Radius.circular(8)),
-            ),
-            // Panel
-            panelBorderRadius: const BorderRadius.all(Radius.circular(8)),
+        controller: controller,
+        panelWidth: isEmpty ? 130 : 460,
+        panelHeight: isEmpty ? 52 : 360,
+        handleWidth: 130,
+        handleHeight: 52,
+        expandPanelFromHandle: true,
+        initialPosition: const Offset(12, 12),
+        openMode: FloatingMenuExpendableOpenMode.vertical,
+        style: FloatingMenuExpendableStyle(
+          // Background barrier
+          showBarrierWhenOpen: isEmpty ? false : true,
+          barrierDismissible: isEmpty ? false : true,
+          barrierColor: context.theme.colorScheme.primaryContainer.withValues(
+            alpha: 0.3,
           ),
-          handleChild: ValueListenableBuilder<FloatingMenuPanelPhysicalSide?>(
-              valueListenable: controller.physicalSide,
-              builder: (context, horizontalSide, _) {
-                return ValueListenableBuilder<FloatingMenuPanelPhysicalSide?>(
-                    valueListenable: controller.verticalSide,
-                    builder: (context, verticalSide, _) {
-                      final isRight =
-                          horizontalSide == FloatingMenuPanelPhysicalSide.right;
+          barrierBlurSigmaX: 10,
+          barrierBlurSigmaY: 10,
+          panelDecoration: BoxDecoration(
+            color: context.theme.colorScheme.surface.withValues(alpha: 0.1),
+            borderRadius: const BorderRadius.all(Radius.circular(8)),
+          ),
+          // Panel
+          panelBorderRadius: const BorderRadius.all(Radius.circular(8)),
+        ),
+        handleChild: ValueListenableBuilder<FloatingMenuPanelPhysicalSide?>(
+          valueListenable: controller.physicalSide,
+          builder: (context, horizontalSide, _) {
+            return ValueListenableBuilder<FloatingMenuPanelPhysicalSide?>(
+              valueListenable: controller.verticalSide,
+              builder: (context, verticalSide, _) {
+                final isRight =
+                    horizontalSide == FloatingMenuPanelPhysicalSide.right;
 
-                      final sideForArrow = verticalSide ?? horizontalSide;
+                final sideForArrow = verticalSide ?? horizontalSide;
 
-                      final arrowAngle = switch (sideForArrow) {
-                        FloatingMenuPanelPhysicalSide.top =>
-                          isRight ? (math.pi / -.87) : (math.pi / -.73),
-                        FloatingMenuPanelPhysicalSide.bottom =>
-                          isRight ? (math.pi / -.42) : (math.pi / -.47),
-                        _ => 0.0,
-                      };
+                final arrowAngle = switch (sideForArrow) {
+                  FloatingMenuPanelPhysicalSide.top =>
+                    isRight ? (math.pi / -.87) : (math.pi / -.73),
+                  FloatingMenuPanelPhysicalSide.bottom =>
+                    isRight ? (math.pi / -.42) : (math.pi / -.47),
+                  _ => 0.0,
+                };
 
-                      return Row(
-                        mainAxisSize: MainAxisSize.min,
-                        textDirection:
-                            isRight ? TextDirection.rtl : TextDirection.ltr,
-                        children: [
-                          Expanded(
-                            child: HijriDateWidget(
-                              alignment: Alignment.center,
-                              svgColor: context.theme.colorScheme.surface,
-                              horizontalPadding: 0.0,
-                            ),
-                          ),
-                          const Gap(8),
-                          Transform.rotate(
-                            angle: arrowAngle,
-                            child: customSvgWithColor(
-                              'assets/svg/arrow_up.svg',
-                              height: 20,
-                              color: context.theme.colorScheme.surface,
-                            ),
-                          )
-                        ],
-                      );
-                    });
-              }),
-          panelChild: isEmpty
-              ? const SizedBox.shrink()
-              : Container(
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: context.theme.colorScheme.primaryContainer,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: DefaultTabController(
-                    length: hadith.isNotEmpty &&
-                            sunnahs.isNotEmpty &&
-                            heresies.isNotEmpty
-                        ? 3
-                        : hadith.isNotEmpty && sunnahs.isNotEmpty
-                            ? 2
-                            : hadith.isNotEmpty && heresies.isNotEmpty
-                                ? 2
-                                : heresies.isNotEmpty && sunnahs.isNotEmpty
-                                    ? 2
-                                    : 1,
-                    child: Container(
-                      margin: const EdgeInsetsDirectional.fromSTEB(8, 0, 0, 0),
-                      padding: const EdgeInsets.all(6.0),
-                      decoration: BoxDecoration(
-                        color: context.theme.colorScheme.primaryContainer,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: context.theme.colorScheme.surface
-                              .withValues(alpha: .15),
-                        ),
+                return Row(
+                  mainAxisSize: MainAxisSize.min,
+                  textDirection: isRight
+                      ? TextDirection.rtl
+                      : TextDirection.ltr,
+                  children: [
+                    Expanded(
+                      child: HijriDateWidget(
+                        alignment: Alignment.center,
+                        svgColor: context.theme.colorScheme.surface,
+                        horizontalPadding: 0.0,
                       ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Flexible(
-                            child: TabBar(
-                              indicatorColor: context.theme.colorScheme.surface,
-                              labelColor: context.theme.colorScheme.surface,
-                              unselectedLabelColor: context
-                                  .theme.colorScheme.surface
-                                  .withValues(alpha: .6),
-                              tabs: [
-                                if (hadith.isNotEmpty)
-                                  Tab(
-                                    child: Text(
-                                      'aboutMonth'.tr,
-                                      style: const TextStyle(
-                                        fontFamily: 'cairo',
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16,
-                                      ),
+                    ),
+                    const Gap(8),
+                    Transform.rotate(
+                      angle: arrowAngle,
+                      child: customSvgWithColor(
+                        'assets/svg/arrow_up.svg',
+                        height: 20,
+                        color: context.theme.colorScheme.surface,
+                      ),
+                    ),
+                  ],
+                );
+              },
+            );
+          },
+        ),
+        panelChild: isEmpty
+            ? const SizedBox.shrink()
+            : GlassContainer(
+                radius: 8,
+                variant: GlassVariant.opaque,
+                child: DefaultTabController(
+                  length:
+                      hadith.isNotEmpty &&
+                          sunnahs.isNotEmpty &&
+                          heresies.isNotEmpty
+                      ? 3
+                      : hadith.isNotEmpty && sunnahs.isNotEmpty
+                      ? 2
+                      : hadith.isNotEmpty && heresies.isNotEmpty
+                      ? 2
+                      : heresies.isNotEmpty && sunnahs.isNotEmpty
+                      ? 2
+                      : 1,
+                  child: Padding(
+                    padding: const EdgeInsets.all(6.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Flexible(
+                          child: TabBar(
+                            indicatorColor: context.theme.colorScheme.surface,
+                            labelColor: context.theme.colorScheme.surface,
+                            unselectedLabelColor: context
+                                .theme
+                                .colorScheme
+                                .surface
+                                .withValues(alpha: .6),
+                            tabs: [
+                              if (hadith.isNotEmpty)
+                                Tab(
+                                  child: Text(
+                                    'aboutMonth'.tr,
+                                    style: const TextStyle(
+                                      fontFamily: 'cairo',
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
                                     ),
+                                  ),
+                                ),
+                              if (sunnahs.isNotEmpty)
+                                Tab(
+                                  child: Text(
+                                    _getLocalizedText('sunnahs', lang),
+                                    style: const TextStyle(
+                                      fontFamily: 'cairo',
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ),
+                              if (heresies.isNotEmpty)
+                                Tab(
+                                  child: Text(
+                                    _getLocalizedText('heresies', lang),
+                                    style: const TextStyle(
+                                      fontFamily: 'cairo',
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          flex: 7,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6.0,
+                            ),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              color: context.theme.colorScheme.surface
+                                  .withValues(alpha: .08),
+                            ),
+                            child: TabBarView(
+                              children: [
+                                if (hadith.isNotEmpty)
+                                  SingleChildScrollView(
+                                    child: _HadithCard(hadith: hadith),
                                   ),
                                 if (sunnahs.isNotEmpty)
-                                  Tab(
-                                    child: Text(
-                                      _getLocalizedText('sunnahs', lang),
-                                      style: const TextStyle(
-                                        fontFamily: 'cairo',
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                  ),
+                                  const SunnahsAndHeresies(isSunnah: true),
                                 if (heresies.isNotEmpty)
-                                  Tab(
-                                    child: Text(
-                                      _getLocalizedText('heresies', lang),
-                                      style: const TextStyle(
-                                        fontFamily: 'cairo',
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                  ),
+                                  const SunnahsAndHeresies(isSunnah: false),
                               ],
                             ),
                           ),
-                          Expanded(
-                            flex: 7,
-                            child: Container(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 6.0),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12),
-                                color: context.theme.colorScheme.surface
-                                    .withValues(alpha: .08),
-                              ),
-                              child: TabBarView(
-                                children: [
-                                  if (hadith.isNotEmpty)
-                                    SingleChildScrollView(
-                                      child: _HadithCard(hadith: hadith),
-                                    ),
-                                  if (sunnahs.isNotEmpty)
-                                    const SunnahsAndHeresies(isSunnah: true),
-                                  if (heresies.isNotEmpty)
-                                    const SunnahsAndHeresies(isSunnah: false),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
-                ));
+                ),
+              ),
+      );
     });
   }
 

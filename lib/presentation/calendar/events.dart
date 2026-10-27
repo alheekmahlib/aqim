@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'dart:io' show Platform;
 
 import 'package:adhan/adhan.dart' show DateComponents, PrayerTimes;
-import 'package:almasjid/core/utils/constants/extensions/convert_number_extension.dart';
+import 'package:aqim/core/utils/constants/extensions/convert_number_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_rounded_progress_bar/flutter_rounded_progress_bar.dart';

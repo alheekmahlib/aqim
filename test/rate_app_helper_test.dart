@@ -1,4 +1,4 @@
-import 'package:almasjid/core/utils/helpers/rate_app_helper.dart';
+import 'package:aqim/core/utils/helpers/rate_app_helper.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:multi_store_review/multi_store_review.dart';
 import 'package:multi_store_review_platform_interface/multi_store_review_platform_interface.dart';

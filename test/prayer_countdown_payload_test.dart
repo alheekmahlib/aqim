@@ -1,6 +1,5 @@
+import 'package:aqim/core/services/prayer_countdown_payload.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:almasjid/core/services/prayer_countdown_payload.dart';
 
 /// بناء خانات يوم واحد بأوقات اصطناعية؛ تُعاد الفهارس بترتيب
 /// prayerNameList (فجر 0 .. ثلث أخير 7).

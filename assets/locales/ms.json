@@ -326,6 +326,21 @@
     "placeholders": {}
   },
   "themeTitle": "Pilih Tema",
+  "oldMode": "Klasik",
+  "@oldMode": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "darkMode": "Gelap",
+  "@darkMode": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "liquidGlassMode": "Kaca Cecair",
+  "@liquidGlassMode": {
+    "type": "text",
+    "placeholders": {}
+  },
   "@themeTitle": {
     "type": "text",
     "placeholders": {}

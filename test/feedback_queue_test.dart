@@ -1,8 +1,8 @@
 import 'dart:io' show Directory, File, FileSystemException;
 
-import 'package:almasjid/presentation/feedback/controller/feedback_controller.dart';
-import 'package:almasjid/presentation/feedback/data/feedback_media_staging.dart';
-import 'package:almasjid/presentation/feedback/data/feedback_queue.dart';
+import 'package:aqim/presentation/feedback/controller/feedback_controller.dart';
+import 'package:aqim/presentation/feedback/data/feedback_media_staging.dart';
+import 'package:aqim/presentation/feedback/data/feedback_queue.dart';
 import 'package:connectivity_kit/connectivity_kit.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';

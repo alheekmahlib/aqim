@@ -1,7 +1,7 @@
 import 'dart:developer' show log;
 
 import 'package:adhan/adhan.dart';
-import 'package:almasjid/core/widgets/custom_button.dart';
+import 'package:aqim/core/widgets/custom_button.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rounded_progress_bar/flutter_rounded_progress_bar.dart';

@@ -31,86 +31,99 @@ class ActiveLocationWidget extends StatelessWidget {
 
         final isHuaweiDevice = snapshot.data ?? false;
 
-        return Padding(
-          padding: const EdgeInsets.all(32.0),
-          child: context.customOrientation(
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Gap(16),
-                customLottieWithColor(LottieConstants.assetsLottieLocation,
-                    width: 250.0, color: context.theme.colorScheme.surface),
-                const Spacer(),
-                Container(
+        return context.customOrientation(
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Gap(16),
+              customLottieWithColor(
+                LottieConstants.assetsLottieLocation,
+                height: 150.0.h,
+                color: context.theme.colorScheme.surface,
+              ),
+              const Spacer(),
+              Container(
+                width: double.infinity,
+                alignment: Alignment.center,
+                margin: const EdgeInsets.symmetric(horizontal: 32.0),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24.0,
+                  vertical: 16.0,
+                ),
+                decoration: BoxDecoration(
+                  color: context.theme.colorScheme.surface.withValues(
+                    alpha: .2,
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  'locationNote'.tr,
+                  style: TextStyle(
+                    fontFamily: 'cairo',
+                    fontSize: 12.sp.clamp(12, 22),
+                    height: 1.5,
+                    fontWeight: FontWeight.w500,
+                    color: context.theme.canvasColor,
+                  ),
+                  textAlign: TextAlign.justify,
+                ),
+              ),
+              const Spacer(),
+              _buttonsBuild(context, isHuaweiDevice),
+            ],
+          ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Expanded(
+                child: Stack(
+                  alignment: Alignment.topCenter,
+                  children: [
+                    Opacity(
+                      opacity: 0.2,
+                      child: customLottieWithColor(
+                        LottieConstants.assetsLottieLocation,
+                        width: 250.0,
+                        color: context.theme.colorScheme.surface,
+                      ),
+                    ),
+                    // const Spacer(),
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: _buttonsBuild(context, isHuaweiDevice),
+                    ),
+                  ],
+                ),
+              ),
+              const Gap(16),
+              Expanded(
+                child: Container(
                   width: double.infinity,
                   alignment: Alignment.center,
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 24.0, vertical: 16.0),
+                    horizontal: 24.0,
+                    vertical: 16.0,
+                  ),
                   decoration: BoxDecoration(
-                      color: context.theme.colorScheme.surface
-                          .withValues(alpha: .2),
-                      borderRadius: BorderRadius.circular(8)),
+                    color: context.theme.colorScheme.surface.withValues(
+                      alpha: .2,
+                    ),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                   child: Text(
                     'locationNote'.tr,
                     style: TextStyle(
-                        fontFamily: 'cairo',
-                        fontSize: 12.sp.clamp(12, 22),
-                        height: 1.5,
-                        fontWeight: FontWeight.w500,
-                        color: context.theme.canvasColor),
+                      fontFamily: 'cairo',
+                      fontSize: 8.sp.clamp(8, 18),
+                      height: 1.5,
+                      fontWeight: FontWeight.w500,
+                      color: context.theme.canvasColor,
+                    ),
                     textAlign: TextAlign.justify,
                   ),
                 ),
-                const Gap(32),
-                _buttonsBuild(context, isHuaweiDevice),
-              ],
-            ),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Expanded(
-                  child: Stack(
-                    alignment: Alignment.topCenter,
-                    children: [
-                      Opacity(
-                        opacity: 0.2,
-                        child: customLottieWithColor(
-                            LottieConstants.assetsLottieLocation,
-                            width: 250.0,
-                            color: context.theme.colorScheme.surface),
-                      ),
-                      // const Spacer(),
-                      Align(
-                          alignment: Alignment.bottomCenter,
-                          child: _buttonsBuild(context, isHuaweiDevice)),
-                    ],
-                  ),
-                ),
-                const Gap(16),
-                Expanded(
-                  child: Container(
-                    width: double.infinity,
-                    alignment: Alignment.center,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 24.0, vertical: 16.0),
-                    decoration: BoxDecoration(
-                        color: context.theme.colorScheme.surface
-                            .withValues(alpha: .2),
-                        borderRadius: BorderRadius.circular(8)),
-                    child: Text(
-                      'locationNote'.tr,
-                      style: TextStyle(
-                          fontFamily: 'cairo',
-                          fontSize: 8.sp.clamp(8, 18),
-                          height: 1.5,
-                          fontWeight: FontWeight.w500,
-                          color: context.theme.canvasColor),
-                      textAlign: TextAlign.justify,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         );
       },
@@ -126,74 +139,76 @@ class ActiveLocationWidget extends StatelessWidget {
   }
 
   Widget _buttonsBuild(BuildContext context, bool isHuaweiDevice) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        !isHuaweiDevice
-            ? Obx(
-                () => ContainerButtonWidget(
-                  onPressed: generalCtrl.state.isLocationLoading.value
-                      ? null
-                      : () async => await generalCtrl.initLocation().then(
-                            (_) async {
-                              generalCtrl.state.activeLocation.value = true;
-                              await SplashScreenController.instance
-                                  .isNotificationAllowed();
-                            },
-                          ),
-                  height: 45,
-                  width: Get.width,
-                  horizontalMargin: 0,
-                  useGradient: false,
-                  withShape: false,
-                  isLoading: generalCtrl.state.isLocationLoading.value,
-                  backgroundColor: Colors.transparent,
-                  shadowColor: Colors.transparent,
-                  borderColor: context.theme.colorScheme.surface,
-                  title: isHuaweiDevice ? 'searchForCity'.tr : 'locate'.tr,
-                ),
-              )
-            : const SizedBox.shrink(),
-        !isHuaweiDevice ? const Gap(8) : const SizedBox.shrink(),
-        ContainerButtonWidget(
-          onPressed: () => context.showSearchBottomSheet(context),
-          height: 45,
-          width: Get.width,
-          horizontalMargin: 0,
-          useGradient: false,
-          withShape: false,
-          backgroundColor: Colors.transparent,
-          shadowColor: Colors.transparent,
-          borderColor: context.theme.colorScheme.surface,
-          title: 'searchForCity'.tr,
-        ),
-        const Gap(8),
-        ContainerButtonWidget(
-          onPressed: () => _showMapBottomSheet(context),
-          height: 45,
-          width: Get.width,
-          horizontalMargin: 0,
-          useGradient: false,
-          withShape: false,
-          backgroundColor: Colors.transparent,
-          shadowColor: Colors.transparent,
-          borderColor: context.theme.colorScheme.surface,
-          title: 'selectFromMap'.tr,
-        ),
-        const Gap(8),
-        ContainerButtonWidget(
-          onPressed: () async => await generalCtrl.cancelLocation(),
-          height: 45,
-          width: Get.width,
-          horizontalMargin: 0,
-          useGradient: false,
-          withShape: false,
-          backgroundColor: Colors.transparent,
-          shadowColor: Colors.transparent,
-          borderColor: Colors.red,
-          title: 'cancel'.tr,
-        ),
-      ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 32.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          !isHuaweiDevice
+              ? Obx(
+                  () => ContainerButtonWidget(
+                    onPressed: generalCtrl.state.isLocationLoading.value
+                        ? null
+                        : () async =>
+                              await generalCtrl.initLocation().then((_) async {
+                                generalCtrl.state.activeLocation.value = true;
+                                await SplashScreenController.instance
+                                    .isNotificationAllowed();
+                              }),
+                    height: 45,
+                    width: Get.width,
+                    horizontalMargin: 0,
+                    useGradient: false,
+                    withShape: false,
+                    isLoading: generalCtrl.state.isLocationLoading.value,
+                    backgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                    borderColor: context.theme.colorScheme.surface,
+                    title: isHuaweiDevice ? 'searchForCity'.tr : 'locate'.tr,
+                  ),
+                )
+              : const SizedBox.shrink(),
+          !isHuaweiDevice ? const Gap(8) : const SizedBox.shrink(),
+          ContainerButtonWidget(
+            onPressed: () => context.showSearchBottomSheet(context),
+            height: 45,
+            width: Get.width,
+            horizontalMargin: 0,
+            useGradient: false,
+            withShape: false,
+            backgroundColor: Colors.transparent,
+            shadowColor: Colors.transparent,
+            borderColor: context.theme.colorScheme.surface,
+            title: 'searchForCity'.tr,
+          ),
+          const Gap(8),
+          ContainerButtonWidget(
+            onPressed: () => _showMapBottomSheet(context),
+            height: 45,
+            width: Get.width,
+            horizontalMargin: 0,
+            useGradient: false,
+            withShape: false,
+            backgroundColor: Colors.transparent,
+            shadowColor: Colors.transparent,
+            borderColor: context.theme.colorScheme.surface,
+            title: 'selectFromMap'.tr,
+          ),
+          const Gap(8),
+          ContainerButtonWidget(
+            onPressed: () async => await generalCtrl.cancelLocation(),
+            height: 45,
+            width: Get.width,
+            horizontalMargin: 0,
+            useGradient: false,
+            withShape: false,
+            backgroundColor: Colors.transparent,
+            shadowColor: Colors.transparent,
+            borderColor: Colors.red,
+            title: 'cancel'.tr,
+          ),
+        ],
+      ),
     );
   }
 }

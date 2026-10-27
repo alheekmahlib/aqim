@@ -37,7 +37,9 @@ class SettingsScreen extends StatelessWidget {
             withShape: false,
             backgroundColor: Colors.transparent,
             shadowColor: Colors.transparent,
-            borderColor: Theme.of(context).canvasColor,
+            borderColor: Theme.of(
+              context,
+            ).colorScheme.surface.withValues(alpha: 0.5),
             height: 45,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,

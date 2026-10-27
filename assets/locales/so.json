@@ -326,6 +326,21 @@
     "placeholders": {}
   },
   "themeTitle": "Dooro muuqaalka",
+  "oldMode": "Classic",
+  "@oldMode": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "darkMode": "Madow",
+  "@darkMode": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "liquidGlassMode": "Qalab Dareere",
+  "@liquidGlassMode": {
+    "type": "text",
+    "placeholders": {}
+  },
   "@themeTitle": {
     "type": "text",
     "placeholders": {}

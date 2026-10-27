@@ -246,7 +246,10 @@ class CustomSwitch extends StatelessWidget {
                 width: thumbWidth,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8),
-                  color: thumbColor ?? context.theme.colorScheme.surface,
+                  color: value
+                      ? (thumbColor ?? context.theme.colorScheme.surface)
+                      : (thumbColor ?? context.theme.colorScheme.surface)
+                            .withValues(alpha: .5),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withValues(alpha: .15),

@@ -1,6 +1,6 @@
 import 'dart:developer';
 
-import 'package:almasjid/core/utils/constants/extensions/custom_error_snack_bar.dart';
+import 'package:aqim/core/utils/constants/extensions/custom_error_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:get/get.dart';
@@ -53,8 +53,10 @@ class FlutterMapController extends GetxController {
     // Move camera to selected location
     mapController.move(location, 15.0);
 
-    log('Location selected: ${location.latitude}, ${location.longitude}',
-        name: 'FlutterMapController');
+    log(
+      'Location selected: ${location.latitude}, ${location.longitude}',
+      name: 'FlutterMapController',
+    );
   }
 
   /// Confirm selected location
@@ -78,8 +80,10 @@ class FlutterMapController extends GetxController {
       Get.back(); // Close map screen
       SplashScreenController.instance.state.customWidgetIndex.value = 2;
 
-      log('Location confirmed: (${location.latitude}, ${location.longitude})',
-          name: 'FlutterMapController');
+      log(
+        'Location confirmed: (${location.latitude}, ${location.longitude})',
+        name: 'FlutterMapController',
+      );
     } catch (e) {
       log('Error confirming location: $e', name: 'FlutterMapController');
       Get.context!.showCustomErrorSnackBar('failedToSetLocation'.tr);
@@ -116,7 +120,8 @@ class FlutterMapController extends GetxController {
       SplashScreenController.instance.state.customWidgetIndex.value = 2;
 
       Get.context!.showCustomErrorSnackBar(
-          '${'locationSetSuccessfully'.tr}: ${city['name']}');
+        '${'locationSetSuccessfully'.tr}: ${city['name']}',
+      );
     } catch (e) {
       Get.context!.showCustomErrorSnackBar('${'failedToSetLocation'.tr}: $e');
     }
