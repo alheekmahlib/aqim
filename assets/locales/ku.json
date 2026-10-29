@@ -1075,5 +1075,19 @@
   "prayerFeaturesResetPrayer": "گەڕاندنەوەی نوێژ بۆ ڕێکخستنی گشتی",
   "prayerReminderTitle": "بیرخەرەوەی پێش نوێژ",
   "prayerReminderBody": "@minutes خولەک ماوە بۆ بانگی @prayer",
-  "prayerFeaturesGrantSilence": "پێدانی ڕێگەی بێ‌تە‌گەزێن"
+  "prayerFeaturesGrantSilence": "پێدانی ڕێگەی بێ‌تە‌گەزێن",
+  "customAdhanSectionTitle": "بانگخەری تایبەت",
+  "customAdhanImport": "هاوردەکردنی فایلی دەنگ",
+  "customAdhanImporting": "هاوردە دەکرێت…",
+  "customAdhanEmpty": "هێشتا هیچ بانگخەرێکی تایبەت زیاد نەکراوە",
+  "customAdhanRename": "ناونانەوە",
+  "customAdhanDelete": "سڕینەوە",
+  "customAdhanSave": "پاشەکەوتکردن",
+  "customAdhanNameHint": "ناوی بانگخەر",
+  "customAdhanDeleteConfirm": "«@name» بسڕدرێتەوە؟ ئەگەر هەڵبژێردرابێت بانگ دەگەڕێتەوە بۆ دوا قیاسی دروست.",
+  "customAdhanUnsupportedFormat": "فۆرماتێکی پشتگیرینەکراو؛ MP3 یان M4A یان WAV بەکاربهێنە.",
+  "customAdhanUnplayable": "فایلەکە لێنەدرا؛ دڵنیابە لە دروستییەکەی.",
+  "customAdhanConversionFailed": "ئامادەکردنی کۆپی ئاگادارکردنەوەی iOS بۆ ئەم فایلە سەرکەوتوو نەبوو.",
+  "customAdhanImportFailed": "هاوردەکردن سەرکەوتوو نەبوو؛ هەڵبژاردەکە نەگۆڕا.",
+  "customAdhanLoadFailed": "بارکردنی بانگخەرە تایبەتەکان سەرکەوتوو نەبوو."
 }

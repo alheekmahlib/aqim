@@ -1075,5 +1075,19 @@
   "prayerFeaturesResetPrayer": "Salaadda ku celi dejimaha guud",
   "prayerReminderTitle": "Xasuusin salaadda",
   "prayerReminderBody": "@minutes daqiiqo ayaa ka hartay adhanka @prayer",
-  "prayerFeaturesGrantSilence": "Sii ogolaansho ha dhibin"
+  "prayerFeaturesGrantSilence": "Sii ogolaansho ha dhibin",
+  "customAdhanSectionTitle": "Muezzin gaar ah",
+  "customAdhanImport": "Soo gal faylasha dhawaaqa",
+  "customAdhanImporting": "Waa la soo galinayaa…",
+  "customAdhanEmpty": "Weli lama darin muezzin gaar ah",
+  "customAdhanRename": "Magaca beddel",
+  "customAdhanDelete": "Tirtir",
+  "customAdhanSave": "Kaydi",
+  "customAdhanNameHint": "Magaca muezzinka",
+  "customAdhanDeleteConfirm": "Tirtir \"@name\"? Adhanku wuu ku noqonaa axunkii ugu dambeeyay haddii la doortay.",
+  "customAdhanUnsupportedFormat": "Nooca aan la taageerin; isticmaal MP3, M4A ama WAV.",
+  "customAdhanUnplayable": "Faylka lama ciyaarin; hubi inuu sax yahay.",
+  "customAdhanConversionFailed": "Lama diyaarin karin nuqulka ogeysiiska iOS.",
+  "customAdhanImportFailed": "Soo galku wuu fashilmay; doorashada hadda ma bedelan.",
+  "customAdhanLoadFailed": "Lama soo dejin karo muezzinada gaarka ah."
 }

@@ -66,7 +66,9 @@ import 'features/data/local_prayer_silence_scheduler.dart';
 import 'features/data/stored_prayer_feature_settings.dart';
 import 'features/domain/prayer_feature.dart';
 import 'features/domain/prayer_id.dart';
+import 'features/presentation/custom_adhan_controller.dart';
 import 'features/presentation/prayer_feature_settings_controller.dart';
+import 'features/presentation/widgets/custom_adhan_section.dart';
 import 'features/presentation/widgets/prayer_features_section.dart';
 
 part 'controller/adhan/adhan_controller.dart';

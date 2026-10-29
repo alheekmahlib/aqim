@@ -27,5 +27,7 @@ import UserNotifications
       name: "com.alheekmah.aqimApp/adhan_motion",
       binaryMessenger: messenger
     ).setStreamHandler(AdhanMotionStreamHandler())
+    // المؤذن المخصص: تجهيز نسخة إشعار iOS متوافقة (المرحلة الخامسة)
+    CustomAdhanChannel.register(on: messenger)
   }
 }

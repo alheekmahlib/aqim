@@ -1075,5 +1075,19 @@
   "prayerFeaturesResetPrayer": "নামাজের সাধারণ সেটিং ফিরিয়ে আনুন",
   "prayerReminderTitle": "নামাজের রিমাইন্ডার",
   "prayerReminderBody": "@prayer আজানের আগে আর @minutes মিনিট বাকি",
-  "prayerFeaturesGrantSilence": "ডো নট ডিস্টার্ব অনুমতি দিন"
+  "prayerFeaturesGrantSilence": "ডো নট ডিস্টার্ব অনুমতি দিন",
+  "customAdhanSectionTitle": "কাস্টম মুয়াজ্জিন",
+  "customAdhanImport": "অডিও ফাইল ইমপোর্ট করুন",
+  "customAdhanImporting": "ইমপোর্ট হচ্ছে…",
+  "customAdhanEmpty": "এখনো কোনো কাস্টম মুয়াজ্জিন যোগ হয়নি",
+  "customAdhanRename": "নাম পরিবর্তন",
+  "customAdhanDelete": "মুছুন",
+  "customAdhanSave": "সংরক্ষণ",
+  "customAdhanNameHint": "মুয়াজ্জিনের নাম",
+  "customAdhanDeleteConfirm": "\"@name\" মুছবেন? নির্বাচিত থাকলে আজান শেষ স্ট্যান্ডার্ড কণ্ঠে ফিরে যাবে।",
+  "customAdhanUnsupportedFormat": "অসমর্থিত ফরম্যাট; MP3, M4A বা WAV ব্যবহার করুন।",
+  "customAdhanUnplayable": "ফাইলটি চালানো গেল না; অনুগ্রহ করে যাচাই করুন।",
+  "customAdhanConversionFailed": "এই ফাইলের iOS নোটিফিকেশন কপি তৈরি করা যায়নি।",
+  "customAdhanImportFailed": "ইমপোর্ট ব্যর্থ; বর্তমান নির্বাচন অপরিবর্তিত।",
+  "customAdhanLoadFailed": "কাস্টম মুয়াজ্জিন লোড করা যায়নি।"
 }

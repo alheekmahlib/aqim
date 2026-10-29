@@ -1075,5 +1075,19 @@
   "prayerFeaturesResetPrayer": "Tetapkan semula solat kepada nilai umum",
   "prayerReminderTitle": "Peringatan solat",
   "prayerReminderBody": "@minutes minit lagi sebelum azan @prayer",
-  "prayerFeaturesGrantSilence": "Benarkan akses Jangan Ganggu"
+  "prayerFeaturesGrantSilence": "Benarkan akses Jangan Ganggu",
+  "customAdhanSectionTitle": "Muezzin tersuai",
+  "customAdhanImport": "Import fail audio",
+  "customAdhanImporting": "Mengimport…",
+  "customAdhanEmpty": "Belum ada muezzin tersuai",
+  "customAdhanRename": "Nama semula",
+  "customAdhanDelete": "Padam",
+  "customAdhanSave": "Simpan",
+  "customAdhanNameHint": "Nama muezzin",
+  "customAdhanDeleteConfirm": "Padam \"@name\"? Azan kembali ke reciter standard terakhir jika dipilih.",
+  "customAdhanUnsupportedFormat": "Format tidak disokong; gunakan MP3, M4A atau WAV.",
+  "customAdhanUnplayable": "Fail tidak dapat dimainkan; pastikan sah.",
+  "customAdhanConversionFailed": "Gagal menyediakan salinan notifikasi iOS.",
+  "customAdhanImportFailed": "Import gagal; pilihan semasa tidak berubah.",
+  "customAdhanLoadFailed": "Gagal memuatkan muezzin tersuai."
 }

@@ -1,16 +1,23 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../../../../core/services/adhan_alarms_scheduler.dart';
 import '../../../../core/services/notification_permission_cache.dart';
 import '../../../../core/services/prayer_silence_access.dart';
 import '../../prayers.dart';
+import '../data/adhan_audio_prober.dart';
+import '../data/custom_adhan_selector.dart';
+import '../data/darwin_notification_sound.dart';
 import '../data/in_app_adhan_session.dart';
 import '../data/local_adhan_playback_control.dart';
 import '../data/local_adhan_stop_gestures.dart';
+import '../data/stored_custom_adhan_repository.dart';
+import '../domain/custom_adhan_repository.dart';
 import '../data/pending_prayer_feature_capabilities.dart';
 import '../data/prayer_feature_capabilities_policy.dart';
 import '../data/stored_prayer_feature_settings.dart';
@@ -19,6 +26,7 @@ import '../domain/prayer_feature_capabilities.dart';
 import '../domain/prayer_feature_settings.dart';
 import '../domain/prayer_feature_settings_repository.dart';
 import '../domain/save_prayer_feature_settings.dart';
+import 'custom_adhan_controller.dart';
 import 'prayer_feature_settings_controller.dart';
 
 class PrayerFeaturesBinding extends Bindings {
@@ -61,6 +69,53 @@ class PrayerFeaturesBinding extends Bindings {
         permanent: true,
       );
     }
+    // المؤذن المخصص (المرحلة الخامسة): مستودع دائم ومحدد ومتحكم.
+    if (!Get.isRegistered<CustomAdhanRepository>()) {
+      const darwinSound = DarwinNotificationSound();
+      Get.put<CustomAdhanRepository>(
+        StoredCustomAdhanRepository(
+          baseDirectory: () async {
+            final docs = await getApplicationDocumentsDirectory();
+            final dir = Directory(
+              '${docs.path}${Platform.pathSeparator}custom_adhan',
+            );
+            return dir;
+          },
+          storage: GetStorage(),
+          probeDuration: const AdhanAudioProber().probe,
+          prepareNotificationCopy: (sourcePath, id) =>
+              darwinSound.prepare(sourcePath: sourcePath, id: id),
+          removeNotificationCopy: darwinSound.remove,
+        ),
+        permanent: true,
+      );
+    }
+    final customSelector = CustomAdhanSelector(
+      adhanSounds: GetStorage('AdhanSounds'),
+      preferences: GetStorage(),
+    );
+    if (!Get.isRegistered<CustomAdhanController>()) {
+      Get.lazyPut<CustomAdhanController>(
+        () => CustomAdhanController(
+          repository: Get.find<CustomAdhanRepository>(),
+          selector: customSelector,
+          pickAudioFile: () async {
+            final result = await FilePicker.platform.pickFiles(
+              type: FileType.custom,
+              allowedExtensions:
+                  StoredCustomAdhanRepository.supportedExtensions,
+            );
+            return result?.files.single.path;
+          },
+          reschedule: PrayersNotificationsCtrl.instance.reschedulePrayers,
+          selectStandardAdhan: (index) async =>
+              PrayersNotificationsCtrl.instance.switchAdhanOnTap(index),
+          probeForPreview: const AdhanAudioProber().probe,
+        ),
+        fenix: true,
+      );
+    }
+
     // الإيقاف الموحد وإيماءات المرحلة الرابعة.
     final repository = Get.find<PrayerFeatureSettingsRepository>();
     final playbackControl = LocalAdhanPlaybackControl(
@@ -123,6 +178,14 @@ Future<void> _applySettingsSideEffects(
   final silenceAfter = next[PrayerFeature.silence];
   if (silenceBefore.enabled != silenceAfter.enabled || silenceAfter.enabled) {
     await PrayersNotificationsCtrl.instance.synchronizePrayerSilence();
+  }
+
+  // تعطيل المؤذن المخصص مع وجود مختار نشط: عودة لآخر قياسي صالح
+  // وإعادة الجدولة.
+  if (previous[PrayerFeature.customAdhan].enabled &&
+      !next[PrayerFeature.customAdhan].enabled &&
+      Get.isRegistered<CustomAdhanController>()) {
+    await Get.find<CustomAdhanController>().fallbackToStandard();
   }
 
   // إيماءات الإيقاف: تفعيل/تعطيل أي منهما يُحدَّث في المنصة فورًا.

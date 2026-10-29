@@ -1346,5 +1346,19 @@
   "prayerFeaturesResetPrayer": "إعادة الصلاة للإعداد العام",
   "prayerReminderTitle": "تذكير قبل الصلاة",
   "prayerReminderBody": "تبقّى @minutes دقيقة على أذان @prayer",
-  "prayerFeaturesGrantSilence": "منح وصول عدم الإزعاج"
+  "prayerFeaturesGrantSilence": "منح وصول عدم الإزعاج",
+  "customAdhanSectionTitle": "مؤذن مخصص",
+  "customAdhanImport": "استيراد ملف صوتي",
+  "customAdhanImporting": "جارٍ الاستيراد…",
+  "customAdhanEmpty": "لم تُضف أي مؤذن مخصص بعد",
+  "customAdhanRename": "إعادة تسمية",
+  "customAdhanDelete": "حذف",
+  "customAdhanSave": "حفظ",
+  "customAdhanNameHint": "اسم المؤذن",
+  "customAdhanDeleteConfirm": "حذف «@name»؟ سيعود الأذان لآخر مؤذن قياسي إن كان مختارًا.",
+  "customAdhanUnsupportedFormat": "الصيغة غير مدعومة؛ استخدم MP3 أو M4A أو WAV.",
+  "customAdhanUnplayable": "تعذر تشغيل الملف؛ تأكد من سلامته.",
+  "customAdhanConversionFailed": "تعذر تجهيز نسخة إشعار iOS لهذا الملف.",
+  "customAdhanImportFailed": "فشل الاستيراد؛ لم يتغير الاختيار الحالي.",
+  "customAdhanLoadFailed": "تعذر تحميل المؤذنين المخصصين."
 }

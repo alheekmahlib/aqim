@@ -1194,5 +1194,19 @@
   "prayerFeaturesResetPrayer": "Reset prayer to defaults",
   "prayerReminderTitle": "Prayer reminder",
   "prayerReminderBody": "@minutes minutes until the @prayer adhan",
-  "prayerFeaturesGrantSilence": "Grant Do Not Disturb access"
+  "prayerFeaturesGrantSilence": "Grant Do Not Disturb access",
+  "customAdhanSectionTitle": "Custom muezzin",
+  "customAdhanImport": "Import audio file",
+  "customAdhanImporting": "Importing…",
+  "customAdhanEmpty": "No custom muezzin added yet",
+  "customAdhanRename": "Rename",
+  "customAdhanDelete": "Delete",
+  "customAdhanSave": "Save",
+  "customAdhanNameHint": "Muezzin name",
+  "customAdhanDeleteConfirm": "Delete \"@name\"? The adhan returns to the last standard reciter if selected.",
+  "customAdhanUnsupportedFormat": "Unsupported format; use MP3, M4A or WAV.",
+  "customAdhanUnplayable": "Could not play the file; make sure it is valid.",
+  "customAdhanConversionFailed": "Could not prepare the iOS notification copy for this file.",
+  "customAdhanImportFailed": "Import failed; the current selection is unchanged.",
+  "customAdhanLoadFailed": "Could not load custom muezzins."
 }

@@ -1075,5 +1075,19 @@
   "prayerFeaturesResetPrayer": "Namazı genel ayarlara döndür",
   "prayerReminderTitle": "Namaz hatırlatması",
   "prayerReminderBody": "@prayer ezanına @minutes dakika kaldı",
-  "prayerFeaturesGrantSilence": "Rahatsız Etme izni ver"
+  "prayerFeaturesGrantSilence": "Rahatsız Etme izni ver",
+  "customAdhanSectionTitle": "Özel müezzin",
+  "customAdhanImport": "Ses dosyası içe aktar",
+  "customAdhanImporting": "İçe aktarılıyor…",
+  "customAdhanEmpty": "Henüz özel müezzin eklenmedi",
+  "customAdhanRename": "Yeniden adlandır",
+  "customAdhanDelete": "Sil",
+  "customAdhanSave": "Kaydet",
+  "customAdhanNameHint": "Müezzin adı",
+  "customAdhanDeleteConfirm": "\"@name\" silinsin mi? Seçiliyse ezan son standart sese döner.",
+  "customAdhanUnsupportedFormat": "Desteklenmeyen biçim; MP3, M4A veya WAV kullanın.",
+  "customAdhanUnplayable": "Dosya çalınamadı; geçerli olduğundan emin olun.",
+  "customAdhanConversionFailed": "iOS bildirim kopyası hazırlanamadı.",
+  "customAdhanImportFailed": "İçe aktarma başarısız; mevcut seçim değişmedi.",
+  "customAdhanLoadFailed": "Özel müezzinler yüklenemedi."
 }

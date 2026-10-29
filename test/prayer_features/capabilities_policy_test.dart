@@ -155,16 +155,22 @@ void main() {
     );
   });
 
-  test('remaining native features stay pending', () {
-    final caps = policy(
-      isAndroid: true,
-      isIOS: false,
-      isMacOS: false,
-      granted: true,
-    );
-    expect(
-      caps.availability(PrayerFeature.customAdhan),
-      PrayerFeatureAvailability.comingSoon,
-    );
+  test('custom muezzin import needs no runtime permissions', () {
+    for (final platform in [
+      (android: true, ios: false, mac: false),
+      (android: false, ios: true, mac: false),
+      (android: false, ios: false, mac: true),
+    ]) {
+      final caps = policy(
+        isAndroid: platform.android,
+        isIOS: platform.ios,
+        isMacOS: platform.mac,
+        granted: false,
+      );
+      expect(
+        caps.availability(PrayerFeature.customAdhan),
+        PrayerFeatureAvailability.available,
+      );
+    }
   });
 }

@@ -37,13 +37,22 @@ class AdhanSounds extends StatelessWidget {
         future: notificationCtrl.state.adhanData,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
+            final customAdhanEnabled = StoredPrayerFeatureSettings(
+              GetStorage(),
+            ).read()[PrayerFeature.customAdhan].enabled;
             return Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: ListView(
-                children: List.generate(
-                  snapshot.data!.length,
-                  (index) => adhanListBuild(context, index),
-                ),
+                children: [
+                  if (customAdhanEnabled && Get.isRegistered<CustomAdhanController>())
+                    CustomAdhanSection(
+                      controller: Get.find<CustomAdhanController>(),
+                    ),
+                  ...List.generate(
+                    snapshot.data!.length,
+                    (index) => adhanListBuild(context, index),
+                  ),
+                ],
               ),
             );
           } else {

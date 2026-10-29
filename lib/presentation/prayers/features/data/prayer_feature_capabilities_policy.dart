@@ -47,8 +47,9 @@ class PrayerFeatureCapabilitiesPolicy implements PrayerFeatureCapabilities {
         return isIOSPlatform()
             ? PrayerFeatureAvailability.unsupported
             : PrayerFeatureAvailability.available;
-      default:
-        return pendingAvailability;
+      case PrayerFeature.customAdhan:
+        // الاستيراد المحلي مدعوم بلا أذونات إضافية على المنصات الثلاث.
+        return PrayerFeatureAvailability.available;
     }
   }
 }

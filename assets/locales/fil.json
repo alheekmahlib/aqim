@@ -1075,5 +1075,19 @@
   "prayerFeaturesResetPrayer": "Ibalik ang default para sa panalangin",
   "prayerReminderTitle": "Paalala sa panalangin",
   "prayerReminderBody": "@minutes minuto na lang bago ang adhan ng @prayer",
-  "prayerFeaturesGrantSilence": "Ibigay ang access sa Huwag Istorbohin"
+  "prayerFeaturesGrantSilence": "Ibigay ang access sa Huwag Istorbohin",
+  "customAdhanSectionTitle": "Custom na muezzin",
+  "customAdhanImport": "Mag-import ng audio file",
+  "customAdhanImporting": "Nag-i-import…",
+  "customAdhanEmpty": "Wala pang naidagdag na custom na muezzin",
+  "customAdhanRename": "I-rename",
+  "customAdhanDelete": "Burahin",
+  "customAdhanSave": "I-save",
+  "customAdhanNameHint": "Pangalan ng muezzin",
+  "customAdhanDeleteConfirm": "Burahin si \"@name\"? Bubalik sa huling standard na reciter ang adhan kung pinili ito.",
+  "customAdhanUnsupportedFormat": "Hindi suportadong format; gamitin ang MP3, M4A o WAV.",
+  "customAdhanUnplayable": "Hindi mapatugtog ang file; siguraduhing wasto ito.",
+  "customAdhanConversionFailed": "Hindi maihanda ang iOS notification copy ng file.",
+  "customAdhanImportFailed": "Nabigo ang import; hindi nagbago ang kasalukuyang pinili.",
+  "customAdhanLoadFailed": "Hindi ma-load ang mga custom na muezzin."
 }

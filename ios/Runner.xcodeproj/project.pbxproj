@@ -24,6 +24,7 @@
 		D4C0DEAD0000000000000002 /* PrayerCountdownChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4C0DEAD0000000000000001 /* PrayerCountdownChannel.swift */; };
 		D4C0DEAD0000000000000012 /* AdhanStopChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4C0DEAD0000000000000011 /* AdhanStopChannel.swift */; };
 		D4C0DEAD0000000000000022 /* AdhanMotionStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4C0DEAD0000000000000021 /* AdhanMotionStream.swift */; };
+		D4C0DEAD0000000000000032 /* CustomAdhanChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4C0DEAD0000000000000031 /* CustomAdhanChannel.swift */; };
 		D4F403332E7D25F300A1A3AC /* silence.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = D4F4032F2E7D25F300A1A3AC /* silence.mp3 */; };
 		D4F403342E7D25F300A1A3AC /* notification.aiff in Resources */ = {isa = PBXBuildFile; fileRef = D4F4032C2E7D25F300A1A3AC /* notification.aiff */; };
 /* End PBXBuildFile section */
@@ -101,6 +102,7 @@
 		D4C0DEAD0000000000000001 /* PrayerCountdownChannel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrayerCountdownChannel.swift; sourceTree = "<group>"; };
 		D4C0DEAD0000000000000011 /* AdhanStopChannel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdhanStopChannel.swift; sourceTree = "<group>"; };
 		D4C0DEAD0000000000000021 /* AdhanMotionStream.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdhanMotionStream.swift; sourceTree = "<group>"; };
+		D4C0DEAD0000000000000031 /* CustomAdhanChannel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomAdhanChannel.swift; sourceTree = "<group>"; };
 		D4F4032C2E7D25F300A1A3AC /* notification.aiff */ = {isa = PBXFileReference; lastKnownFileType = audio.aiff; path = notification.aiff; sourceTree = "<group>"; };
 		D4F4032F2E7D25F300A1A3AC /* silence.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = silence.mp3; sourceTree = "<group>"; };
 		E8BDCE7673CC9F5742BC5301 /* Pods-RunnerTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.release.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -234,6 +236,7 @@
 				D4C0DEAD0000000000000001 /* PrayerCountdownChannel.swift */,
 				D4C0DEAD0000000000000011 /* AdhanStopChannel.swift */,
 				D4C0DEAD0000000000000021 /* AdhanMotionStream.swift */,
+				D4C0DEAD0000000000000031 /* CustomAdhanChannel.swift */,
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
 			);
 			path = Runner;
@@ -519,6 +522,7 @@
 				D4C0DEAD0000000000000002 /* PrayerCountdownChannel.swift in Sources */,
 				D4C0DEAD0000000000000012 /* AdhanStopChannel.swift in Sources */,
 				D4C0DEAD0000000000000022 /* AdhanMotionStream.swift in Sources */,
+				D4C0DEAD0000000000000032 /* CustomAdhanChannel.swift in Sources */,
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -1075,5 +1075,19 @@
   "prayerFeaturesResetPrayer": "نماز کی عمومی ترتیبات بحال کریں",
   "prayerReminderTitle": "نماز کی یاد دہانی",
   "prayerReminderBody": "@prayer اذان تک @minutes منٹ باقی ہیں",
-  "prayerFeaturesGrantSilence": "ڈسٹرب نہ کریں تک رسائی دیں"
+  "prayerFeaturesGrantSilence": "ڈسٹرب نہ کریں تک رسائی دیں",
+  "customAdhanSectionTitle": "کسٹم مؤذن",
+  "customAdhanImport": "آڈیو فائل درآمد کریں",
+  "customAdhanImporting": "درآمد ہو رہی ہے…",
+  "customAdhanEmpty": "ابھی کوئی کسٹم مؤذن شامل نہیں",
+  "customAdhanRename": "نام تبدیل کریں",
+  "customAdhanDelete": "حذف کریں",
+  "customAdhanSave": "محفوظ کریں",
+  "customAdhanNameHint": "مؤذن کا نام",
+  "customAdhanDeleteConfirm": "\"@name\" حذف کریں؟ منتخب ہو تو اذان آخری معیاری آواز پر لوٹ جائے گی۔",
+  "customAdhanUnsupportedFormat": "غیر معاون فارمیٹ؛ MP3، M4A یا WAV استعمال کریں۔",
+  "customAdhanUnplayable": "فائل چلائی نہیں جا سکی؛ درست ہونے کی تصدیق کریں۔",
+  "customAdhanConversionFailed": "اس فائل کا iOS اطلاعیاتی نقل تیار نہیں ہو سکا۔",
+  "customAdhanImportFailed": "درآمد ناکام؛ موجودہ انتخاب تبدیل نہیں ہوا۔",
+  "customAdhanLoadFailed": "کسٹم مؤذن لوڈ نہیں ہو سکے۔"
 }

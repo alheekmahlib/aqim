@@ -1075,5 +1075,19 @@
   "prayerFeaturesResetPrayer": "Restablecer los ajustes de esta oración",
   "prayerReminderTitle": "Recordatorio de oración",
   "prayerReminderBody": "Faltan @minutes minutos para el adhan de @prayer",
-  "prayerFeaturesGrantSilence": "Conceder acceso a No molestar"
+  "prayerFeaturesGrantSilence": "Conceder acceso a No molestar",
+  "customAdhanSectionTitle": "Muecín personalizado",
+  "customAdhanImport": "Importar archivo de audio",
+  "customAdhanImporting": "Importando…",
+  "customAdhanEmpty": "Aún no hay muecín personalizado",
+  "customAdhanRename": "Renombrar",
+  "customAdhanDelete": "Eliminar",
+  "customAdhanSave": "Guardar",
+  "customAdhanNameHint": "Nombre del muecín",
+  "customAdhanDeleteConfirm": "¿Eliminar «@name»? El adhan volverá al último recitador estándar si estaba seleccionado.",
+  "customAdhanUnsupportedFormat": "Formato no compatible; usa MP3, M4A o WAV.",
+  "customAdhanUnplayable": "No se pudo reproducir el archivo; verifica que sea válido.",
+  "customAdhanConversionFailed": "No se pudo preparar la copia de notificación de iOS.",
+  "customAdhanImportFailed": "Error al importar; la selección actual no cambió.",
+  "customAdhanLoadFailed": "No se pudieron cargar los muecines personalizados."
 }
