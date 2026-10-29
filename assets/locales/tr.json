@@ -1072,5 +1072,7 @@
   "prayerFeaturesPerPrayerHelp": "Dahil edilecek namazları seçin ve özelleştirmek için sürelerini değiştirin. Bu ayarlar özellik açıldığında uygulanır.",
   "prayerFeaturesInherited": "Genel süreyi kullanır",
   "prayerFeaturesCustomized": "Özel süre",
-  "prayerFeaturesResetPrayer": "Namazı genel ayarlara döndür"
+  "prayerFeaturesResetPrayer": "Namazı genel ayarlara döndür",
+  "prayerReminderTitle": "Namaz hatırlatması",
+  "prayerReminderBody": "@prayer ezanına @minutes dakika kaldı"
 }

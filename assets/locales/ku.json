@@ -1072,5 +1072,7 @@
   "prayerFeaturesPerPrayerHelp": "نوێژەکان هەڵبژێرە و ماوەکەیان بگۆڕە بۆ تایبەتکردن. ئەم ڕێکخستنانە کاتێک جێبەجێ دەکرێن کە تایبەتمەندییەکە چالاک بێت.",
   "prayerFeaturesInherited": "ماوەی گشتی بەکاردەهێنێت",
   "prayerFeaturesCustomized": "ماوەی تایبەت",
-  "prayerFeaturesResetPrayer": "گەڕاندنەوەی نوێژ بۆ ڕێکخستنی گشتی"
+  "prayerFeaturesResetPrayer": "گەڕاندنەوەی نوێژ بۆ ڕێکخستنی گشتی",
+  "prayerReminderTitle": "بیرخەرەوەی پێش نوێژ",
+  "prayerReminderBody": "@minutes خولەک ماوە بۆ بانگی @prayer"
 }

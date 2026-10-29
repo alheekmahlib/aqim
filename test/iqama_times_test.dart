@@ -133,6 +133,48 @@ void main() {
       );
     });
 
+    test('pre-prayer reminders reserve 10 slots and shrink the horizon', () {
+      expect(
+        IqamaSchedulePolicy.adhanDaysForIOS(
+          enabledAdhanCount: 5,
+          iqamaEnabled: true,
+          ramadanActive: false,
+          remindersEnabled: true,
+        ),
+        7,
+      );
+      expect(
+        IqamaSchedulePolicy.adhanDaysForIOS(
+          enabledAdhanCount: 5,
+          iqamaEnabled: false,
+          ramadanActive: false,
+          remindersEnabled: true,
+        ),
+        9,
+      );
+    });
+
+    test('reminders with ramadan still keep the minimum horizon', () {
+      expect(
+        IqamaSchedulePolicy.adhanDaysForIOS(
+          enabledAdhanCount: 5,
+          iqamaEnabled: true,
+          ramadanActive: true,
+          remindersEnabled: true,
+        ),
+        4,
+      );
+      expect(
+        IqamaSchedulePolicy.adhanDaysForIOS(
+          enabledAdhanCount: 0,
+          iqamaEnabled: true,
+          ramadanActive: true,
+          remindersEnabled: true,
+        ),
+        IqamaSchedulePolicy.minAdhanDays,
+      );
+    });
+
     test(
       'fixes the latent Ramadan overflow (70 > 64) by shrinking to 6 days',
       () {

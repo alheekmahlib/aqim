@@ -1072,5 +1072,7 @@
   "prayerFeaturesPerPrayerHelp": "Piliin ang mga kasamang panalangin at baguhin ang tagal para i-customize. Ilalapat ito kapag naka-on ang tampok.",
   "prayerFeaturesInherited": "Gamit ang default na tagal",
   "prayerFeaturesCustomized": "Pasadyang tagal",
-  "prayerFeaturesResetPrayer": "Ibalik ang default para sa panalangin"
+  "prayerFeaturesResetPrayer": "Ibalik ang default para sa panalangin",
+  "prayerReminderTitle": "Paalala sa panalangin",
+  "prayerReminderBody": "@minutes minuto na lang bago ang adhan ng @prayer"
 }

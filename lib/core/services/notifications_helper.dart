@@ -13,6 +13,7 @@ import '../utils/constants/shared_preferences_constants.dart';
 import '../widgets/local_notification/controller/local_notifications_controller.dart';
 import 'adhan_alarms_scheduler.dart';
 import 'local_notifications_service.dart';
+import 'notification_permission_cache.dart';
 
 export 'local_notifications_service.dart' show LocalReceivedNotification;
 
@@ -66,6 +67,11 @@ class NotifyHelper {
         await FeedbackController.instance.openConversation(token);
         Get.toNamed(AppRouter.feedbackConversation);
       }
+      return;
+    }
+    // تذكير ما قبل الصلاة → افتح شاشة الصلاة دون تشغيل الأذان.
+    if (notification.payload['type'] == 'prayer_reminder') {
+      await Get.toNamed(AppRouter.prayerScreen);
       return;
     }
     if (notification.title != null &&
@@ -209,6 +215,10 @@ class NotifyHelper {
     final granted = await LocalNotificationsService.instance
         .requestPermissions();
     await GetStorage().write(_permissionFlagKey, granted);
+    // تحديث نسخة الإذن المخبأة لسياسات توفّر المميزات إن سُجّلت.
+    if (Get.isRegistered<NotificationPermissionCache>()) {
+      unawaited(Get.find<NotificationPermissionCache>().refresh());
+    }
     log(
       'Notification permission requested (granted: $granted)',
       name: 'NotifyHelper',

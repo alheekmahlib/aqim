@@ -222,6 +222,13 @@ class PrayerBackgroundManager {
         log('Iqama notifications refresh failed: $e', name: _tag);
       }
 
+      // تجديد نافذة تذكيرات ما قبل الصلاة بنفس منطق الإقامة أعلاه.
+      try {
+        await PrayersNotificationsCtrl.instance.synchronizePrayerReminders();
+      } catch (e) {
+        log('Prayer reminders refresh failed: $e', name: _tag);
+      }
+
       // تحديث ويدجت الصلوات في كل مرة - Update prayers widget every time
       if (Platform.isIOS || Platform.isAndroid) {
         try {

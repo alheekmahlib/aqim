@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:get/get.dart';
@@ -18,11 +19,25 @@ class PrayerFeatureSettingsController extends GetxController {
     required this.repository,
     required this.capabilities,
     required this.save,
+    this.refreshAvailability,
+    this.onSaved,
   });
 
   final PrayerFeatureSettingsRepository repository;
   final PrayerFeatureCapabilities capabilities;
   final SavePrayerFeatureSettings save;
+
+  /// يجدّد حالة الإتاحة غير المتزامنة (مثل إذن الإشعارات) عند فتح
+  /// الإعدادات؛ تُحدَّث الواجهة فور اكتمال التحديث.
+  final Future<void> Function()? refreshAvailability;
+
+  /// أثر جانبي بعد نجاح الحفظ فقط (مزامنة جدولة التذكيرات)؛ فشله لا
+  /// يُرجع الإعداد المحفوظ.
+  final Future<void> Function(
+    PrayerFeatureSettings previous,
+    PrayerFeatureSettings next,
+  )?
+  onSaved;
 
   PrayerFeatureSettingsState _state = PrayerFeatureSettingsState(
     settings: PrayerFeatureSettings(),
@@ -48,6 +63,7 @@ class PrayerFeatureSettingsController extends GetxController {
 
   void reload() {
     if (_state.saving) return;
+    unawaited(_refreshAvailabilityThenUpdate());
     try {
       var loaded = repository.read();
       // Never display or later persist enabled flags for unfinished features,
@@ -74,6 +90,21 @@ class PrayerFeatureSettingsController extends GetxController {
       );
     }
     update();
+  }
+
+  Future<void> _refreshAvailabilityThenUpdate() async {
+    final refresh = refreshAvailability;
+    if (refresh == null) return;
+    try {
+      await refresh();
+    } catch (error, stack) {
+      log(
+        'Could not refresh feature availability',
+        error: error,
+        stackTrace: stack,
+      );
+    }
+    if (!isClosed) update();
   }
 
   Future<void> setEnabled(PrayerFeature feature, bool enabled) async {
@@ -147,9 +178,11 @@ class PrayerFeatureSettingsController extends GetxController {
     final next = previous.withPreference(feature, preference);
     _state = PrayerFeatureSettingsState(settings: previous, saving: true);
     update();
+    var saved = false;
     try {
       await save(next);
       _state = PrayerFeatureSettingsState(settings: next);
+      saved = true;
     } catch (error, stack) {
       log(
         'Could not save prayer feature settings',
@@ -160,6 +193,17 @@ class PrayerFeatureSettingsController extends GetxController {
         settings: previous,
         errorKey: 'prayerFeaturesSaveError',
       );
+    }
+    if (saved && onSaved != null) {
+      try {
+        await onSaved!(previous, next);
+      } catch (error, stack) {
+        log(
+          'Prayer feature settings saved but side effects failed',
+          error: error,
+          stackTrace: stack,
+        );
+      }
     }
     if (!isClosed) update();
   }

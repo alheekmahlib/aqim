@@ -245,6 +245,36 @@ class LocalNotificationsService {
     return false;
   }
 
+  /// قراءة فعلية لحالة إذن الإشعارات من المنصة دون طلب إذن جديد.
+  Future<bool> hasNotificationsPermission() async {
+    try {
+      if (Platform.isAndroid) {
+        final android = _plugin
+            .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin
+            >();
+        return await android?.areNotificationsEnabled() ?? false;
+      }
+      if (Platform.isIOS) {
+        final ios = _plugin
+            .resolvePlatformSpecificImplementation<
+              IOSFlutterLocalNotificationsPlugin
+            >();
+        return (await ios?.checkPermissions())?.isEnabled ?? false;
+      }
+      if (Platform.isMacOS) {
+        final macOS = _plugin
+            .resolvePlatformSpecificImplementation<
+              MacOSFlutterLocalNotificationsPlugin
+            >();
+        return (await macOS?.checkPermissions())?.isEnabled ?? false;
+      }
+    } catch (e) {
+      log('Permission read failed: $e', name: 'LocalNotifications');
+    }
+    return false;
+  }
+
   // ─── القنوات (Android) ───
 
   Future<void> _createAndroidChannels() async {

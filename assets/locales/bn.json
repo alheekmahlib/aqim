@@ -1072,5 +1072,7 @@
   "prayerFeaturesPerPrayerHelp": "কোন নামাজগুলো অন্তর্ভুক্ত হবে তা বেছে নিন এবং সময় বদলে আলাদাভাবে নির্ধারণ করুন। সুবিধাটি চালু হলে এই সেটিংস প্রযোজ্য হবে।",
   "prayerFeaturesInherited": "সাধারণ সময়কাল অনুসরণ করে",
   "prayerFeaturesCustomized": "আলাদা সময়কাল",
-  "prayerFeaturesResetPrayer": "নামাজের সাধারণ সেটিং ফিরিয়ে আনুন"
+  "prayerFeaturesResetPrayer": "নামাজের সাধারণ সেটিং ফিরিয়ে আনুন",
+  "prayerReminderTitle": "নামাজের রিমাইন্ডার",
+  "prayerReminderBody": "@prayer আজানের আগে আর @minutes মিনিট বাকি"
 }

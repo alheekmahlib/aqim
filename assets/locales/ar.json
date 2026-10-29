@@ -1343,5 +1343,7 @@
   "prayerFeaturesPerPrayerHelp": "اختر الصلوات المشمولة، وعدّل مدة أي صلاة لتخصيصها. تطبيق هذه الخيارات يتطلب تفعيل الميزة.",
   "prayerFeaturesInherited": "يتبع القيمة العامة",
   "prayerFeaturesCustomized": "مدة مخصصة",
-  "prayerFeaturesResetPrayer": "إعادة الصلاة للإعداد العام"
+  "prayerFeaturesResetPrayer": "إعادة الصلاة للإعداد العام",
+  "prayerReminderTitle": "تذكير قبل الصلاة",
+  "prayerReminderBody": "تبقّى @minutes دقيقة على أذان @prayer"
 }

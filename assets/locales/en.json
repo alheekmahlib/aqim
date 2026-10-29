@@ -1191,5 +1191,7 @@
   "prayerFeaturesPerPrayerHelp": "Choose the included prayers and adjust a duration to customize it. These preferences apply when the feature is enabled.",
   "prayerFeaturesInherited": "Uses the default duration",
   "prayerFeaturesCustomized": "Custom duration",
-  "prayerFeaturesResetPrayer": "Reset prayer to defaults"
+  "prayerFeaturesResetPrayer": "Reset prayer to defaults",
+  "prayerReminderTitle": "Prayer reminder",
+  "prayerReminderBody": "@minutes minutes until the @prayer adhan"
 }

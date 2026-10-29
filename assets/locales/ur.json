@@ -1072,5 +1072,7 @@
   "prayerFeaturesPerPrayerHelp": "شامل نمازیں منتخب کریں اور الگ دورانیہ مقرر کرنے کے لیے وقت بدلیں۔ یہ ترتیبات خصوصیت فعال ہونے پر لاگو ہوں گی۔",
   "prayerFeaturesInherited": "عمومی دورانیے کے مطابق",
   "prayerFeaturesCustomized": "مخصوص دورانیہ",
-  "prayerFeaturesResetPrayer": "نماز کی عمومی ترتیبات بحال کریں"
+  "prayerFeaturesResetPrayer": "نماز کی عمومی ترتیبات بحال کریں",
+  "prayerReminderTitle": "نماز کی یاد دہانی",
+  "prayerReminderBody": "@prayer اذان تک @minutes منٹ باقی ہیں"
 }

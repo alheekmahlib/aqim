@@ -1072,5 +1072,7 @@
   "prayerFeaturesPerPrayerHelp": "Pilih solat yang disertakan dan laraskan tempoh untuk menyesuaikannya. Tetapan ini digunakan apabila ciri diaktifkan.",
   "prayerFeaturesInherited": "Mengikut tempoh umum",
   "prayerFeaturesCustomized": "Tempoh tersuai",
-  "prayerFeaturesResetPrayer": "Tetapkan semula solat kepada nilai umum"
+  "prayerFeaturesResetPrayer": "Tetapkan semula solat kepada nilai umum",
+  "prayerReminderTitle": "Peringatan solat",
+  "prayerReminderBody": "@minutes minit lagi sebelum azan @prayer"
 }

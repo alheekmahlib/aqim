@@ -6,6 +6,10 @@ const int _kPrayerOpenAppReminderBaseId = 21000;
 const String _kLegacyPrayerNotificationsCancelledFlag =
     'legacy_prayer_notifications_cancelled_v2';
 
+/// علم GetStorage يوثق وجود تذكيرات مجدولة فعليًا؛ يمنع تكرار الإلغاء
+/// الدوري للميزة المعطلة دون حاجة.
+const String _kPrayerRemindersScheduledFlag = 'prayer_reminders_scheduled';
+
 /// خانات الإقامة داخل كتلة اليوم (الصلوات 0-4 والإقامة 5-9).
 const int _kIqamaSlotOffset = 5;
 
@@ -20,6 +24,9 @@ class IqamaSchedulePolicy {
   /// نافذة الإقامة على iOS: اليوم + الغد فقط (تتجدد مع كل تشغيل/مهمة خلفية).
   static const int iOSIqamaWindowDays = 2;
 
+  /// نافذة تذكير ما قبل الصلاة على iOS: اليوم + الغد (10 خانات).
+  static const int iOSReminderWindowDays = 2;
+
   /// أقصى عدد أيام جدولة أذان على iOS (كما كان قبل الميزانية الديناميكية).
   static const int iOSAdhanMaxDays = 10;
 
@@ -31,6 +38,7 @@ class IqamaSchedulePolicy {
     required int enabledAdhanCount,
     required bool iqamaEnabled,
     required bool ramadanActive,
+    bool remindersEnabled = false,
   }) {
     if (enabledAdhanCount <= 0) return minAdhanDays;
     const adhanCount = 5;
@@ -38,12 +46,16 @@ class IqamaSchedulePolicy {
     // رمضان: 3 أنواع × 5 أيام على iOS في أسوأ الأحوال.
     final ramadanSlots = ramadanActive ? 15 : 0;
     const openAppReminders = 5;
+    final reminderSlots = remindersEnabled
+        ? iOSReminderWindowDays * adhanCount
+        : 0;
     final available =
         iOSPendingNotificationsLimit -
         reservedSlots -
         iqamaSlots -
         ramadanSlots -
-        openAppReminders;
+        openAppReminders -
+        reminderSlots;
     return (available ~/ enabledAdhanCount).clamp(
       minAdhanDays,
       iOSAdhanMaxDays,
@@ -54,6 +66,16 @@ class IqamaSchedulePolicy {
   static int iqamaDaysToSchedule() {
     return Platform.isIOS ? iOSIqamaWindowDays : _daysToSchedule();
   }
+
+  /// نافذة تذكير ما قبل الصلاة: اليوم + الغد على iOS (ضمن الميزانية)،
+  /// وكامل أفق المنصة فيما عداها — تتجدد مع كل تشغيل ومهمة دورية.
+  static int reminderDaysToSchedule() {
+    return Platform.isIOS ? iOSReminderWindowDays : _daysToSchedule();
+  }
+
+  /// أقصى مدى للإلغاء: الأفق الديناميكي قد يتقلص بعد جدولة أوسع سابقًا،
+  /// فيُلغى دائمًا على أقصى مدى ممكن لكل منصة.
+  static int maxReminderDaysToCancel() => _maxDaysToCancel();
 }
 
 int _prayerKeyFromIndex(int prayerIndex) {
@@ -125,8 +147,68 @@ int _daysToSchedule() {
     iqamaEnabled:
         AdhanController.instance.state.iqamaNotificationsEnabled.value,
     ramadanActive: _isRamadanNotificationsActive(),
+    remindersEnabled: _prayerRemindersEnabled(),
   );
 }
+
+/// هل تذكير ما قبل الصلاة مفعّل في إعدادات المميزات؟ (قراءة مباشرة من
+/// التخزين لتعمل في عزل الخلفية أيضًا دون الاعتماد على حقن GetX.)
+bool _prayerRemindersEnabled() {
+  try {
+    return StoredPrayerFeatureSettings(
+      GetStorage(),
+    ).read()[PrayerFeature.reminder].enabled;
+  } catch (_) {
+    return false;
+  }
+}
+
+/// موعد أذان الصلاة بعد dayOffset أيام من اليوم؛ null إن لم تجهز المواقيت.
+DateTime? _reminderPrayerTime(PrayerId prayer, int dayOffset) {
+  final athanCtrl = AdhanController.instance;
+  if (athanCtrl.state.prayerTimes == null) return null;
+  final dateComponents = DateComponents.from(
+    DateTime.now().add(Duration(days: dayOffset)),
+  );
+  final prayerTimes = PrayerTimes(
+    athanCtrl.state.coordinates,
+    dateComponents,
+    athanCtrl.state.params,
+  );
+  final adhanPrayer = switch (prayer) {
+    PrayerId.fajr => Prayer.fajr,
+    PrayerId.dhuhr => Prayer.dhuhr,
+    PrayerId.asr => Prayer.asr,
+    PrayerId.maghrib => Prayer.maghrib,
+    PrayerId.isha => Prayer.isha,
+  };
+  return prayerTimes.timeForPrayer(adhanPrayer);
+}
+
+LocalPrayerReminderScheduler _reminderScheduler() =>
+    LocalPrayerReminderScheduler(
+      prayerTimeFor: _reminderPrayerTime,
+      daysToSchedule: IqamaSchedulePolicy.reminderDaysToSchedule,
+      maxDaysToCancel: IqamaSchedulePolicy.maxReminderDaysToCancel,
+      schedule:
+          ({
+            required id,
+            required time,
+            required title,
+            required summary,
+            required body,
+            required payload,
+          }) => NotifyHelper().scheduledNotification(
+            reminderId: id,
+            title: title,
+            summary: summary,
+            body: body,
+            isRepeats: false,
+            time: time,
+            payload: payload,
+          ),
+      cancel: NotifyHelper().cancelNotification,
+    );
 
 /// أقصى مدى للإلغاء: الأفق الديناميكي قد يتقلص بعد جدولة أوسع سابقًا،
 /// فيُلغى دائمًا على أقصى مدى ممكن لكل منصة.
@@ -463,8 +545,38 @@ extension ScheduleDailyExtension on PrayersNotificationsCtrl {
       await cancelAllIqamaNotifications();
     }
 
+    // تذكيرات ما قبل الصلاة (المرحلة الثانية): مزامنة مع الإعدادات الحالية.
+    await synchronizePrayerReminders();
+
     // إعادة جدولة إشعارات الصيام (السحور/الإفطار/العشر الأواخر)
     await RamadanController.instance.rescheduleFastingNotifications();
+  }
+
+  /// مزامنة تذكيرات ما قبل الصلاة مع إعدادات المميزات الحالية:
+  /// إلغاء شامل ثم جدولة النافذة النشطة؛ لا تفعل شيئًا متى كانت الميزة
+  /// معطلة دون تذكيرات سابقة (يمنع الإلغاء الدوري عبثًا).
+  Future<void> synchronizePrayerReminders() async {
+    try {
+      final preferences = StoredPrayerFeatureSettings(
+        GetStorage(),
+      ).read()[PrayerFeature.reminder];
+      final storage = GetStorage();
+      final previouslyScheduled =
+          storage.read<bool>(_kPrayerRemindersScheduledFlag) ?? false;
+      if (!preferences.enabled && !previouslyScheduled) return;
+
+      await _reminderScheduler().synchronize(preferences);
+      await storage.write(_kPrayerRemindersScheduledFlag, preferences.enabled);
+    } catch (e) {
+      log('Prayer reminders sync failed: $e', name: 'ScheduleDailyExtension');
+    }
+  }
+
+  /// إلغاء جميع تذكيرات ما قبل الصلاة (معرفات الميزة وحدها).
+  Future<void> cancelAllPrayerReminders() async {
+    await _reminderScheduler().cancelReminders();
+    await GetStorage().write(_kPrayerRemindersScheduledFlag, false);
+    log('تم إلغاء جميع تذكيرات ما قبل الصلاة.', name: 'ScheduleDailyExtension');
   }
 
   Future<void> cancelAllPrayerNotifications() async {
@@ -493,6 +605,9 @@ extension ScheduleDailyExtension on PrayersNotificationsCtrl {
 
     // تشمل إشعارات الإقامة (خانات 5-9 في كل كتلة يوم).
     await cancelAllIqamaNotifications();
+
+    // تشمل تذكيرات ما قبل الصلاة (معرفات 21100 فأعلى).
+    await cancelAllPrayerReminders();
 
     log('تم إلغاء جميع إشعارات الصلاة.', name: 'ScheduleDailyExtension');
   }

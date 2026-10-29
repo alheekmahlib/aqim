@@ -1072,5 +1072,7 @@
   "prayerFeaturesPerPrayerHelp": "Elige las oraciones incluidas y ajusta su duración para personalizarlas. Estos ajustes se aplican al activar la función.",
   "prayerFeaturesInherited": "Usa la duración predeterminada",
   "prayerFeaturesCustomized": "Duración personalizada",
-  "prayerFeaturesResetPrayer": "Restablecer los ajustes de esta oración"
+  "prayerFeaturesResetPrayer": "Restablecer los ajustes de esta oración",
+  "prayerReminderTitle": "Recordatorio de oración",
+  "prayerReminderBody": "Faltan @minutes minutos para el adhan de @prayer"
 }

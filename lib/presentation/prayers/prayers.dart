@@ -60,6 +60,10 @@ import 'dashboard/domain/dashboard_data.dart';
 import 'dashboard/domain/dashboard_layout.dart';
 import 'data/model/adhan_data.dart';
 import 'data/model/prayer_details.dart';
+import 'features/data/local_prayer_reminder_scheduler.dart';
+import 'features/data/stored_prayer_feature_settings.dart';
+import 'features/domain/prayer_feature.dart';
+import 'features/domain/prayer_id.dart';
 import 'features/presentation/prayer_feature_settings_controller.dart';
 import 'features/presentation/widgets/prayer_features_section.dart';
 

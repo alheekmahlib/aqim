@@ -1072,5 +1072,7 @@
   "prayerFeaturesPerPrayerHelp": "Dooro salaadaha lagu darayo oo beddel muddada si aad u gaar yeesho. Dejimahan waxay shaqeeyaan marka astaanta la daaro.",
   "prayerFeaturesInherited": "Waxay raacdaa muddada guud",
   "prayerFeaturesCustomized": "Muddo gaar ah",
-  "prayerFeaturesResetPrayer": "Salaadda ku celi dejimaha guud"
+  "prayerFeaturesResetPrayer": "Salaadda ku celi dejimaha guud",
+  "prayerReminderTitle": "Xasuusin salaadda",
+  "prayerReminderBody": "@minutes daqiiqo ayaa ka hartay adhanka @prayer"
 }

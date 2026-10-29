@@ -72,6 +72,33 @@ void main() {
     },
   );
 
+  test(
+    'onSaved fires with previous and next settings only after a saved change',
+    () async {
+      final repo = FakePrayerFeatureRepository();
+      final caps = FakePrayerFeatureCapabilities(
+        value: PrayerFeatureAvailability.available,
+      );
+      final calls = <String>[];
+      final controller = PrayerFeatureSettingsController(
+        repository: repo,
+        capabilities: caps,
+        save: SavePrayerFeatureSettings(repo, caps),
+        onSaved: (previous, next) async {
+          calls.add(
+            '${previous[PrayerFeature.reminder].enabled}'
+            '>${next[PrayerFeature.reminder].enabled}',
+          );
+        },
+      )..onInit();
+
+      await controller.setEnabled(PrayerFeature.reminder, true);
+      expect(calls, ['false>true']);
+      await controller.adjustMinutes(PrayerFeature.reminder, 5);
+      expect(calls, ['false>true', 'true>true']);
+    },
+  );
+
   test('unfinished features stay off but durations can be prepared', () async {
     final repo = FakePrayerFeatureRepository();
     final caps = FakePrayerFeatureCapabilities(
