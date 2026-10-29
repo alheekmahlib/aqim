@@ -5,9 +5,17 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.media.MediaPlayer
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
+import android.view.KeyEvent
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
+import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodChannel
 import java.io.File
 import java.io.FileOutputStream
@@ -17,6 +25,8 @@ class MainActivity : FlutterActivity() {
     private val ALARMS_CHANNEL = "com.alheekmah.aqimApp/adhan_alarms"
     private val COUNTDOWN_CHANNEL = "com.alheekmah.aqimApp/prayer_countdown"
     private val SILENCE_CHANNEL = "com.alheekmah.aqimApp/prayer_silence"
+    private val ADHAN_STOP_CHANNEL = "com.alheekmah.aqimApp/adhan_stop"
+    private val ADHAN_MOTION_CHANNEL = "com.alheekmah.aqimApp/adhan_motion"
     private val ADHAN_ALARM_ACTION = "com.alheekmah.aqimApp.ADAN_ALARM"
     private var mediaPlayer: MediaPlayer? = null
 
@@ -56,6 +66,26 @@ class MainActivity : FlutterActivity() {
                 else -> result.notImplemented()
             }
         }
+
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, ADHAN_STOP_CHANNEL).setMethodCallHandler { call, result ->
+            when (call.method) {
+                "setStopGestures" -> {
+                    val flip = call.argument<Boolean>("flip") ?: false
+                    val volume = call.argument<Boolean>("volume") ?: false
+                    AdhanStopGestures.setGestures(this, flip, volume)
+                    result.success(true)
+                }
+                "setInAppPlaying" -> {
+                    AdhanStopGestures.inAppPlaying =
+                        call.argument<Boolean>("playing") ?: false
+                    result.success(true)
+                }
+                else -> result.notImplemented()
+            }
+        }
+
+        EventChannel(flutterEngine.dartExecutor.binaryMessenger, ADHAN_MOTION_CHANNEL)
+            .setStreamHandler(AccelerometerStreamHandler(this))
 
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, COUNTDOWN_CHANNEL).setMethodCallHandler { call, result ->
             when (call.method) {
@@ -134,6 +164,40 @@ class MainActivity : FlutterActivity() {
                 else -> result.notImplemented()
             }
         }
+    }
+
+    // ─── إيقاف الأذان بزري الصوت في الواجهة النشطة (المرحلة الرابعة) ───
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        val isVolumeKey = keyCode == KeyEvent.KEYCODE_VOLUME_UP ||
+            keyCode == KeyEvent.KEYCODE_VOLUME_DOWN
+        if (isVolumeKey &&
+            AdhanStopGestures.volumeEnabled(this) &&
+            stopAdhanFromVolumeKey()
+        ) {
+            return true
+        }
+        return super.onKeyDown(keyCode, event)
+    }
+
+    /** يوقف جلسة الأذان الجارية فقط (تشغيل التطبيق أو الخدمة) ويرجع true. */
+    private fun stopAdhanFromVolumeKey(): Boolean {
+        if (AdhanStopGestures.inAppPlaying) {
+            // التطبيق يشغّل الأذان داخل الواجهة؛ وجّه الطلب إلى Flutter.
+            MethodChannel(
+                flutterEngine!!.dartExecutor.binaryMessenger,
+                ADHAN_STOP_CHANNEL
+            ).invokeMethod("stopFromVolumeKey", null)
+            return true
+        }
+        if (AdhanPlaybackService.isPlaying) {
+            startService(
+                Intent(this, AdhanPlaybackService::class.java)
+                    .setAction(AdhanPlaybackService.ACTION_STOP)
+            )
+            return true
+        }
+        return false
     }
 
     // ─── جدولة أذان المنبة الدقيقة (بالتوازي مع إشعارات FLN) ───

@@ -21,6 +21,7 @@ void main() {
     notificationPermissionGranted: () => granted,
     silenceSupported: () => silenceSupported,
     dndAccessGranted: () => dndGranted,
+    isIOSPlatform: () => isIOS,
   );
 
   test('reminder becomes available once notifications are granted', () {
@@ -121,20 +122,45 @@ void main() {
     }
   });
 
-  test('native features of later stages remain pending', () {
-    final caps = policy(
+  test('stop gestures are available where honestly supported', () {
+    final android = policy(
       isAndroid: true,
       isIOS: false,
       isMacOS: false,
       granted: true,
     );
     expect(
-      caps.availability(PrayerFeature.flipToStop),
-      PrayerFeatureAvailability.comingSoon,
+      android.availability(PrayerFeature.flipToStop),
+      PrayerFeatureAvailability.available,
     );
     expect(
-      caps.availability(PrayerFeature.volumeToStop),
-      PrayerFeatureAvailability.comingSoon,
+      android.availability(PrayerFeature.volumeToStop),
+      PrayerFeatureAvailability.available,
+    );
+
+    final ios = policy(
+      isAndroid: false,
+      isIOS: true,
+      isMacOS: false,
+      granted: true,
+    );
+    expect(
+      ios.availability(PrayerFeature.flipToStop),
+      PrayerFeatureAvailability.available,
+    );
+    // أزرار الصوت لا تُعترض بواجهة عامة على iOS فتظهر غير مدعومة.
+    expect(
+      ios.availability(PrayerFeature.volumeToStop),
+      PrayerFeatureAvailability.unsupported,
+    );
+  });
+
+  test('remaining native features stay pending', () {
+    final caps = policy(
+      isAndroid: true,
+      isIOS: false,
+      isMacOS: false,
+      granted: true,
     );
     expect(
       caps.availability(PrayerFeature.customAdhan),

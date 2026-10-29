@@ -13,12 +13,14 @@ class PrayerFeatureCapabilitiesPolicy implements PrayerFeatureCapabilities {
     required this.notificationPermissionGranted,
     required this.silenceSupported,
     required this.dndAccessGranted,
+    required this.isIOSPlatform,
   });
 
   final PendingPrayerFeatureCapabilities pending;
   final bool Function() notificationPermissionGranted;
   final bool Function() silenceSupported;
   final bool Function() dndAccessGranted;
+  final bool Function() isIOSPlatform;
 
   @override
   PrayerFeatureAvailability availability(PrayerFeature feature) {
@@ -36,6 +38,15 @@ class PrayerFeatureCapabilitiesPolicy implements PrayerFeatureCapabilities {
         return dndAccessGranted()
             ? PrayerFeatureAvailability.available
             : PrayerFeatureAvailability.needsPermission;
+      case PrayerFeature.flipToStop:
+        // القلب يعمل داخل التطبيق على المنصتين المدعومتين.
+        return PrayerFeatureAvailability.available;
+      case PrayerFeature.volumeToStop:
+        // أزرار الصوت تُستقبل في الواجهة النشطة على أندرويد فقط؛
+        // iOS لا تسمح باعتراضها بواجهة عامة فتُعرض بلا وعد كاذب.
+        return isIOSPlatform()
+            ? PrayerFeatureAvailability.unsupported
+            : PrayerFeatureAvailability.available;
       default:
         return pendingAvailability;
     }

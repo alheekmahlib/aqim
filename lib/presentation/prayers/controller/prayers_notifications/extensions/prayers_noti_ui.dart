@@ -177,7 +177,10 @@ extension PrayersNotiUi on PrayersNotificationsCtrl {
           ),
         ),
         isScrollControlled: true,
-      ).then((_) async => await state.adhanPlayer.stop());
+      ).then((_) async {
+        await state.adhanPlayer.stop();
+        await InAppAdhanSession.instance.end();
+      });
       await playAudio(receivedAction.id, receivedAction.title);
     }
   }

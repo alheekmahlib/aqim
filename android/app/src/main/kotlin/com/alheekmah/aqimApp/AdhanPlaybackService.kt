@@ -13,6 +13,10 @@ import android.media.AudioAttributes
 import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.media.MediaPlayer
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.os.Build
 import android.os.IBinder
 import java.io.File
@@ -29,6 +33,15 @@ class AdhanPlaybackService : Service() {
 
     companion object {
         const val EXTRA_FILE_PATH = "filePath"
+
+        /** عتبة محور z للشاشة للأعلى/الأسفل (m/s²) ومدة الاستقرار. */
+        const val FACE_UP_THRESHOLD = 7.0f
+        const val FLIP_STABILITY_MS = 1200L
+
+        /** هل الخدمة تشغّل الأذان الآن؟ (زر الصوت في الواجهة النشطة). */
+        @Volatile
+        var isPlaying: Boolean = false
+            private set
 
         /// بيانات إشعار الصلاة المدمج فيه، تُمرَّر من Flutter وقت الجدولة.
         const val EXTRA_NOTIF_ID = "notifId"
@@ -55,6 +68,10 @@ class AdhanPlaybackService : Service() {
     private var mediaPlayer: MediaPlayer? = null
     private var audioFocusRequest: AudioFocusRequest? = null
     private var audioManager: AudioManager? = null
+    private var sensorManager: SensorManager? = null
+    private var sensorListener: SensorEventListener? = null
+    private var sawFaceUp = false
+    private var faceDownSince = 0L
 
     override fun onBind(intent: Intent?): IBinder? = null
 
@@ -198,11 +215,59 @@ class AdhanPlaybackService : Service() {
                 true
             }
             mediaPlayer = player
+            isPlaying = true
             player.start()
+            armFlipDetection()
         } catch (e: Exception) {
             e.printStackTrace()
             stopAdhan()
         }
+    }
+
+    /**
+     * كشف القلب داخل الخدمة الأمامية أثناء التشغيل فقط:
+     * انتقال من الشاشة للأعلى إلى الأسفل مستقرًا ~1.2 ثانية؛ الجهاز
+     * المقلوب قبل البدء لا يوقفه لغياب الانتقال. المستمع يُفك دائمًا
+     * مع التوقف.
+     */
+    private fun armFlipDetection() {
+        if (!AdhanStopGestures.flipEnabled(this)) return
+        val manager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        val sensor = manager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) ?: return
+        sawFaceUp = false
+        faceDownSince = 0L
+        val listener = object : SensorEventListener {
+            override fun onSensorChanged(event: SensorEvent) {
+                val z = event.values[2]
+                if (z > FACE_UP_THRESHOLD) {
+                    sawFaceUp = true
+                    faceDownSince = 0L
+                } else if (z < -FACE_UP_THRESHOLD) {
+                    if (!sawFaceUp) return
+                    val now = System.currentTimeMillis()
+                    if (faceDownSince == 0L) {
+                        faceDownSince = now
+                    } else if (now - faceDownSince >= FLIP_STABILITY_MS) {
+                        faceDownSince = 0L
+                        sawFaceUp = false
+                        stopAdhan()
+                    }
+                } else {
+                    faceDownSince = 0L
+                }
+            }
+
+            override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
+        }
+        manager.registerListener(listener, sensor, SensorManager.SENSOR_DELAY_NORMAL)
+        sensorManager = manager
+        sensorListener = listener
+    }
+
+    private fun disarmFlipDetection() {
+        sensorListener?.let { sensorManager?.unregisterListener(it) }
+        sensorListener = null
+        sensorManager = null
     }
 
     private fun requestAudioFocus(): Boolean {
@@ -226,6 +291,8 @@ class AdhanPlaybackService : Service() {
      * ongoing الملتصق به أثناء الخدمة يمنع مسحه نهائياً.
      */
     private fun stopAdhan(removeOnStop: Boolean = false) {
+        isPlaying = false
+        disarmFlipDetection()
         try {
             mediaPlayer?.let {
                 // تفريغ المستمعين قبل stop/release يمنع تحذير

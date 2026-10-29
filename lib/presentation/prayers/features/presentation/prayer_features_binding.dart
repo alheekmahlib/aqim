@@ -4,9 +4,13 @@ import 'dart:io';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
+import '../../../../core/services/adhan_alarms_scheduler.dart';
 import '../../../../core/services/notification_permission_cache.dart';
 import '../../../../core/services/prayer_silence_access.dart';
 import '../../prayers.dart';
+import '../data/in_app_adhan_session.dart';
+import '../data/local_adhan_playback_control.dart';
+import '../data/local_adhan_stop_gestures.dart';
 import '../data/pending_prayer_feature_capabilities.dart';
 import '../data/prayer_feature_capabilities_policy.dart';
 import '../data/stored_prayer_feature_settings.dart';
@@ -52,10 +56,30 @@ class PrayerFeaturesBinding extends Bindings {
               Get.find<NotificationPermissionCache>().granted,
           silenceSupported: () => Get.find<PrayerSilenceAccess>().supported,
           dndAccessGranted: () => Get.find<PrayerSilenceAccess>().granted,
+          isIOSPlatform: () => Platform.isIOS,
         ),
         permanent: true,
       );
     }
+    // الإيقاف الموحد وإيماءات المرحلة الرابعة.
+    final repository = Get.find<PrayerFeatureSettingsRepository>();
+    final playbackControl = LocalAdhanPlaybackControl(
+      stopNativeService: AdhanAlarmsScheduler.stopPlayback,
+      stopInAppPlayer: () async {
+        if (Get.isRegistered<PrayersNotificationsCtrl>()) {
+          await PrayersNotificationsCtrl.instance.state.adhanPlayer.stop();
+        }
+      },
+    );
+    InAppAdhanSession.instance.configure(
+      flipEnabled: () => repository.read()[PrayerFeature.flipToStop].enabled,
+      onStopRequested: playbackControl.stopCurrentAdhan,
+    );
+    AdhanStopChannelHandler(
+      onStopFromVolumeKey: playbackControl.stopCurrentAdhan,
+    ).register();
+    _synchronizeStopGestures(repository.read());
+
     if (!Get.isRegistered<PrayerFeatureSettingsController>()) {
       Get.lazyPut<PrayerFeatureSettingsController>(
         () => PrayerFeatureSettingsController(
@@ -100,4 +124,19 @@ Future<void> _applySettingsSideEffects(
   if (silenceBefore.enabled != silenceAfter.enabled || silenceAfter.enabled) {
     await PrayersNotificationsCtrl.instance.synchronizePrayerSilence();
   }
+
+  // إيماءات الإيقاف: تفعيل/تعطيل أي منهما يُحدَّث في المنصة فورًا.
+  if (previous[PrayerFeature.flipToStop].enabled !=
+          next[PrayerFeature.flipToStop].enabled ||
+      previous[PrayerFeature.volumeToStop].enabled !=
+          next[PrayerFeature.volumeToStop].enabled) {
+    _synchronizeStopGestures(next);
+  }
+}
+
+void _synchronizeStopGestures(PrayerFeatureSettings settings) {
+  LocalAdhanStopGestures(
+    flipEnabled: settings[PrayerFeature.flipToStop].enabled,
+    volumeEnabled: settings[PrayerFeature.volumeToStop].enabled,
+  ).synchronize();
 }

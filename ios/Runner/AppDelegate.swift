@@ -20,5 +20,12 @@ import UserNotifications
     GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
     // قناة إشعار العدّ التنازلي الدائم (iOS: إنشاء/تحديث/إنهاء Live Activity)
     PrayerCountdownChannel.register(on: engineBridge.applicationRegistrar.messenger())
+    // إيماءات إيقاف الأذان وبث التسارع داخل التطبيق (المرحلة الرابعة)
+    let messenger = engineBridge.applicationRegistrar.messenger()
+    AdhanStopChannel.register(on: messenger)
+    FlutterEventChannel(
+      name: "com.alheekmah.aqimApp/adhan_motion",
+      binaryMessenger: messenger
+    ).setStreamHandler(AdhanMotionStreamHandler())
   }
 }
