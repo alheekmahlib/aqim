@@ -248,10 +248,15 @@ void main() {
       final english =
           jsonDecode(File('assets/locales/en.json').readAsStringSync())
               as Map<String, dynamic>;
-      final keys = english.keys
+      final featureKeys = english.keys
           .where((key) => key.startsWith('prayerFeatures'))
           .toSet();
-      expect(keys, hasLength(29));
+      expect(featureKeys, hasLength(29));
+      final customAdhanKeys = english.keys
+          .where((key) => key.startsWith('customAdhan'))
+          .toSet();
+      expect(customAdhanKeys, hasLength(14));
+      final keys = {...featureKeys, ...customAdhanKeys};
       for (final file in Directory(
         'assets/locales',
       ).listSync().whereType<File>().where((f) => f.path.endsWith('.json'))) {
@@ -262,6 +267,7 @@ void main() {
           expect((locale[key] as String).trim(), isNotEmpty);
         }
         expect(locale['prayerFeaturesMinutes'], contains('@minutes'));
+        expect(locale['customAdhanDeleteConfirm'], contains('@name'));
       }
     },
   );
