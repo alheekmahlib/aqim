@@ -1074,5 +1074,6 @@
   "prayerFeaturesCustomized": "Durasi khusus",
   "prayerFeaturesResetPrayer": "Kembalikan salat ke pengaturan umum",
   "prayerReminderTitle": "Pengingat salat",
-  "prayerReminderBody": "@minutes menit lagi sebelum adzan @prayer"
+  "prayerReminderBody": "@minutes menit lagi sebelum adzan @prayer",
+  "prayerFeaturesGrantSilence": "Beri akses Jangan Ganggu"
 }

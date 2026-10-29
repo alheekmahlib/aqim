@@ -3,4 +3,5 @@
     <string name="widget_countdown_placeholder">--:--</string>
     <string name="widget_small_label">ويدجت الصلوات - صغير</string>
     <string name="widget_large_label">ويدجت الصلوات - كبير</string>
+    <string name="prayer_silence_rule_name">تصميت الصلاة</string>
 </resources>

@@ -16,11 +16,46 @@ class MainActivity : FlutterActivity() {
     private val CHANNEL = "com.alheekmah.aqimApp/raw_audio"
     private val ALARMS_CHANNEL = "com.alheekmah.aqimApp/adhan_alarms"
     private val COUNTDOWN_CHANNEL = "com.alheekmah.aqimApp/prayer_countdown"
+    private val SILENCE_CHANNEL = "com.alheekmah.aqimApp/prayer_silence"
     private val ADHAN_ALARM_ACTION = "com.alheekmah.aqimApp.ADAN_ALARM"
     private var mediaPlayer: MediaPlayer? = null
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
+
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, SILENCE_CHANNEL).setMethodCallHandler { call, result ->
+            when (call.method) {
+                "isSupported" -> {
+                    result.success(PrayerSilenceManager.isSupported())
+                }
+                "hasDndAccess" -> {
+                    result.success(PrayerSilenceManager.hasDndAccess(this))
+                }
+                "requestDndAccess" -> {
+                    // لا يُمنح الوصول برمجيًا؛ نفتح شاشة النظام المخصصة.
+                    runCatching {
+                        startActivity(PrayerSilenceManager.dndAccessSettingsIntent())
+                    }
+                    result.success(true)
+                }
+                "syncSilencePeriods" -> {
+                    val periods = (call.argument<List<Any?>>("periods") ?: emptyList())
+                        .mapNotNull { entry ->
+                            val map = entry as? Map<*, *> ?: return@mapNotNull null
+                            val start = (map["start"] as? Number)?.toLong() ?: return@mapNotNull null
+                            val end = (map["end"] as? Number)?.toLong() ?: return@mapNotNull null
+                            if (end > start) start to end else null
+                        }
+                    PrayerSilenceManager.sync(this, periods)
+                    result.success(true)
+                }
+                "endAndCancelSilence" -> {
+                    PrayerSilenceManager.endAndCancel(this)
+                    result.success(true)
+                }
+                else -> result.notImplemented()
+            }
+        }
 
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, COUNTDOWN_CHANNEL).setMethodCallHandler { call, result ->
             when (call.method) {

@@ -1345,5 +1345,6 @@
   "prayerFeaturesCustomized": "مدة مخصصة",
   "prayerFeaturesResetPrayer": "إعادة الصلاة للإعداد العام",
   "prayerReminderTitle": "تذكير قبل الصلاة",
-  "prayerReminderBody": "تبقّى @minutes دقيقة على أذان @prayer"
+  "prayerReminderBody": "تبقّى @minutes دقيقة على أذان @prayer",
+  "prayerFeaturesGrantSilence": "منح وصول عدم الإزعاج"
 }

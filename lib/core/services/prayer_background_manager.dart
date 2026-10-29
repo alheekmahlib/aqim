@@ -229,6 +229,13 @@ class PrayerBackgroundManager {
         log('Prayer reminders refresh failed: $e', name: _tag);
       }
 
+      // تجديد فترات التصميت (يوسّع تسليح المنبّهات الأصلي ويصحح الانحراف).
+      try {
+        await PrayersNotificationsCtrl.instance.synchronizePrayerSilence();
+      } catch (e) {
+        log('Prayer silence refresh failed: $e', name: _tag);
+      }
+
       // تحديث ويدجت الصلوات في كل مرة - Update prayers widget every time
       if (Platform.isIOS || Platform.isAndroid) {
         try {

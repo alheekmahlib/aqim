@@ -3,27 +3,41 @@ import '../domain/prayer_feature_availability.dart';
 import '../domain/prayer_feature_capabilities.dart';
 import 'pending_prayer_feature_capabilities.dart';
 
-/// سياسة الإتاحة بعد ربط التذكير (المرحلة الثانية): التذكير متاح فعليًا
-/// متى مُنح إذن الإشعارات على منصة مدعومة، وإلا فيعرض حالة الحاجة للإذن.
-/// تبقى المميزات الأصلية الأخرى معلّقة (comingSoon) حتى مرحلتها.
+/// سياسة الإتاحة بعد ربط التذكير (المرحلة الثانية) والتصميت (الثالثة):
+/// التذكير متاح متى مُنح إذن الإشعارات، والتصميت متاح على أندرويد 10+
+/// متى مُنح وصول عدم الإزعاج، وإلا فيعرضان حالة الحاجة للإذن. تبقى بقية
+/// المميزات الأصلية معلّقة (comingSoon) حتى مرحلتها.
 class PrayerFeatureCapabilitiesPolicy implements PrayerFeatureCapabilities {
   const PrayerFeatureCapabilitiesPolicy({
     required this.pending,
     required this.notificationPermissionGranted,
+    required this.silenceSupported,
+    required this.dndAccessGranted,
   });
 
   final PendingPrayerFeatureCapabilities pending;
   final bool Function() notificationPermissionGranted;
+  final bool Function() silenceSupported;
+  final bool Function() dndAccessGranted;
 
   @override
   PrayerFeatureAvailability availability(PrayerFeature feature) {
     final pendingAvailability = pending.availability(feature);
-    if (feature != PrayerFeature.reminder) return pendingAvailability;
     if (pendingAvailability == PrayerFeatureAvailability.unsupported) {
       return pendingAvailability;
     }
-    return notificationPermissionGranted()
-        ? PrayerFeatureAvailability.available
-        : PrayerFeatureAvailability.needsPermission;
+    switch (feature) {
+      case PrayerFeature.reminder:
+        return notificationPermissionGranted()
+            ? PrayerFeatureAvailability.available
+            : PrayerFeatureAvailability.needsPermission;
+      case PrayerFeature.silence:
+        if (!silenceSupported()) return PrayerFeatureAvailability.unsupported;
+        return dndAccessGranted()
+            ? PrayerFeatureAvailability.available
+            : PrayerFeatureAvailability.needsPermission;
+      default:
+        return pendingAvailability;
+    }
   }
 }

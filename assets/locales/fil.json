@@ -1074,5 +1074,6 @@
   "prayerFeaturesCustomized": "Pasadyang tagal",
   "prayerFeaturesResetPrayer": "Ibalik ang default para sa panalangin",
   "prayerReminderTitle": "Paalala sa panalangin",
-  "prayerReminderBody": "@minutes minuto na lang bago ang adhan ng @prayer"
+  "prayerReminderBody": "@minutes minuto na lang bago ang adhan ng @prayer",
+  "prayerFeaturesGrantSilence": "Ibigay ang access sa Huwag Istorbohin"
 }

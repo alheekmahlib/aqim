@@ -251,7 +251,7 @@ void main() {
       final keys = english.keys
           .where((key) => key.startsWith('prayerFeatures'))
           .toSet();
-      expect(keys, hasLength(28));
+      expect(keys, hasLength(29));
       for (final file in Directory(
         'assets/locales',
       ).listSync().whereType<File>().where((f) => f.path.endsWith('.json'))) {

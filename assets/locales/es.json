@@ -1074,5 +1074,6 @@
   "prayerFeaturesCustomized": "Duración personalizada",
   "prayerFeaturesResetPrayer": "Restablecer los ajustes de esta oración",
   "prayerReminderTitle": "Recordatorio de oración",
-  "prayerReminderBody": "Faltan @minutes minutos para el adhan de @prayer"
+  "prayerReminderBody": "Faltan @minutes minutos para el adhan de @prayer",
+  "prayerFeaturesGrantSilence": "Conceder acceso a No molestar"
 }

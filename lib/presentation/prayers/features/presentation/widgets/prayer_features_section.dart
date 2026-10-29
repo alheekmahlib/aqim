@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../../../../../../core/utils/constants/extensions/bottom_sheet_extension.dart';
 import '../../../../../../core/widgets/container_button_widget.dart';
 import '../../domain/prayer_feature.dart';
+import '../../domain/prayer_feature_availability.dart';
 import '../prayer_feature_labels.dart';
 import '../prayer_feature_settings_controller.dart';
 import 'prayer_feature_toggle.dart';
@@ -63,6 +64,25 @@ class PrayerFeaturesSection extends StatelessWidget {
                   ),
                 ),
               ),
+              // وصول عدم الإزعاج لا يُمنح برمجيًا؛ مسار منح صريح للتصميت.
+              if (feature == PrayerFeature.silence &&
+                  controller.availability(feature) ==
+                      PrayerFeatureAvailability.needsPermission)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: ContainerButtonWidget(
+                    key: const ValueKey('grant-silence'),
+                    title: 'prayerFeaturesGrantSilence'.tr,
+                    titleColor: Theme.of(context).colorScheme.inversePrimary,
+                    backgroundColor: Theme.of(
+                      context,
+                    ).colorScheme.surface.withValues(alpha: .15),
+                    borderRadius: 8,
+                    withShape: false,
+                    useGradient: false,
+                    onPressed: controller.grantSilenceAccess,
+                  ),
+                ),
               if (feature.hasTiming)
                 Padding(
                   padding: const EdgeInsets.only(bottom: 12),

@@ -1074,5 +1074,6 @@
   "prayerFeaturesCustomized": "Muddo gaar ah",
   "prayerFeaturesResetPrayer": "Salaadda ku celi dejimaha guud",
   "prayerReminderTitle": "Xasuusin salaadda",
-  "prayerReminderBody": "@minutes daqiiqo ayaa ka hartay adhanka @prayer"
+  "prayerReminderBody": "@minutes daqiiqo ayaa ka hartay adhanka @prayer",
+  "prayerFeaturesGrantSilence": "Sii ogolaansho ha dhibin"
 }

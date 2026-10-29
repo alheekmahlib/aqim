@@ -1074,5 +1074,6 @@
   "prayerFeaturesCustomized": "مخصوص دورانیہ",
   "prayerFeaturesResetPrayer": "نماز کی عمومی ترتیبات بحال کریں",
   "prayerReminderTitle": "نماز کی یاد دہانی",
-  "prayerReminderBody": "@prayer اذان تک @minutes منٹ باقی ہیں"
+  "prayerReminderBody": "@prayer اذان تک @minutes منٹ باقی ہیں",
+  "prayerFeaturesGrantSilence": "ڈسٹرب نہ کریں تک رسائی دیں"
 }

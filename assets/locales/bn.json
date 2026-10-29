@@ -1074,5 +1074,6 @@
   "prayerFeaturesCustomized": "আলাদা সময়কাল",
   "prayerFeaturesResetPrayer": "নামাজের সাধারণ সেটিং ফিরিয়ে আনুন",
   "prayerReminderTitle": "নামাজের রিমাইন্ডার",
-  "prayerReminderBody": "@prayer আজানের আগে আর @minutes মিনিট বাকি"
+  "prayerReminderBody": "@prayer আজানের আগে আর @minutes মিনিট বাকি",
+  "prayerFeaturesGrantSilence": "ডো নট ডিস্টার্ব অনুমতি দিন"
 }

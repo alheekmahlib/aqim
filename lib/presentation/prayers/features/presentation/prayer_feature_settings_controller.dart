@@ -20,6 +20,7 @@ class PrayerFeatureSettingsController extends GetxController {
     required this.capabilities,
     required this.save,
     this.refreshAvailability,
+    this.openDndSettings,
     this.onSaved,
   });
 
@@ -31,7 +32,10 @@ class PrayerFeatureSettingsController extends GetxController {
   /// الإعدادات؛ تُحدَّث الواجهة فور اكتمال التحديث.
   final Future<void> Function()? refreshAvailability;
 
-  /// أثر جانبي بعد نجاح الحفظ فقط (مزامنة جدولة التذكيرات)؛ فشله لا
+  /// يفتح شاشة وصول عدم الإزعاج في النظام (لا يُمنح برمجيًا).
+  final Future<void> Function()? openDndSettings;
+
+  /// أثر جانبي بعد نجاح الحفظ فقط (مزامنة الجدولة)؛ فشله لا
   /// يُرجع الإعداد المحفوظ.
   final Future<void> Function(
     PrayerFeatureSettings previous,
@@ -105,6 +109,21 @@ class PrayerFeatureSettingsController extends GetxController {
       );
     }
     if (!isClosed) update();
+  }
+
+  /// يفتح إعدادات وصول عدم الإزعاج؛ يبقى الإعداد الحالي كما هو.
+  Future<void> grantSilenceAccess() async {
+    final open = openDndSettings;
+    if (open == null) return;
+    try {
+      await open();
+    } catch (error, stack) {
+      log(
+        'Could not open DND access settings',
+        error: error,
+        stackTrace: stack,
+      );
+    }
   }
 
   Future<void> setEnabled(PrayerFeature feature, bool enabled) async {

@@ -1193,5 +1193,6 @@
   "prayerFeaturesCustomized": "Custom duration",
   "prayerFeaturesResetPrayer": "Reset prayer to defaults",
   "prayerReminderTitle": "Prayer reminder",
-  "prayerReminderBody": "@minutes minutes until the @prayer adhan"
+  "prayerReminderBody": "@minutes minutes until the @prayer adhan",
+  "prayerFeaturesGrantSilence": "Grant Do Not Disturb access"
 }

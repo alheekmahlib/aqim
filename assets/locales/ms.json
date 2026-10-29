@@ -1074,5 +1074,6 @@
   "prayerFeaturesCustomized": "Tempoh tersuai",
   "prayerFeaturesResetPrayer": "Tetapkan semula solat kepada nilai umum",
   "prayerReminderTitle": "Peringatan solat",
-  "prayerReminderBody": "@minutes minit lagi sebelum azan @prayer"
+  "prayerReminderBody": "@minutes minit lagi sebelum azan @prayer",
+  "prayerFeaturesGrantSilence": "Benarkan akses Jangan Ganggu"
 }

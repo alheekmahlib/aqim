@@ -10,6 +10,9 @@ const String _kLegacyPrayerNotificationsCancelledFlag =
 /// الدوري للميزة المعطلة دون حاجة.
 const String _kPrayerRemindersScheduledFlag = 'prayer_reminders_scheduled';
 
+/// علم GetStorage يوثق وجود فترات تصميت مجدولة فعليًا.
+const String _kPrayerSilenceScheduledFlag = 'prayer_silence_scheduled';
+
 /// خانات الإقامة داخل كتلة اليوم (الصلوات 0-4 والإقامة 5-9).
 const int _kIqamaSlotOffset = 5;
 
@@ -209,6 +212,35 @@ LocalPrayerReminderScheduler _reminderScheduler() =>
           ),
       cancel: NotifyHelper().cancelNotification,
     );
+
+/// موعد إقامة الصلاة (أذان + إزاحة) بعد dayOffset أيام؛ مستقل عن تفعيل
+/// إشعارات الإقامة، وnull إن لم تجهز المواقيت.
+DateTime? _silenceIqamaTime(PrayerId prayer, int dayOffset) {
+  final athanCtrl = AdhanController.instance;
+  final adhan = _reminderPrayerTime(prayer, dayOffset);
+  if (adhan == null) return null;
+  final prayerIndex = switch (prayer) {
+    PrayerId.fajr => 0,
+    PrayerId.dhuhr => 2,
+    PrayerId.asr => 3,
+    PrayerId.maghrib => 4,
+    PrayerId.isha => 5,
+  };
+  return adhan.add(athanCtrl.state.iqamaOffsets.durationByIndex(prayerIndex));
+}
+
+const MethodChannel _silenceChannel = MethodChannel(
+  'com.alheekmah.aqimApp/prayer_silence',
+);
+
+LocalPrayerSilenceScheduler _silenceScheduler() => LocalPrayerSilenceScheduler(
+  iqamaTimeFor: _silenceIqamaTime,
+  daysToSchedule: _daysToSchedule,
+  isSupported: () => Platform.isAndroid,
+  syncPeriods: (periods) =>
+      _silenceChannel.invokeMethod('syncSilencePeriods', {'periods': periods}),
+  endAndCancel: () => _silenceChannel.invokeMethod('endAndCancelSilence'),
+);
 
 /// أقصى مدى للإلغاء: الأفق الديناميكي قد يتقلص بعد جدولة أوسع سابقًا،
 /// فيُلغى دائمًا على أقصى مدى ممكن لكل منصة.
@@ -548,6 +580,9 @@ extension ScheduleDailyExtension on PrayersNotificationsCtrl {
     // تذكيرات ما قبل الصلاة (المرحلة الثانية): مزامنة مع الإعدادات الحالية.
     await synchronizePrayerReminders();
 
+    // فترات التصميت (المرحلة الثالثة): مزامنة مع الإعدادات والإقامات.
+    await synchronizePrayerSilence();
+
     // إعادة جدولة إشعارات الصيام (السحور/الإفطار/العشر الأواخر)
     await RamadanController.instance.rescheduleFastingNotifications();
   }
@@ -577,6 +612,35 @@ extension ScheduleDailyExtension on PrayersNotificationsCtrl {
     await _reminderScheduler().cancelReminders();
     await GetStorage().write(_kPrayerRemindersScheduledFlag, false);
     log('تم إلغاء جميع تذكيرات ما قبل الصلاة.', name: 'ScheduleDailyExtension');
+  }
+
+  /// مزامنة فترات التصميت مع إعدادات المميزات الحالية؛ لا تنفذ شيئًا
+  /// على غير أندرويد، ولا تكرر الإلغاء متى كانت الميزة معطلة بلا جدولة.
+  Future<void> synchronizePrayerSilence() async {
+    try {
+      final preferences = StoredPrayerFeatureSettings(
+        GetStorage(),
+      ).read()[PrayerFeature.silence];
+      final storage = GetStorage();
+      final previouslyScheduled =
+          storage.read<bool>(_kPrayerSilenceScheduledFlag) ?? false;
+      if (!preferences.enabled && !previouslyScheduled) return;
+
+      await _silenceScheduler().synchronize(preferences);
+      await storage.write(_kPrayerSilenceScheduledFlag, preferences.enabled);
+    } catch (e) {
+      log('Prayer silence sync failed: $e', name: 'ScheduleDailyExtension');
+    }
+  }
+
+  /// إنهاء فترة التصميت النشطة وإلغاء جدولتها (تعطيل الميزة مثلًا).
+  Future<void> endAndCancelPrayerSilence() async {
+    try {
+      await _silenceScheduler().endAndCancelSilence();
+      await GetStorage().write(_kPrayerSilenceScheduledFlag, false);
+    } catch (e) {
+      log('Prayer silence cancel failed: $e', name: 'ScheduleDailyExtension');
+    }
   }
 
   Future<void> cancelAllPrayerNotifications() async {

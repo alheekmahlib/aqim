@@ -1074,5 +1074,6 @@
   "prayerFeaturesCustomized": "Özel süre",
   "prayerFeaturesResetPrayer": "Namazı genel ayarlara döndür",
   "prayerReminderTitle": "Namaz hatırlatması",
-  "prayerReminderBody": "@prayer ezanına @minutes dakika kaldı"
+  "prayerReminderBody": "@prayer ezanına @minutes dakika kaldı",
+  "prayerFeaturesGrantSilence": "Rahatsız Etme izni ver"
 }

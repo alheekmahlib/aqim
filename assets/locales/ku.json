@@ -1074,5 +1074,6 @@
   "prayerFeaturesCustomized": "ماوەی تایبەت",
   "prayerFeaturesResetPrayer": "گەڕاندنەوەی نوێژ بۆ ڕێکخستنی گشتی",
   "prayerReminderTitle": "بیرخەرەوەی پێش نوێژ",
-  "prayerReminderBody": "@minutes خولەک ماوە بۆ بانگی @prayer"
+  "prayerReminderBody": "@minutes خولەک ماوە بۆ بانگی @prayer",
+  "prayerFeaturesGrantSilence": "پێدانی ڕێگەی بێ‌تە‌گەزێن"
 }
