@@ -32,8 +32,9 @@ class QiblaCompassWidget extends StatelessWidget {
               final qiblaIndex = qiblaCtrl.qiblaWidgetIndex.value;
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 qiblaCtrl.direction.value = direction;
-                final bool nextIsCorrect =
-                    qiblaCtrl.isDirectionCorrect(direction).value;
+                final bool nextIsCorrect = qiblaCtrl
+                    .isDirectionCorrect(direction)
+                    .value;
                 // Trigger haptic only on transition into correct alignment.
                 if (nextIsCorrect && !qiblaCtrl.isCorrect.value) {
                   HapticFeedback.mediumImpact();
@@ -45,36 +46,50 @@ class QiblaCompassWidget extends StatelessWidget {
                 qiblaCtrl.isCorrect.value = nextIsCorrect;
               });
               final theme = context.theme.colorScheme;
-              final double targetAngleDeg =
-                  _normalizeAngle(qiblaCtrl.qiblaDirection.value - direction);
+              final double targetAngleDeg = _normalizeAngle(
+                qiblaCtrl.qiblaDirection.value - direction,
+              );
               final bool aligned = qiblaCtrl.isCorrect.value;
 
               return Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: context.customOrientation(
-                    Stack(
-                      children: [
-                        // Header card with Kaaba watermark and Qibla degrees
-                        HeaderCardWidget(aligned: aligned),
+                padding: const EdgeInsets.all(16.0),
+                child: context.customOrientation(
+                  Stack(
+                    children: [
+                      // Header card with Kaaba watermark and Qibla degrees
+                      HeaderCardWidget(aligned: aligned),
 
-                        // Compass area
-                        compassBuild(qiblaIndex, qiblaCtrl, theme,
-                            targetAngleDeg, aligned, direction),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        // Header card with Kaaba watermark and Qibla degrees
-                        Expanded(child: HeaderCardWidget(aligned: aligned)),
+                      // Compass area
+                      compassBuild(
+                        qiblaIndex,
+                        qiblaCtrl,
+                        theme,
+                        targetAngleDeg,
+                        aligned,
+                        direction,
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      // Header card with Kaaba watermark and Qibla degrees
+                      Expanded(child: HeaderCardWidget(aligned: aligned)),
 
-                        // Compass area
-                        Expanded(
-                          child: compassBuild(qiblaIndex, qiblaCtrl, theme,
-                              targetAngleDeg, aligned, direction),
+                      // Compass area
+                      Expanded(
+                        child: compassBuild(
+                          qiblaIndex,
+                          qiblaCtrl,
+                          theme,
+                          targetAngleDeg,
+                          aligned,
+                          direction,
                         ),
-                      ],
-                    ),
-                  ));
+                      ),
+                    ],
+                  ),
+                ),
+              );
             }
           },
         );
@@ -97,8 +112,8 @@ class QiblaCompassWidget extends StatelessWidget {
               .clamp(220.0, 420.0)
               .toDouble();
           final double dialSize = size;
-          final double needleSize =
-              (qiblaList[qiblaIndex]['height'] + 20).toDouble();
+          final double needleSize = (qiblaList[qiblaIndex]['height'] + 20)
+              .toDouble();
 
           return RepaintBoundary(
             child: AnimatedContainer(
@@ -112,13 +127,15 @@ class QiblaCompassWidget extends StatelessWidget {
                     width: dialSize,
                     height: dialSize,
                     child: Transform.rotate(
-                      angle: (-qiblaCtrl.qiblaDirection.value *
+                      angle:
+                          (-qiblaCtrl.qiblaDirection.value *
                           (3.141592653589793 / 180)),
                       child: CustomPaint(
                         painter: _CompassDialPainter(
                           ringColor: theme.primary.withValues(alpha: .15),
-                          tickColor:
-                              theme.inversePrimary.withValues(alpha: .55),
+                          tickColor: theme.inversePrimary.withValues(
+                            alpha: .55,
+                          ),
                           textColor: theme.inversePrimary.withValues(alpha: .7),
                         ),
                       ),
@@ -153,7 +170,9 @@ class QiblaCompassWidget extends StatelessWidget {
                     bottom: 10,
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 8),
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
                       decoration: BoxDecoration(
                         color: theme.surface.withValues(alpha: .6),
                         borderRadius: BorderRadius.circular(24),
@@ -169,15 +188,16 @@ class QiblaCompassWidget extends StatelessWidget {
                             size: 18,
                             color: theme.inversePrimary.withValues(alpha: .7),
                           ),
-                          const SizedBox(width: 6),
+                          const Gap(6),
                           Text(
                             '${direction.toStringAsFixed(1)}°',
                             style: TextStyle(
                               fontFamily: 'cairo',
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
-                              color:
-                                  theme.inversePrimary.withValues(alpha: .75),
+                              color: theme.inversePrimary.withValues(
+                                alpha: .75,
+                              ),
                             ),
                           ),
                         ],

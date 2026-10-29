@@ -1,297 +1,130 @@
 part of '../prayers.dart';
 
 class PrayerScreen extends StatelessWidget {
-  PrayerScreen({super.key});
+  PrayerScreen({
+    super.key,
+    DashboardController? controller,
+    DashboardLayoutController? layoutController,
+  }) : controller = controller ?? Get.find<DashboardController>(),
+       layoutController =
+           layoutController ?? Get.find<DashboardLayoutController>();
 
-  final generalCtrl = GeneralController.instance;
-  final adhanCtrl = AdhanController.instance;
-  final eventCtrl = EventController.instance;
+  final DashboardController controller;
+  final DashboardLayoutController layoutController;
+  static const presenter = DashboardPresenter();
+
+  void _customize(BuildContext context) => context.customBottomSheet(
+    textTitle: 'dashboardCustomize',
+    scrollChild: false,
+    containerColor: Theme.of(context).colorScheme.primaryContainer,
+    child: DashboardCustomizationSheet(controller: layoutController),
+  );
 
   @override
-  Widget build(BuildContext context) {
-    // adhanCtrl.initializeAdhan();
-    return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (bool didPop, _) {
-        if (didPop) {
-          return;
-        }
-        PrayersNotificationsCtrl.instance.state.adhanPlayer.stop();
-        Get.back();
-      },
-      child: Scaffold(
-        backgroundColor:
-            context.theme.colorScheme.surface.withValues(alpha: .1),
-        body: SafeArea(
-          child: Container(
-            color: context.theme.colorScheme.primaryContainer,
-            child: Column(
+  Widget build(BuildContext context) => PopScope(
+    canPop: false,
+    onPopInvokedWithResult: (didPop, _) {
+      if (didPop) return;
+      controller.leaveScreen();
+      Get.back();
+    },
+    child: Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+      body: SafeArea(
+        child: Column(
+          children: [
+            AppBarWidget(
+              trailing: IconButton(
+                key: const ValueKey('customize-prayer-dashboard'),
+                tooltip: 'dashboardCustomize'.tr,
+                onPressed: () => _customize(context),
+                icon: const Icon(Icons.dashboard_customize_outlined),
+                color: Theme.of(context).colorScheme.inversePrimary,
+              ),
+            ),
+            Expanded(
+              child: GetBuilder<LocalizationController>(
+                id: 'changeLanguage',
+                builder: (_) => Obx(() => _content(context)),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+
+  Widget _content(BuildContext context) {
+    final panels = layoutController.layout.value.panels
+        .where((p) => p.visible)
+        .toList();
+    if (panels.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('dashboardEmpty'.tr, style: dashboardText(context)),
+            TextButton(
+              onPressed: () => _customize(context),
+              child: Text('dashboardAdd'.tr),
+            ),
+          ],
+        ),
+      );
+    }
+    switch (controller.status.value) {
+      case DashboardStatus.locationRequired:
+        return Center(child: ActiveLocationButton());
+      case DashboardStatus.loading:
+        return const Center(child: CircularProgressIndicator());
+      case DashboardStatus.error:
+        return Center(
+          child: TextButton.icon(
+            onPressed: controller.reload,
+            icon: const Icon(Icons.refresh),
+            label: Text('dashboardLoadRetry'.tr),
+          ),
+        );
+      case DashboardStatus.ready:
+        final data = controller.data.value;
+        if (data == null) return const SizedBox.shrink();
+        // Read reactive values before handing the non-reactive context to builders.
+        final formatted = presenter.present(data, controller.now.value);
+        final refreshing = controller.refreshingLocation.value;
+        final locationFailed = controller.locationFailed.value;
+        final panelContext = DashboardPanelContext(
+          formatted,
+          controller,
+          presenter.week(data, controller.now.value),
+        );
+        return Align(
+          alignment: Alignment.topCenter,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 760),
+            child: ListView(
+              key: const PageStorageKey('prayer-dashboard'),
+              padding: const EdgeInsets.only(top: 16, bottom: 120),
               children: [
-                const AppBarWidget(),
-                Obx(
-                  () => !generalCtrl.state.activeLocation.value ||
-                          LocationHelper.instance.locationIsEmpty
-                      ? ActiveLocationButton()
-                      : GetBuilder<AdhanController>(
-                          id: 'loading_state',
-                          builder: (ctrl) => ctrl.isLoadingPrayerData.value ||
-                                  ctrl.isNoInternetAndDataNotInitialized.value
-                              ? const LoadingWidget()
-                              : Flexible(
-                                  child: context.customOrientation(
-                                    portraitBuild(context),
-                                    landscapeBuild(context),
-                                  ),
-                                ),
-                        ),
-                ),
+                if (refreshing) const LinearProgressIndicator(),
+                if (locationFailed)
+                  TextButton(
+                    onPressed: controller.updateLocation,
+                    child: Text('dashboardLocationRetry'.tr),
+                  ),
+                for (final preference in panels)
+                  KeyedSubtree(
+                    key: ValueKey('panel-${preference.panel.id}'),
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: dashboardRegistry[preference.panel]!.builder(
+                        panelContext,
+                      ),
+                    ),
+                  ),
               ],
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget portraitBuild(BuildContext context) {
-    return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
-      child: Column(
-        children: [
-          SizedBox(
-            width: context.customOrientation(Get.width, Get.width * .45),
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  Gap(16.h),
-                  const PrayerNowWidget(),
-                  Gap(8.h),
-                  context.hDivider(width: Get.width * .5),
-                  Gap(8.h),
-                  Row(
-                    children: [
-                      Expanded(
-                        flex: 6,
-                        child: updateLocationBuild(context),
-                      ),
-                      Expanded(
-                        flex: 4,
-                        child: HijriDateWidget(
-                          svgColor: context.theme.colorScheme.surface,
-                          horizontalPadding: 24.0,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Gap(8.h),
-                  horizontalWeekCalendar(context),
-                  Gap(8.h),
-                  const ProhibitionWidget(),
-                ],
-              ),
-            ),
-          ),
-          SizedBox(
-            width: context.customOrientation(Get.width, Get.width * .45),
-            child: const PrayerBuild(),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget landscapeBuild(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              child: Column(
-                children: [
-                  const Gap(16),
-                  horizontalWeekCalendar(context),
-                  const Gap(8),
-                  const PrayerBuild(),
-                ],
-              )),
-        ),
-        Expanded(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Gap(16),
-              const PrayerNowWidget(),
-              const Gap(16),
-              context.hDivider(width: Get.width * .5),
-              const Gap(16),
-              Row(
-                children: [
-                  Expanded(
-                    child: updateLocationBuild(context),
-                  ),
-                  Expanded(
-                    child: HijriDateWidget(
-                      svgColor: context.theme.colorScheme.surface,
-                      horizontalPadding: 24.0,
-                    ),
-                  ),
-                ],
-              ),
-              const Gap(8),
-              const ProhibitionWidget(),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget horizontalWeekCalendar(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0),
-      child: HorizontalWeekCalendar(
-        hijriInitialDate: eventCtrl.hijriNow,
-        hijriMaxDate:
-            HijriDate.fromDate(DateTime.now().add(const Duration(days: 7))),
-        hijriMinDate: HijriDate.fromDate(
-            DateTime.now().subtract(const Duration(days: 7))),
-        minDate: DateTime.now().subtract(const Duration(days: 7)),
-        maxDate: DateTime.now().add(const Duration(days: 7)),
-        initialDate: DateTime.now(),
-        onDateChange: (date) async {
-          adhanCtrl.state.selectedDate = date;
-          // حساب أوقات الصلاة للتاريخ المختار
-          // Calculate prayer times for selected date
-          await adhanCtrl.updateSelectedDate(date);
-        },
-        carouselHeight: 65,
-        showTopNavbar: false,
-        monthFormat: 'MMMM yyyy',
-        showNavigationButtons: true,
-        useHijriDates: true,
-        weekStartFrom: WeekStartFrom.friday,
-        borderRadius: BorderRadius.circular(12),
-        itemBorderColor: Colors.transparent,
-        activeBackgroundColor: context.theme.colorScheme.surface,
-        activeTextColor: Colors.white,
-        inactiveBackgroundColor: Colors.transparent,
-        inactiveTextColor: context.theme.colorScheme.inversePrimary,
-        disabledTextColor: Colors.grey,
-        disabledBackgroundColor: Colors.grey.withValues(alpha: .3),
-        activeNavigatorColor: context.theme.colorScheme.surface,
-        inactiveNavigatorColor: Colors.grey,
-        monthColor: context.theme.colorScheme.surface,
-        onWeekChange: (List<DateTime> dates) {},
-        scrollPhysics: const BouncingScrollPhysics(),
-        translateNumbers: true,
-        languageCode: Get.locale?.languageCode ?? 'ar',
-        customDayNames: [
-          'Sun'.tr,
-          'Mon'.tr,
-          'Tue'.tr,
-          'Wed'.tr,
-          'Thu'.tr,
-          'Fri'.tr,
-          'Sat'.tr,
-        ],
-        dayTextStyle: TextStyle(
-          fontSize: 22,
-          fontFamily: 'cairo',
-          fontWeight: FontWeight.bold,
-          color: context.theme.colorScheme.inversePrimary,
-          height: 1.1,
-        ),
-        monthTextStyle: TextStyle(
-          fontSize: 18,
-          fontFamily: 'cairo',
-          fontWeight: FontWeight.bold,
-          color: context.theme.colorScheme.inversePrimary,
-          height: 1.5,
-        ),
-        dayNameTextStyle: TextStyle(
-          fontSize: 16,
-          fontFamily: 'cairo',
-          fontWeight: FontWeight.bold,
-          color: context.theme.colorScheme.inversePrimary,
-          height: 1.1,
-        ),
-      ),
-    );
-  }
-
-  Padding updateLocationBuild(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0),
-      child: FutureBuilder<String>(
-          future: adhanCtrl.localizedLocation,
-          builder: (context, snapshot) {
-            return Stack(
-              alignment: Alignment.topCenter,
-              children: [
-                ContainerButtonWidget(
-                  onPressed: () async {
-                    final success =
-                        await generalCtrl.updateLocationAndPrayerTimes();
-                    if (success) {
-                      Get.forceAppUpdate();
-                      log(
-                        'Location and prayer times updated successfully',
-                        name: 'PrayerScreen',
-                      );
-                    }
-                  },
-                  height: 60,
-                  svgHeight: 80,
-                  width: Get.width,
-                  withShape: false,
-                  useGradient: false,
-                  backgroundColor: Colors.transparent,
-                  borderColor: Theme.of(context)
-                      .colorScheme
-                      .surface
-                      .withValues(alpha: .2),
-                  child: Stack(
-                    alignment: AlignmentDirectional.centerStart,
-                    children: [
-                      Icon(Icons.place_rounded,
-                          color: context.theme.colorScheme.surface
-                              .withValues(alpha: .1),
-                          size: 70),
-                      Text(
-                        snapshot.data ?? '',
-                        style: TextStyle(
-                          fontFamily: 'cairo',
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: context.theme.colorScheme.inversePrimary,
-                          height: 1.3,
-                        ),
-                        maxLines: 2,
-                        textAlign: TextAlign.center,
-                      )
-                    ],
-                  ),
-                ),
-                Align(
-                  alignment: AlignmentDirectional.topEnd,
-                  child: Container(
-                    height: 30,
-                    width: 30,
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: context.theme.colorScheme.surface,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: customSvgWithColor(
-                      SvgPath.svgPrayerRefresh,
-                      height: 24,
-                      color: context.theme.canvasColor,
-                    ),
-                  ),
-                )
-              ],
-            );
-          }),
-    );
+        );
+    }
   }
 }

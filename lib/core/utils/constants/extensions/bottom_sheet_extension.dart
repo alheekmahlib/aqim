@@ -14,6 +14,7 @@ extension BottomSheetExtension on void {
     Widget? titleChild,
     String? textTitle,
     Color? containerColor,
+    bool scrollChild = true,
   }) {
     showModalBottomSheet(
       context: Get.context!,
@@ -68,10 +69,12 @@ extension BottomSheetExtension on void {
             ],
             const Gap(8),
             Flexible(
-              child: SingleChildScrollView(
-                physics: const ClampingScrollPhysics(),
-                child: Column(children: [child]),
-              ),
+              child: scrollChild
+                  ? SingleChildScrollView(
+                      physics: const ClampingScrollPhysics(),
+                      child: Column(children: [child]),
+                    )
+                  : child,
             ),
             const Gap(32),
           ],

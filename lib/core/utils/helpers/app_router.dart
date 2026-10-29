@@ -22,11 +22,13 @@ class AppRouter {
   static List<GetPage> pages = [
     GetPage(
       name: homeScreen,
+      binding: PrayerDashboardBinding(),
       page: () => const HomeScreen(),
       transition: Transition.fadeIn,
     ),
     GetPage(
       name: prayerScreen,
+      binding: PrayerDashboardBinding(),
       page: () => PrayerScreen(),
       transition: Transition.fadeIn,
     ),

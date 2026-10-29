@@ -22,6 +22,10 @@ class PrayerSettings extends StatelessWidget {
             AdhanSounds(),
             const Gap(8),
             SetTimingCalculations(),
+            const Gap(8),
+            PrayerFeaturesSection(
+              controller: Get.find<PrayerFeatureSettingsController>(),
+            ),
           ],
         );
       }),

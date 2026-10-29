@@ -10,6 +10,11 @@ class HomeController extends GetxController {
 
   void changeIndex(int index) {
     _currentIndex = index;
+    if (Get.isRegistered<DashboardController>()) {
+      Get.find<DashboardController>().setVisible(
+        index == NavBarTab.prayer.index,
+      );
+    }
     // if (isWeb) {
     //   final tab = NavBarTab.values[index];
     //   _updateWebUrl(tab.urlPath);

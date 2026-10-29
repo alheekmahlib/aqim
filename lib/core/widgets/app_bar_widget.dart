@@ -8,7 +8,8 @@ import '../utils/constants/svg_constants.dart';
 
 class AppBarWidget extends StatelessWidget {
   final bool? withBackButton;
-  const AppBarWidget({super.key, this.withBackButton = false});
+  final Widget? trailing;
+  const AppBarWidget({super.key, this.withBackButton = false, this.trailing});
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +26,8 @@ class AppBarWidget extends StatelessWidget {
       child: Stack(
         alignment: Alignment.center,
         children: [
+          if (trailing != null)
+            Align(alignment: AlignmentDirectional.centerEnd, child: trailing),
           customSvgWithCustomColor(
             SvgPath.svgLogoAqemLogo,
             height: 25,

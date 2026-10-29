@@ -14,6 +14,7 @@ import '../../presentation/controllers/theme_controller.dart';
 import '../../presentation/feedback/controller/feedback_controller.dart';
 import '../../presentation/ourApp/controller/our_apps_controller.dart';
 import '../../presentation/prayers/prayers.dart';
+import '../../presentation/prayers/features/presentation/prayer_features_binding.dart';
 import '../../presentation/splash/splash.dart';
 import '../../presentation/whats_new/whats_new.dart';
 import '../utils/helpers/rate_app_helper.dart';
@@ -25,6 +26,8 @@ final sl = GetIt.instance;
 class ServicesLocator {
   Future<void> init() async {
     await Future.wait([GetStorage.init('AdhanSounds')]);
+
+    PrayerFeaturesBinding().dependencies();
 
     // Controllers
     sl.registerLazySingleton<ThemeController>(
