@@ -16,6 +16,7 @@ import 'package:timezone/data/latest_all.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 
 import '../utils/constants/shared_preferences_constants.dart';
+import 'prayer_reminder_sound.dart';
 
 /// نموذج موحد لإشعار مستلَم عند النقر، بديل أنواع awesome_notifications.
 class LocalReceivedNotification {
@@ -306,6 +307,18 @@ class LocalNotificationsService {
       ),
     );
 
+    for (final sound in PrayerReminderSound.values) {
+      await android.createNotificationChannel(
+        AndroidNotificationChannel(
+          sound.androidChannelId,
+          sound.androidChannelName,
+          importance: Importance.max,
+          playSound: true,
+          sound: RawResourceAndroidNotificationSound(sound.resourceName),
+        ),
+      );
+    }
+
     for (final legacyId in _legacyAwesomeChannelIds) {
       await android.deleteNotificationChannel(channelId: legacyId);
     }
@@ -333,6 +346,7 @@ class LocalNotificationsService {
       soundType: soundType,
       summary: summary,
       badgeNumber: badgeNumber,
+      payload: payload,
     );
 
     final tzDateTime = tz.TZDateTime.from(safeTime, tz.local);
@@ -389,6 +403,7 @@ class LocalNotificationsService {
         soundType: soundType,
         summary: summary,
         badgeNumber: badgeNumber,
+        payload: payload,
       ),
       payload: encodePayload(payload),
     );
@@ -430,7 +445,12 @@ class LocalNotificationsService {
     required String? soundType,
     required String? summary,
     required int? badgeNumber,
+    required Map<String, String?> payload,
   }) {
+    final reminderSound = PrayerReminderSound.fromPayload(
+      payload,
+      soundType: soundType,
+    );
     final isAdhan = soundType == 'sound';
     final isSilent = soundType == 'nothing' || soundType == 'silent';
 
@@ -439,14 +459,18 @@ class LocalNotificationsService {
     final muteAndroidNotification = isSilent || isAdhan;
     final AndroidNotificationSound? androidSound;
     if (soundType == 'bell') {
-      androidSound = const RawResourceAndroidNotificationSound('notification');
+      androidSound = RawResourceAndroidNotificationSound(
+        reminderSound?.resourceName ?? 'notification',
+      );
     } else {
       androidSound = null;
     }
 
     final androidDetails = AndroidNotificationDetails(
-      soundType == 'bell' ? bellChannelId : silentChannelId,
-      soundType == 'bell' ? 'تنبيهات التطبيق' : 'إشعارات صامتة',
+      reminderSound?.androidChannelId ??
+          (soundType == 'bell' ? bellChannelId : silentChannelId),
+      reminderSound?.androidChannelName ??
+          (soundType == 'bell' ? 'تنبيهات التطبيق' : 'إشعارات صامتة'),
       importance: Importance.max,
       priority: Priority.max,
       playSound: !muteAndroidNotification,
@@ -479,27 +503,30 @@ class LocalNotificationsService {
                 downloadedSegmentName: _downloadedDarwinSegmentName(),
               );
       case 'bell':
-        darwinSoundFile = stripDarwinSoundExtension(
-          'notification.aiff',
-          isMacOS: Platform.isMacOS,
-        );
+        darwinSoundFile = 'notification.aiff';
       default:
         darwinSoundFile = null;
     }
 
-    final darwinDetails = DarwinNotificationDetails(
-      sound: darwinSoundFile,
-      subtitle: summary,
-      presentAlert: true,
-      presentBadge: true,
-      presentSound: darwinSoundFile != null,
-      badgeNumber: badgeNumber,
-    );
+    DarwinNotificationDetails darwinDetails(String? sound) =>
+        DarwinNotificationDetails(
+          sound: sound,
+          subtitle: summary,
+          presentAlert: true,
+          presentBadge: true,
+          presentSound: sound != null,
+          badgeNumber: badgeNumber,
+        );
 
     return NotificationDetails(
       android: androidDetails,
-      iOS: darwinDetails,
-      macOS: darwinDetails,
+      iOS: darwinDetails(reminderSound?.iosFileName ?? darwinSoundFile),
+      macOS: darwinDetails(
+        reminderSound?.resourceName ??
+            (darwinSoundFile == null
+                ? null
+                : stripDarwinSoundExtension(darwinSoundFile, isMacOS: true)),
+      ),
     );
   }
 

@@ -27,6 +27,11 @@
 		D4C0DEAD0000000000000032 /* CustomAdhanChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4C0DEAD0000000000000031 /* CustomAdhanChannel.swift */; };
 		D4F403332E7D25F300A1A3AC /* silence.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = D4F4032F2E7D25F300A1A3AC /* silence.mp3 */; };
 		D4F403342E7D25F300A1A3AC /* notification.aiff in Resources */ = {isa = PBXBuildFile; fileRef = D4F4032C2E7D25F300A1A3AC /* notification.aiff */; };
+		4BDB464BB3A543389319F164 /* prayer_reminder_fajr.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 54BC6EDF838C48CD8716FC00 /* prayer_reminder_fajr.aiff */; };
+		2486B358FCCC454A909D8352 /* prayer_reminder_dhuhr.aiff in Resources */ = {isa = PBXBuildFile; fileRef = AC1064A6A9F6435A89768435 /* prayer_reminder_dhuhr.aiff */; };
+		4880A83B2B7548DB98BA758F /* prayer_reminder_asr.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 2ECCDE9E84A342769B5DCA7F /* prayer_reminder_asr.aiff */; };
+		0A6573B4FC0747908DC63EF2 /* prayer_reminder_maghrib.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 6E6E9FF8080A4591896056F9 /* prayer_reminder_maghrib.aiff */; };
+		C1A1463E3184444AB50E4D0D /* prayer_reminder_isha.aiff in Resources */ = {isa = PBXBuildFile; fileRef = DBF3198387DB4B2882CB56A9 /* prayer_reminder_isha.aiff */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -107,6 +112,11 @@
 		D4F4032F2E7D25F300A1A3AC /* silence.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = silence.mp3; sourceTree = "<group>"; };
 		E8BDCE7673CC9F5742BC5301 /* Pods-RunnerTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.release.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.release.xcconfig"; sourceTree = "<group>"; };
 		F3BB82453A3F662D99F1C074 /* Pods-RunnerTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.debug.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.debug.xcconfig"; sourceTree = "<group>"; };
+		54BC6EDF838C48CD8716FC00 /* prayer_reminder_fajr.aiff */ = {isa = PBXFileReference; lastKnownFileType = audio.aiff; path = prayer_reminder_fajr.aiff; sourceTree = "<group>"; };
+		AC1064A6A9F6435A89768435 /* prayer_reminder_dhuhr.aiff */ = {isa = PBXFileReference; lastKnownFileType = audio.aiff; path = prayer_reminder_dhuhr.aiff; sourceTree = "<group>"; };
+		2ECCDE9E84A342769B5DCA7F /* prayer_reminder_asr.aiff */ = {isa = PBXFileReference; lastKnownFileType = audio.aiff; path = prayer_reminder_asr.aiff; sourceTree = "<group>"; };
+		6E6E9FF8080A4591896056F9 /* prayer_reminder_maghrib.aiff */ = {isa = PBXFileReference; lastKnownFileType = audio.aiff; path = prayer_reminder_maghrib.aiff; sourceTree = "<group>"; };
+		DBF3198387DB4B2882CB56A9 /* prayer_reminder_isha.aiff */ = {isa = PBXFileReference; lastKnownFileType = audio.aiff; path = prayer_reminder_isha.aiff; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -257,6 +267,11 @@
 			isa = PBXGroup;
 			children = (
 				D4F4032C2E7D25F300A1A3AC /* notification.aiff */,
+				DBF3198387DB4B2882CB56A9 /* prayer_reminder_isha.aiff */,
+				6E6E9FF8080A4591896056F9 /* prayer_reminder_maghrib.aiff */,
+				2ECCDE9E84A342769B5DCA7F /* prayer_reminder_asr.aiff */,
+				AC1064A6A9F6435A89768435 /* prayer_reminder_dhuhr.aiff */,
+				54BC6EDF838C48CD8716FC00 /* prayer_reminder_fajr.aiff */,
 				D4F4032F2E7D25F300A1A3AC /* silence.mp3 */,
 				D492D0FB2EC6E33E0036D8F1 /* aqsa_athan.aiff */,
 			);
@@ -393,6 +408,11 @@
 			files = (
 				D4F403332E7D25F300A1A3AC /* silence.mp3 in Resources */,
 				D4F403342E7D25F300A1A3AC /* notification.aiff in Resources */,
+				C1A1463E3184444AB50E4D0D /* prayer_reminder_isha.aiff in Resources */,
+				0A6573B4FC0747908DC63EF2 /* prayer_reminder_maghrib.aiff in Resources */,
+				4880A83B2B7548DB98BA758F /* prayer_reminder_asr.aiff in Resources */,
+				2486B358FCCC454A909D8352 /* prayer_reminder_dhuhr.aiff in Resources */,
+				4BDB464BB3A543389319F164 /* prayer_reminder_fajr.aiff in Resources */,
 				D492D1022EC6E33E0036D8F1 /* aqsa_athan.aiff in Resources */,
 				97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */,
 				3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */,

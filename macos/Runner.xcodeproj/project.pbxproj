@@ -41,6 +41,11 @@
 		D4995E4F2F2DD96F00E85D89 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4995E4E2F2DD96E00E85D89 /* WidgetKit.framework */; };
 		D4995E512F2DD96F00E85D89 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4995E502F2DD96F00E85D89 /* SwiftUI.framework */; };
 		D4995E602F2DD97000E85D89 /* prayer_widgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = D4995E4D2F2DD96E00E85D89 /* prayer_widgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		26D4F6B696034809BD7442D3 /* prayer_reminder_fajr.aiff in Resources */ = {isa = PBXBuildFile; fileRef = B75E6309A2B24D128F34D0D7 /* prayer_reminder_fajr.aiff */; };
+		CB44C5ED241E4770912C222E /* prayer_reminder_dhuhr.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 13FE91243A294B43B510F955 /* prayer_reminder_dhuhr.aiff */; };
+		5B0B600240D9492E9567BEEA /* prayer_reminder_asr.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 33C7E8053C554DE687FDB4A2 /* prayer_reminder_asr.aiff */; };
+		B7281FDFB7514540B8744447 /* prayer_reminder_maghrib.aiff in Resources */ = {isa = PBXBuildFile; fileRef = EB0BF1AE99774AC1A0C2E2A5 /* prayer_reminder_maghrib.aiff */; };
+		0E807760303148BCBC2AEE9E /* prayer_reminder_isha.aiff in Resources */ = {isa = PBXBuildFile; fileRef = 33A640E315E54277A99F48BB /* prayer_reminder_isha.aiff */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -130,6 +135,11 @@
 		D4995E502F2DD96F00E85D89 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		E1165DDC3620BB5AD99F98B1 /* Pods-Runner.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.debug.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"; sourceTree = "<group>"; };
 		F8C947A0362358F71F1122D7 /* Pods-Runner.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile.xcconfig"; sourceTree = "<group>"; };
+		B75E6309A2B24D128F34D0D7 /* prayer_reminder_fajr.aiff */ = {isa = PBXFileReference; lastKnownFileType = audio.aiff; path = prayer_reminder_fajr.aiff; sourceTree = "<group>"; };
+		13FE91243A294B43B510F955 /* prayer_reminder_dhuhr.aiff */ = {isa = PBXFileReference; lastKnownFileType = audio.aiff; path = prayer_reminder_dhuhr.aiff; sourceTree = "<group>"; };
+		33C7E8053C554DE687FDB4A2 /* prayer_reminder_asr.aiff */ = {isa = PBXFileReference; lastKnownFileType = audio.aiff; path = prayer_reminder_asr.aiff; sourceTree = "<group>"; };
+		EB0BF1AE99774AC1A0C2E2A5 /* prayer_reminder_maghrib.aiff */ = {isa = PBXFileReference; lastKnownFileType = audio.aiff; path = prayer_reminder_maghrib.aiff; sourceTree = "<group>"; };
+		33A640E315E54277A99F48BB /* prayer_reminder_isha.aiff */ = {isa = PBXFileReference; lastKnownFileType = audio.aiff; path = prayer_reminder_isha.aiff; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -300,6 +310,11 @@
 				D45EE9042EFB6B7400F85D42 /* qatami_athan.aiff */,
 				D45EE9052EFB6B7400F85D42 /* salah_athan.aiff */,
 				D45EE8C12EFB6B7400F85D42 /* notification.aiff */,
+				33A640E315E54277A99F48BB /* prayer_reminder_isha.aiff */,
+				EB0BF1AE99774AC1A0C2E2A5 /* prayer_reminder_maghrib.aiff */,
+				33C7E8053C554DE687FDB4A2 /* prayer_reminder_asr.aiff */,
+				13FE91243A294B43B510F955 /* prayer_reminder_dhuhr.aiff */,
+				B75E6309A2B24D128F34D0D7 /* prayer_reminder_fajr.aiff */,
 				D45EE8C62EFB6B7400F85D42 /* silence.mp3 */,
 			);
 			path = Sounds;
@@ -445,6 +460,11 @@
 			files = (
 				D45EE8CB2EFB6B7400F85D42 /* aqsa_athan.aiff in Resources */,
 				D45EE8CD2EFB6B7400F85D42 /* notification.aiff in Resources */,
+				0E807760303148BCBC2AEE9E /* prayer_reminder_isha.aiff in Resources */,
+				B7281FDFB7514540B8744447 /* prayer_reminder_maghrib.aiff in Resources */,
+				5B0B600240D9492E9567BEEA /* prayer_reminder_asr.aiff in Resources */,
+				CB44C5ED241E4770912C222E /* prayer_reminder_dhuhr.aiff in Resources */,
+				26D4F6B696034809BD7442D3 /* prayer_reminder_fajr.aiff in Resources */,
 				D45EE8CF2EFB6B7400F85D42 /* silence.mp3 in Resources */,
 				D45EE9112EFB6B7400F85D42 /* saqqaf_athan.aiff in Resources */,
 				D45EE9122EFB6B7400F85D42 /* sarihi_athan.aiff in Resources */,

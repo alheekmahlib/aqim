@@ -5,6 +5,7 @@ import 'dart:ui' as ui;
 import 'package:aqim/core/utils/helpers/app_themes.dart';
 import 'package:aqim/core/widgets/custom_switch_widget.dart';
 import 'package:aqim/presentation/prayers/features/data/pending_prayer_feature_capabilities.dart';
+import 'package:aqim/presentation/prayers/features/data/prayer_feature_capabilities_policy.dart';
 import 'package:aqim/presentation/prayers/features/domain/prayer_feature.dart';
 import 'package:aqim/presentation/prayers/features/domain/prayer_feature_availability.dart';
 import 'package:aqim/presentation/prayers/features/domain/prayer_id.dart';
@@ -214,33 +215,67 @@ void main() {
     },
   );
 
-  testWidgets(
-    'iOS explains device silence limitation without an active switch',
-    (tester) async {
-      final repo = FakePrayerFeatureRepository();
-      const caps = PendingPrayerFeatureCapabilities(
-        isAndroid: false,
-        isIOS: true,
-        isMacOS: false,
-      );
-      final controller = Get.put(
-        PrayerFeatureSettingsController(
-          repository: repo,
-          capabilities: caps,
-          save: SavePrayerFeatureSettings(repo, caps),
-        ),
-      );
-      await tester.pumpWidget(
-        host(PrayerFeaturesSection(controller: controller)),
-      );
-      await tester.pumpAndSettle();
-      expect(
-        find.textContaining('Use Focus or Do Not Disturb'),
-        findsOneWidget,
-      );
-      expect(controller.canToggle(PrayerFeature.silence), isFalse);
-    },
-  );
+  for (final platform in ['iOS', 'macOS', 'Android']) {
+    testWidgets(
+      '$platform hides unsupported features including descriptions and timing',
+      (tester) async {
+        final repo = FakePrayerFeatureRepository();
+        final caps = PrayerFeatureCapabilitiesPolicy(
+          pending: PendingPrayerFeatureCapabilities(
+            isAndroid: platform == 'Android',
+            isIOS: platform == 'iOS',
+            isMacOS: platform == 'macOS',
+          ),
+          // Missing permissions must not hide supported features.
+          notificationPermissionGranted: () => false,
+          silenceSupported: () => platform == 'Android',
+          dndAccessGranted: () => false,
+          isIOSPlatform: () => platform == 'iOS',
+        );
+        final controller = Get.put(
+          PrayerFeatureSettingsController(
+            repository: repo,
+            capabilities: caps,
+            save: SavePrayerFeatureSettings(repo, caps),
+          ),
+        );
+        await tester.pumpWidget(
+          host(PrayerFeaturesSection(controller: controller)),
+        );
+        await tester.pumpAndSettle();
+        final hidden = switch (platform) {
+          'iOS' => {PrayerFeature.silence, PrayerFeature.volumeToStop},
+          'macOS' => {
+            PrayerFeature.silence,
+            PrayerFeature.volumeToStop,
+            PrayerFeature.flipToStop,
+          },
+          _ => <PrayerFeature>{},
+        };
+        for (final feature in PrayerFeature.values) {
+          final expected = hidden.contains(feature)
+              ? findsNothing
+              : findsOneWidget;
+          expect(find.byKey(ValueKey('feature-${feature.name}')), expected);
+          if (feature.hasTiming) {
+            expect(find.byKey(ValueKey('configure-${feature.name}')), expected);
+          }
+        }
+        expect(
+          find.textContaining('Use Focus or Do Not Disturb'),
+          findsNothing,
+        );
+        expect(find.text('prayerFeaturesUnsupported'.tr), findsNothing);
+        expect(
+          find.byKey(const ValueKey('grant-silence')),
+          platform == 'Android' ? findsOneWidget : findsNothing,
+        );
+        expect(controller.canToggle(PrayerFeature.reminder), isFalse);
+        expect(repo.saves, 0);
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
 
   test(
     'every supported locale includes all feature strings and keeps placeholders',

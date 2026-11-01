@@ -7,9 +7,9 @@ import '../domain/prayer_id.dart';
 import '../domain/prayer_reminder_plan.dart';
 import '../domain/prayer_reminder_scheduler.dart';
 
-/// محوّل المرحلة الثانية: يجدول إشعارات تذكير قصيرة قبل الصلاة بصوت
-/// التنبيه الموجود (bell)، مستقلة عن صوت الأذان والإقامة، ووسمها بنوع
-/// prayer_reminder ليفتح النقر شاشة الصلاة دون تشغيل الأذان.
+/// يجدول تذكيرًا قبل الصلاة بصوتها المدمج، مستقلًا عن صوت الأذان والإقامة.
+/// يختار محوّل الإشعارات الصوت من prayer على أندرويد وآيفون والماك.
+/// الوسم prayer_reminder يفتح شاشة الصلاة دون تشغيل الأذان.
 /// تعتمد كل التبعيات حقنًا لتظل قابلة للاختبار دون منصة.
 class LocalPrayerReminderScheduler implements PrayerReminderScheduler {
   LocalPrayerReminderScheduler({

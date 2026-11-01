@@ -3,12 +3,18 @@ import 'package:aqim/presentation/prayers/features/data/custom_adhan_selector.da
 import 'package:aqim/presentation/prayers/features/domain/custom_adhan_repository.dart';
 import 'package:aqim/presentation/prayers/features/domain/local_adhan_audio.dart';
 import 'package:aqim/presentation/prayers/features/presentation/custom_adhan_controller.dart';
+import 'package:aqim/presentation/prayers/features/domain/prayer_feature.dart';
+import 'package:aqim/presentation/prayers/features/domain/save_prayer_feature_settings.dart';
+import 'package:aqim/presentation/prayers/features/presentation/prayer_feature_settings_controller.dart';
+import 'package:aqim/presentation/prayers/features/presentation/widgets/prayer_features_section.dart';
 import 'package:aqim/presentation/prayers/features/presentation/widgets/custom_adhan_section.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 
 import 'feature_test_translations.dart';
+import 'fake_prayer_feature_capabilities.dart';
+import 'fake_prayer_feature_repository.dart';
 
 class _FakeRepository implements CustomAdhanRepository {
   final audios = <LocalAdhanAudio>[
@@ -27,7 +33,16 @@ class _FakeRepository implements CustomAdhanRepository {
   Future<LocalAdhanAudio> importAudio({
     required String sourcePath,
     required String name,
-  }) async => throw UnimplementedError();
+  }) async {
+    final audio = LocalAdhanAudio(
+      id: 'imported',
+      name: name,
+      duration: const Duration(seconds: 125),
+      audioPath: '/durable/imported.mp3',
+    );
+    audios.add(audio);
+    return audio;
+  }
 
   @override
   Future<void> rename(String id, String name) async {}
@@ -65,6 +80,71 @@ Widget host(Widget child, {double scale = 1}) => GetMaterialApp(
 );
 
 void main() {
+  tearDown(Get.reset);
+
+  testWidgets('enabling custom adhan reveals import in the same settings', (
+    tester,
+  ) async {
+    final repository = _FakeRepository()..audios.clear();
+    var pickerCalls = 0;
+    Get.lazyPut<CustomAdhanController>(
+      () => CustomAdhanController(
+        repository: repository,
+        selector: _FakeSelector(''),
+        pickAudioFile: () async {
+          pickerCalls++;
+          return '/picked/My Adhan.mp3';
+        },
+        reschedule: () async {},
+        selectStandardAdhan: (_) async {},
+        probeForPreview: (_) async => const Duration(seconds: 125),
+      ),
+    );
+    final settings = FakePrayerFeatureRepository();
+    final caps = FakePrayerFeatureCapabilities();
+    final controller = Get.put(
+      PrayerFeatureSettingsController(
+        repository: settings,
+        capabilities: caps,
+        save: SavePrayerFeatureSettings(settings, caps),
+      ),
+    );
+    await tester.pumpWidget(
+      host(PrayerFeaturesSection(controller: controller)),
+    );
+    await tester.pumpAndSettle();
+    final importButton = find.byKey(const ValueKey('custom-adhan-import'));
+    final toggle = find.byKey(const ValueKey('feature-customAdhan'));
+    expect(importButton, findsNothing);
+
+    await tester.ensureVisible(toggle);
+    await tester.tap(toggle);
+    await tester.pumpAndSettle();
+    expect(settings.stored[PrayerFeature.customAdhan].enabled, isTrue);
+    expect(importButton, findsOneWidget);
+    expect(pickerCalls, 0);
+
+    await tester.ensureVisible(importButton);
+    await tester.tap(importButton);
+    await tester.pumpAndSettle();
+    expect(pickerCalls, 1);
+    expect(find.text('My Adhan'), findsOneWidget);
+    expect(find.byKey(const ValueKey('preview-imported')), findsOneWidget);
+
+    await tester.ensureVisible(toggle);
+    await tester.tap(toggle);
+    await tester.pumpAndSettle();
+    expect(importButton, findsNothing);
+    expect(find.text('My Adhan'), findsNothing);
+    expect(repository.audios, hasLength(1));
+
+    await tester.tap(toggle);
+    await tester.pumpAndSettle();
+    expect(importButton, findsOneWidget);
+    expect(find.text('My Adhan'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('custom muezzin section fits at 2x text, 320px', (tester) async {
     tester.view.physicalSize = const Size(320, 900);
     tester.view.devicePixelRatio = 1;

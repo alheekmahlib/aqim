@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:ui' as ui;
+import 'package:aqim/presentation/prayers/prayers.dart';
 import 'package:aqim/core/services/languages/localization_controller.dart';
 import 'package:aqim/core/widgets/custom_switch_widget.dart';
 import 'package:aqim/core/widgets/container_button_widget.dart';
@@ -8,15 +9,6 @@ import 'package:aqim/core/utils/helpers/app_themes.dart';
 import 'package:aqim/core/utils/constants/extensions/bottom_sheet_extension.dart';
 import 'package:aqim/presentation/prayers/dashboard/domain/dashboard_data.dart';
 import 'package:aqim/presentation/prayers/dashboard/domain/dashboard_layout.dart';
-import 'package:aqim/presentation/prayers/dashboard/presentation/dashboard_controller.dart';
-import 'package:aqim/presentation/prayers/dashboard/presentation/dashboard_layout_controller.dart';
-import 'package:aqim/presentation/prayers/dashboard/presentation/dashboard_presenter.dart';
-import 'package:aqim/presentation/prayers/dashboard/presentation/dashboard_preview_data.dart';
-import 'package:aqim/presentation/prayers/dashboard/presentation/widgets/dashboard_panel_preview.dart';
-import 'package:aqim/presentation/prayers/dashboard/presentation/widgets/dashboard_customization_sheet.dart';
-import 'package:aqim/presentation/prayers/dashboard/presentation/widgets/dashboard_registry.dart';
-import 'package:aqim/presentation/prayers/dashboard/presentation/widgets/prayer_dashboard_cards.dart';
-import 'package:aqim/presentation/prayers/screen/prayer_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -192,9 +184,10 @@ void main() {
       final cards = <Widget>[
         VerticalPrayerCard(data: data, navigation: navigation),
         MoonPrayerCard(data: data),
-        CalendarPrayerCard(data: data),
+        CalendarPrayerCard(data: data, prayerIndex: data.currentIndex),
         CountdownPrayerCard(
           data: data,
+          prayerIndex: data.currentIndex,
           navigation: navigation,
           countdown: presenter.presentCountdown(
             PreparePrayerDashboard.countdown(
@@ -361,6 +354,111 @@ void main() {
       await clock.stream.close();
     },
   );
+
+  testWidgets('dashboard packs unequal cards on landscape phones and macOS', (
+    tester,
+  ) async {
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    Get.put(LocalizationController());
+    final clock = FakeClock();
+    final repository = FakeDataRepository();
+    final controller = Get.put(
+      DashboardController(PreparePrayerDashboard(repository), clock),
+    );
+    const visiblePanels = [
+      PrayerPanel.verticalTimes,
+      PrayerPanel.calendar,
+      PrayerPanel.moon,
+      PrayerPanel.countdown,
+    ];
+    final layouts = MemoryLayout()
+      ..value = DashboardLayout([
+        for (final panel in visiblePanels) PanelPreference(panel, true),
+      ]);
+    final layout = Get.put(
+      DashboardLayoutController(CustomizeDashboard(layouts)),
+    );
+    await controller.reload();
+    for (final scenario in [
+      (size: const Size(414, 900), platform: TargetPlatform.iOS, columns: 1),
+      (size: const Size(850, 430), platform: TargetPlatform.iOS, columns: 2),
+      (
+        size: const Size(740, 360),
+        platform: TargetPlatform.android,
+        columns: 2,
+      ),
+      (size: const Size(1400, 900), platform: TargetPlatform.macOS, columns: 3),
+      (size: const Size(800, 1000), platform: TargetPlatform.macOS, columns: 2),
+      (size: const Size(500, 800), platform: TargetPlatform.macOS, columns: 1),
+    ]) {
+      tester.view.physicalSize = scenario.size;
+      await tester.pumpWidget(
+        host(
+          PrayerScreen(controller: controller, layoutController: layout),
+          theme: darkTheme.copyWith(platform: scenario.platform),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final first = find.byKey(const ValueKey('panel-vertical_times'));
+      final second = find.byKey(const ValueKey('panel-calendar'));
+      final firstRect = tester.getRect(first);
+      final secondRect = tester.getRect(second);
+      if (scenario.columns > 1) {
+        expect(secondRect.top, closeTo(firstRect.top, .01));
+        expect(secondRect.overlaps(firstRect), isFalse);
+        // The first card stays on the right in Arabic reading order.
+        expect(firstRect.left, greaterThan(secondRect.left));
+        expect(
+          firstRect.width,
+          closeTo(
+            (scenario.size.width.clamp(0, 1200) - 12 * (scenario.columns - 1)) /
+                scenario.columns,
+            .01,
+          ),
+        );
+        final initialRects = [
+          for (var i = 0; i < scenario.columns; i++)
+            tester.getRect(
+              find.byKey(ValueKey('panel-${visiblePanels[i].id}')),
+            ),
+        ]..sort((a, b) => a.bottom.compareTo(b.bottom));
+        final nextCard = tester.getRect(
+          find.byKey(ValueKey('panel-${visiblePanels[scenario.columns].id}')),
+        );
+        // Fill the shortest column instead of waiting for the tallest card.
+        expect(nextCard.top, closeTo(initialRects.first.bottom + 12, .01));
+        expect(nextCard.left, closeTo(initialRects.first.left, .01));
+        expect(nextCard.top, lessThan(initialRects.last.bottom + 12));
+        final rects = [
+          for (final panel in visiblePanels)
+            tester.getRect(find.byKey(ValueKey('panel-${panel.id}'))),
+        ];
+        for (var i = 0; i < rects.length; i++) {
+          for (var j = i + 1; j < rects.length; j++) {
+            expect(rects[i].overlaps(rects[j]), isFalse);
+          }
+        }
+      } else {
+        expect(secondRect.top, greaterThan(firstRect.bottom));
+      }
+      final scrollable = find
+          .descendant(
+            of: find.byKey(const PageStorageKey('prayer-dashboard')),
+            matching: find.byType(Scrollable),
+          )
+          .first;
+      expect(
+        tester.state<ScrollableState>(scrollable).position.maxScrollExtent,
+        greaterThan(0),
+      );
+      expect(tester.takeException(), isNull);
+    }
+    await tester.pumpWidget(const SizedBox());
+    await Get.delete<DashboardController>();
+    await repository.events.close();
+    await clock.stream.close();
+  });
 
   test('registry covers every stable panel identifier', () {
     expect(dashboardRegistry.keys.toSet(), PrayerPanel.values.toSet());

@@ -5,7 +5,7 @@ import '../../../../../../core/widgets/container_button_widget.dart';
 import '../../domain/local_adhan_audio.dart';
 import '../custom_adhan_controller.dart';
 
-/// قسم المؤذنين المخصصين داخل ورقة أصوات الأذان: يظهر عند تفعيل ميزة
+/// قسم المؤذنين المخصصين في الإعدادات وورقة أصوات الأذان: يظهر عند تفعيل ميزة
 /// «استخدام مؤذن مخصص»، ويعرض الاستيراد والمعاينة والاختيار وإعادة
 /// التسمية والحذف بالنمط البصري نفسه.
 class CustomAdhanSection extends StatelessWidget {

@@ -14,6 +14,8 @@ import 'package:flutter/services.dart' show MethodChannel, rootBundle;
 import 'package:flutter_rounded_progress_bar/flutter_rounded_progress_bar.dart';
 import 'package:flutter_rounded_progress_bar/rounded_progress_bar_style.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart'
+    show StaggeredGrid, StaggeredGridTile;
 import 'package:gap/gap.dart';
 import 'package:gauge_indicator/gauge_indicator.dart';
 import 'package:get/get.dart';

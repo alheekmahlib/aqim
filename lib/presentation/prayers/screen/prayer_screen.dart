@@ -97,31 +97,74 @@ class PrayerScreen extends StatelessWidget {
           controller,
           presenter.week(data, controller.now.value),
         );
+        final useColumns =
+            Theme.of(context).platform == TargetPlatform.macOS ||
+            MediaQuery.orientationOf(context) == Orientation.landscape;
+        final panelWidgets = [
+          for (final preference in panels)
+            KeyedSubtree(
+              key: ValueKey('panel-${preference.panel.id}'),
+              child: dashboardRegistry[preference.panel]!.builder(panelContext),
+            ),
+        ];
+        final statusWidgets = [
+          if (refreshing) const LinearProgressIndicator(),
+          if (locationFailed)
+            TextButton(
+              onPressed: controller.updateLocation,
+              child: Text('dashboardLocationRetry'.tr),
+            ),
+        ];
         return Align(
           alignment: Alignment.topCenter,
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 760),
-            child: ListView(
-              key: const PageStorageKey('prayer-dashboard'),
-              padding: const EdgeInsets.only(top: 16, bottom: 120),
-              children: [
-                if (refreshing) const LinearProgressIndicator(),
-                if (locationFailed)
-                  TextButton(
-                    onPressed: controller.updateLocation,
-                    child: Text('dashboardLocationRetry'.tr),
-                  ),
-                for (final preference in panels)
-                  KeyedSubtree(
-                    key: ValueKey('panel-${preference.panel.id}'),
-                    child: Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: dashboardRegistry[preference.panel]!.builder(
-                        panelContext,
+            constraints: BoxConstraints(maxWidth: useColumns ? 1200 : 760),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                const spacing = 12.0;
+                // Keep cards readable as the viewport gains or loses columns.
+                final columns = math.max(
+                  1,
+                  ((constraints.maxWidth + spacing) / (360 + spacing)).floor(),
+                );
+                if (!useColumns) {
+                  return ListView(
+                    key: const PageStorageKey('prayer-dashboard'),
+                    padding: const EdgeInsets.only(top: 16, bottom: 120),
+                    children: [
+                      ...statusWidgets,
+                      for (final panel in panelWidgets)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: spacing),
+                          child: panel,
+                        ),
+                    ],
+                  );
+                }
+                return SingleChildScrollView(
+                  key: const PageStorageKey('prayer-dashboard'),
+                  padding: const EdgeInsets.only(top: 16, bottom: 120),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      ...statusWidgets,
+                      StaggeredGrid.count(
+                        crossAxisCount: columns,
+                        mainAxisSpacing: spacing,
+                        crossAxisSpacing: spacing,
+                        children: [
+                          for (final panel in panelWidgets)
+                            StaggeredGridTile.fit(
+                              key: ValueKey(('tile', panel.key)),
+                              crossAxisCellCount: 1,
+                              child: panel,
+                            ),
+                        ],
                       ),
-                    ),
+                    ],
                   ),
-              ],
+                );
+              },
             ),
           ),
         );
