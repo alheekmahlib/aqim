@@ -1,4 +1,4 @@
-part of '../../../prayers.dart';
+part of '../../prayers.dart';
 
 typedef PanelBuilder = Widget Function(DashboardPanelContext context);
 
@@ -75,6 +75,14 @@ final dashboardRegistry = <PrayerPanel, DashboardPanelDefinition>{
       navigation: _previewNavigation(data),
     ),
     (c) => VerticalPrayerCard(data: c.data, navigation: c.navigation),
+  ),
+  PrayerPanel.verticalTimeline: DashboardPanelDefinition(
+    PrayerPanel.verticalTimeline,
+    (data) => VerticalPrayerTimelineCard(
+      data: data.card,
+      navigation: _previewNavigation(data),
+    ),
+    (c) => VerticalPrayerTimelineCard(data: c.data, navigation: c.navigation),
   ),
   PrayerPanel.moon: DashboardPanelDefinition(
     PrayerPanel.moon,
@@ -243,7 +251,7 @@ class DashboardLocationDate extends StatelessWidget {
   );
 }
 
-class DashboardWeekCalendar extends StatelessWidget {
+class DashboardWeekCalendar extends StatefulWidget {
   const DashboardWeekCalendar({
     super.key,
     required this.data,
@@ -251,8 +259,19 @@ class DashboardWeekCalendar extends StatelessWidget {
   });
   final WeekCalendarViewData data;
   final ValueChanged<DateTime> onDateChange;
+
+  @override
+  State<DashboardWeekCalendar> createState() => _DashboardWeekCalendarState();
+}
+
+class _DashboardWeekCalendarState extends State<DashboardWeekCalendar> {
+  // A newly created calendar starts with three weeks; an offset saved by an
+  // earlier instance can point beyond that list after dashboard changes.
+  final PageStorageBucket _calendarStorage = PageStorageBucket();
+
   @override
   Widget build(BuildContext context) {
+    final data = widget.data;
     final dayStyle = dashboardText(
       context,
       22,
@@ -272,49 +291,54 @@ class DashboardWeekCalendar extends StatelessWidget {
     ].map((day) => day.tr).toList(growable: false);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: LayoutBuilder(
-        builder: (context, constraints) => HorizontalWeekCalendar(
-          key: ValueKey('${data.date}-${data.hijriDate.hDay}'),
-          initialDate: data.date,
-          minDate: data.minDate,
-          maxDate: data.maxDate,
-          hijriInitialDate: data.hijriDate,
-          hijriMinDate: data.hijriMinDate,
-          hijriMaxDate: data.hijriMaxDate,
-          onDateChange: onDateChange,
-          useHijriDates: true,
-          showTopNavbar: false,
-          monthFormat: 'MMMM yyyy',
-          showNavigationButtons: true,
-          weekStartFrom: WeekStartFrom.friday,
-          carouselHeight: _calendarHeight(
-            context,
-            constraints.maxWidth / 7 - 6,
-            dayNames,
-            dayStyle,
-            nameStyle,
+      child: PageStorage(
+        bucket: _calendarStorage,
+        child: LayoutBuilder(
+          builder: (context, constraints) => HorizontalWeekCalendar(
+            key: ValueKey(
+              '${data.date}-${data.hijriDate.hDay}-${constraints.maxWidth}',
+            ),
+            initialDate: data.date,
+            minDate: data.minDate,
+            maxDate: data.maxDate,
+            hijriInitialDate: data.hijriDate,
+            hijriMinDate: data.hijriMinDate,
+            hijriMaxDate: data.hijriMaxDate,
+            onDateChange: widget.onDateChange,
+            useHijriDates: true,
+            showTopNavbar: false,
+            monthFormat: 'MMMM yyyy',
+            showNavigationButtons: true,
+            weekStartFrom: WeekStartFrom.friday,
+            carouselHeight: _calendarHeight(
+              context,
+              constraints.maxWidth / 7 - 6,
+              dayNames,
+              dayStyle,
+              nameStyle,
+            ),
+            borderRadius: BorderRadius.circular(12),
+            itemBorderColor: Colors.transparent,
+            translateNumbers: true,
+            languageCode: Get.locale?.languageCode ?? 'ar',
+            activeBackgroundColor: Theme.of(context).colorScheme.surface,
+            activeTextColor: Colors.white,
+            inactiveBackgroundColor: Colors.transparent,
+            inactiveTextColor: Theme.of(context).colorScheme.inversePrimary,
+            disabledTextColor: Colors.grey,
+            disabledBackgroundColor: Colors.grey.withValues(alpha: .3),
+            activeNavigatorColor: Theme.of(context).colorScheme.surface,
+            inactiveNavigatorColor: Colors.grey,
+            monthColor: Theme.of(context).colorScheme.surface,
+            scrollPhysics: const ClampingScrollPhysics(),
+            dayTextStyle: dayStyle,
+            dayNameTextStyle: nameStyle,
+            monthTextStyle: dashboardText(
+              context,
+              18,
+            ).copyWith(fontWeight: FontWeight.bold, height: 1.5),
+            customDayNames: dayNames,
           ),
-          borderRadius: BorderRadius.circular(12),
-          itemBorderColor: Colors.transparent,
-          translateNumbers: true,
-          languageCode: Get.locale?.languageCode ?? 'ar',
-          activeBackgroundColor: Theme.of(context).colorScheme.surface,
-          activeTextColor: Colors.white,
-          inactiveBackgroundColor: Colors.transparent,
-          inactiveTextColor: Theme.of(context).colorScheme.inversePrimary,
-          disabledTextColor: Colors.grey,
-          disabledBackgroundColor: Colors.grey.withValues(alpha: .3),
-          activeNavigatorColor: Theme.of(context).colorScheme.surface,
-          inactiveNavigatorColor: Colors.grey,
-          monthColor: Theme.of(context).colorScheme.surface,
-          scrollPhysics: const BouncingScrollPhysics(),
-          dayTextStyle: dayStyle,
-          dayNameTextStyle: nameStyle,
-          monthTextStyle: dashboardText(
-            context,
-            18,
-          ).copyWith(fontWeight: FontWeight.bold, height: 1.5),
-          customDayNames: dayNames,
         ),
       ),
     );

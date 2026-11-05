@@ -57,4 +57,12 @@ class LottieConstants {
   /// Assets for assetsLottieCheck
   /// assets/lottie/check.json
   static const String assetsLottieCheck = 'assets/lottie/check.json';
+
+  /// Assets for assetsLottieCloud
+  /// assets/lottie/cloud.json
+  static const String assetsLottieCloud = 'assets/lottie/cloud.json';
+
+  /// Assets for assetsLottieSmallCloud
+  /// assets/lottie/small_cloud.json
+  static const String assetsLottieSmallCloud = 'assets/lottie/small_cloud.json';
 }

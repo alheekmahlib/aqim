@@ -1,6 +1,7 @@
 import 'dart:async';
-import 'package:aqim/presentation/prayers/dashboard/domain/dashboard_data.dart';
-import 'package:aqim/presentation/prayers/dashboard/domain/dashboard_layout.dart';
+
+import 'package:aqim/presentation/prayers/domain/dashboard_data.dart';
+import 'package:aqim/presentation/prayers/domain/dashboard_layout.dart';
 
 DashboardData dashboardFixture(DateTime date) {
   List<PrayerTimeEntry> times(DateTime day) => [

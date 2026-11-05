@@ -1,14 +1,15 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:ui' as ui;
-import 'package:aqim/presentation/prayers/prayers.dart';
+
 import 'package:aqim/core/services/languages/localization_controller.dart';
-import 'package:aqim/core/widgets/custom_switch_widget.dart';
-import 'package:aqim/core/widgets/container_button_widget.dart';
-import 'package:aqim/core/utils/helpers/app_themes.dart';
 import 'package:aqim/core/utils/constants/extensions/bottom_sheet_extension.dart';
-import 'package:aqim/presentation/prayers/dashboard/domain/dashboard_data.dart';
-import 'package:aqim/presentation/prayers/dashboard/domain/dashboard_layout.dart';
+import 'package:aqim/core/utils/helpers/app_themes.dart';
+import 'package:aqim/core/widgets/container_button_widget.dart';
+import 'package:aqim/core/widgets/custom_switch_widget.dart';
+import 'package:aqim/presentation/prayers/domain/dashboard_data.dart';
+import 'package:aqim/presentation/prayers/domain/dashboard_layout.dart';
+import 'package:aqim/presentation/prayers/prayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -18,6 +19,7 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:hijri_date/hijri.dart';
 import 'package:intl/date_symbol_data_local.dart';
+
 import 'fixtures.dart';
 
 class _Translations extends Translations {
@@ -81,6 +83,45 @@ void main() {
     addTearDown(() => dir.delete(recursive: true));
   });
   tearDown(() => Get.reset());
+
+  testWidgets('calendar survives overscroll and dashboard reconstruction', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(382, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    Get.locale = const Locale('ar');
+    final date = DateTime(2026, 11, 4);
+    const presenter = DashboardPresenter();
+    final data = presenter.week(dashboardFixture(date), date);
+    final bucket = PageStorageBucket();
+
+    Widget dashboard(bool showCalendar) => host(
+      PageStorage(
+        bucket: bucket,
+        child: ListView(
+          key: const PageStorageKey('prayer-dashboard'),
+          children: [
+            if (showCalendar)
+              DashboardWeekCalendar(data: data, onDateChange: (_) {}),
+          ],
+        ),
+      ),
+    );
+
+    await tester.pumpWidget(dashboard(true));
+    await tester.pumpAndSettle();
+    final calendar = find.byType(HorizontalWeekCalendar);
+    for (var i = 0; i < 4; i++) {
+      await tester.fling(calendar, const Offset(-700, 0), 2500);
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+    }
+    await tester.pumpWidget(dashboard(false));
+    await tester.pumpWidget(dashboard(true));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+  });
 
   testWidgets(
     'legacy location and week styles retain refresh and date actions',
@@ -458,6 +499,38 @@ void main() {
     await Get.delete<DashboardController>();
     await repository.events.close();
     await clock.stream.close();
+  });
+
+  test('new timeline option is added to old layouts and persists', () async {
+    const storageName = 'dashboard_timeline_test';
+    await GetStorage.init(storageName);
+    final storage = GetStorage(storageName);
+    final repository = StoredDashboardLayout(storage);
+    await storage.write(StoredDashboardLayout.storageKey, {
+      'version': 1,
+      'panels': [
+        {'id': 'vertical_times', 'visible': true},
+      ],
+    });
+    final oldLayout = repository.load();
+    expect(oldLayout.panels.first.panel, PrayerPanel.verticalTimes);
+    expect(oldLayout.panels.first.visible, isTrue);
+    expect(
+      oldLayout.panels
+          .singleWhere((p) => p.panel == PrayerPanel.verticalTimeline)
+          .visible,
+      isFalse,
+    );
+    await repository.save(oldLayout.toggle(PrayerPanel.verticalTimeline, true));
+    expect(
+      repository
+          .load()
+          .panels
+          .singleWhere((p) => p.panel == PrayerPanel.verticalTimeline)
+          .visible,
+      isTrue,
+    );
+    await storage.erase();
   });
 
   test('registry covers every stable panel identifier', () {

@@ -112,9 +112,18 @@ class SvgPath {
   static const String svgLogoAqemLogoStroke =
       "assets/svg/logo/aqem_logo_stroke.svg";
 
+  /// Assets for svgNightOfQadir
+  /// assets/svg/nightOfQadir.svg
+  static const String svgNightOfQadir = "assets/svg/nightOfQadir.svg";
+
   /// Assets for svgNotifications
   /// assets/svg/notifications.svg
   static const String svgNotifications = "assets/svg/notifications.svg";
+
+  /// Assets for svgPrayerMoonBackground
+  /// assets/svg/prayer/moon_background.svg
+  static const String svgPrayerMoonBackground =
+      "assets/svg/prayer/moon_background.svg";
 
   /// Assets for svgPrayerPauseArrow
   /// assets/svg/prayer/pause_arrow.svg
@@ -156,6 +165,11 @@ class SvgPath {
   /// Assets for svgShareShare
   /// assets/svg/share/share.svg
   static const String svgShareShare = "assets/svg/share/share.svg";
+
+  /// Assets for svgTenDaysOfDhulHijjah
+  /// assets/svg/tenDaysOfDhul-Hijjah.svg
+  static const String svgTenDaysOfDhulHijjah =
+      "assets/svg/tenDaysOfDhul-Hijjah.svg";
 
   /// Assets for svgThemeTheme1
   /// assets/svg/theme/theme1.svg

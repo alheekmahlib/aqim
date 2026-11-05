@@ -1,4 +1,4 @@
-part of '../../../prayers.dart';
+part of '../../prayers.dart';
 
 /// Render a full-width composition, then scale the entire widget into a
 /// thumbnail. No live controllers, input handlers or timers are mounted here.

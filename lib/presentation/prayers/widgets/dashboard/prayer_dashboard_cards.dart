@@ -1,22 +1,30 @@
-part of '../../../prayers.dart';
+part of '../../prayers.dart';
 
-TextStyle dashboardText(BuildContext context, [double size = 16]) => TextStyle(
+TextStyle dashboardText(
+  BuildContext context, [
+  double size = 16,
+  Color? textColor,
+]) => TextStyle(
   fontFamily: 'cairo',
   fontSize: size,
-  color: Theme.of(context).colorScheme.inversePrimary,
+  color: textColor ?? Theme.of(context).colorScheme.inversePrimary,
   fontWeight: FontWeight.w600,
+  height: 1.4,
 );
 
 class DashboardCard extends StatelessWidget {
-  const DashboardCard({super.key, required this.child});
+  const DashboardCard({super.key, required this.child, this.backgroundColor});
   final Widget child;
+  final Color? backgroundColor;
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+    padding: const EdgeInsets.symmetric(horizontal: 20),
     child: Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface.withValues(alpha: .05),
+        color:
+            backgroundColor ??
+            Theme.of(context).colorScheme.surface.withValues(alpha: .05),
         borderRadius: BorderRadius.circular(12),
       ),
       child: child,
@@ -145,21 +153,45 @@ class CompactPrayerTimes extends StatelessWidget {
 }
 
 class DashboardMoon extends StatelessWidget {
-  const DashboardMoon({super.key, required this.info, this.size = 145});
+  const DashboardMoon({
+    super.key,
+    required this.info,
+    this.size = 145,
+    this.height,
+  });
   final MoonPhaseInfo info;
   final double size;
+  final double? height;
   @override
-  Widget build(BuildContext context) => MoonPhaseWidget(
-    moonInfo: info,
-    size: size,
-    overlayOpacity: .92,
-    backgroundAssetPath: null,
-  );
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: height,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: MoonPhaseWidget(
+          moonInfo: info,
+          size: size,
+          overlayOpacity: .75,
+          showPhaseName: false,
+          phaseNameLanguage: Get.locale!.languageCode,
+          backgroundAssetPath: null,
+          phaseNameStyle: TextStyle(
+            fontFamily: 'cairo',
+            fontSize: 16,
+            color: Theme.of(context).colorScheme.inversePrimary,
+            fontWeight: FontWeight.w600,
+          ),
+          // usePhaseBasedIllumination: true,
+        ),
+      ),
+    );
+  }
 }
 
 class _SolarTime extends StatelessWidget {
-  const _SolarTime({required this.label, required this.time});
+  const _SolarTime({required this.label, required this.time, this.textColor});
   final String label, time;
+  final Color? textColor;
   @override
   Widget build(BuildContext context) => Column(
     mainAxisSize: MainAxisSize.min,
@@ -167,37 +199,13 @@ class _SolarTime extends StatelessWidget {
       Text(
         label,
         textAlign: TextAlign.center,
-        style: dashboardText(context, 13),
+        style: dashboardText(context, 13, textColor),
       ),
       Text(
         time,
         textAlign: TextAlign.center,
-        style: dashboardText(context, 16),
+        style: dashboardText(context, 16, textColor),
       ),
     ],
   );
-}
-
-class _MoonArcPainter extends CustomPainter {
-  const _MoonArcPainter(this.color);
-  final Color color;
-  @override
-  void paint(Canvas canvas, Size size) {
-    final rect = (Offset.zero & size).deflate(5);
-    final paint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 5
-      ..strokeCap = StrokeCap.round
-      ..shader = SweepGradient(
-        colors: [
-          color.withValues(alpha: .35),
-          color,
-          color.withValues(alpha: .35),
-        ],
-      ).createShader(rect);
-    canvas.drawArc(rect, math.pi * .75, math.pi * 1.5, false, paint);
-  }
-
-  @override
-  bool shouldRepaint(_MoonArcPainter oldDelegate) => oldDelegate.color != color;
 }

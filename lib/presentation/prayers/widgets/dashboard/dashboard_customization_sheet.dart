@@ -1,4 +1,4 @@
-part of '../../../prayers.dart';
+part of '../../prayers.dart';
 
 class DashboardCustomizationSheet extends StatelessWidget {
   const DashboardCustomizationSheet({super.key, required this.controller});

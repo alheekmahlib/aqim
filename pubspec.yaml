@@ -59,7 +59,7 @@ dependencies:
     git:
       ref: dev
       url: https://github.com/alheekmahlib/google_huawei_availability.git
-  hijri_date: ^1.1.0
+  hijri_date: ^1.2.1
   home_widget: ^0.9.4
   huawei_location: ^6.17.0+300
   huawei_site: ^6.5.1+303

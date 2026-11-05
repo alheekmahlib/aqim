@@ -34,12 +34,47 @@ class PrayerScreen extends StatelessWidget {
         child: Column(
           children: [
             AppBarWidget(
-              trailing: IconButton(
-                key: const ValueKey('customize-prayer-dashboard'),
-                tooltip: 'dashboardCustomize'.tr,
-                onPressed: () => _customize(context),
-                icon: const Icon(Icons.dashboard_customize_outlined),
-                color: Theme.of(context).colorScheme.inversePrimary,
+              trailing: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Row(
+                  mainAxisAlignment: .spaceBetween,
+                  children: [
+                    SizedBox(
+                      height: 35,
+                      child: CustomButton(
+                        onPressed: () => context.customBottomSheet(
+                          containerColor:
+                              context.theme.colorScheme.primaryContainer,
+                          textTitle: 'sharePrayerTime',
+                          child: ShareOptionsWidget(),
+                        ),
+                        width: 40,
+                        iconSize: 28,
+                        isCustomSvgColor: true,
+                        svgPath: SvgPath.svgShareShare,
+                        svgColor: context.theme.colorScheme.surface,
+                        borderColor: context.theme.colorScheme.surface
+                            .withValues(alpha: .3),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 35,
+                      child: CustomButton(
+                        key: const ValueKey('customize-prayer-dashboard'),
+                        onPressed: () => _customize(context),
+                        width: 40,
+                        iconSize: 24,
+                        horizontalPadding: 0.0,
+                        verticalPadding: 0.0,
+                        isCustomSvgColor: true,
+                        icon: Icons.dashboard_customize_outlined,
+                        svgColor: context.theme.colorScheme.surface,
+                        borderColor: context.theme.colorScheme.surface
+                            .withValues(alpha: .3),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
             Expanded(
@@ -121,7 +156,7 @@ class PrayerScreen extends StatelessWidget {
             constraints: BoxConstraints(maxWidth: useColumns ? 1200 : 760),
             child: LayoutBuilder(
               builder: (context, constraints) {
-                const spacing = 12.0;
+                const spacing = 8.0;
                 // Keep cards readable as the viewport gains or loses columns.
                 final columns = math.max(
                   1,

@@ -6,6 +6,7 @@ enum PrayerPanel {
   prohibition('prohibition', true),
   timeline('timeline', true),
   verticalTimes('vertical_times', false),
+  verticalTimeline('vertical_timeline', false),
   moon('moon', false),
   calendar('calendar', false),
   countdown('countdown', false);
