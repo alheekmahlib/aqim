@@ -5,12 +5,11 @@ import 'package:get_storage/get_storage.dart';
 import 'package:hijri_date/hijri_date.dart';
 import 'package:latlong2/latlong.dart';
 
-import '/core/services/internet_connection_controller.dart';
 import '/core/services/location/locations.dart';
+import '/core/services/internet_connection_controller.dart';
 import '/core/services/notifications_helper.dart';
 import '/core/services/prayer_countdown_notification_service.dart';
 import '/core/widgets/home_widget/home_widget.dart';
-import '/core/widgets/local_notification/controller/local_notifications_controller.dart';
 import '../../presentation/prayers/prayers.dart';
 
 /// مدير العمليات في الخلفية للصلوات
@@ -32,6 +31,31 @@ class PrayerBackgroundManager {
         return false;
       }
 
+      var resolvedCountry = false;
+      final knownPosition = Location.instance.position;
+      if (Location.instance.country.isEmpty &&
+          knownPosition != null &&
+          (knownPosition.latitude - currentLocation.latitude).abs() <= 0.01 &&
+          (knownPosition.longitude - currentLocation.longitude).abs() <= 0.01 &&
+          InternetConnectionController.instance.isConnected) {
+        try {
+          final address = await NominatimReverseGeocodingService.instance.reverse(
+            latitude: currentLocation.latitude,
+            longitude: currentLocation.longitude,
+          );
+          if (address.country.isNotEmpty && address.country != 'Unknown') {
+            Location.instance.updateLocation(
+              city: address.city,
+              country: address.country,
+              position: knownPosition,
+            );
+            resolvedCountry = true;
+          }
+        } catch (e) {
+          log('Unable to resolve location country: $e', name: _tag);
+        }
+      }
+
       // التحقق من صحة التخزين الشهري أولاً
       // Check monthly cache validity first
       final isMonthlyValid = MonthlyPrayerCache.isMonthlyDataValid(
@@ -44,12 +68,24 @@ class PrayerBackgroundManager {
         currentLocation: currentLocation,
       );
 
-      if (isMonthlyValid || isDailyValid) {
+      if ((isMonthlyValid || isDailyValid) &&
+          !(resolvedCountry && AdhanController.instance.state.autoCalculationMethod.value)) {
         log('Prayer times cache is valid, no update needed', name: _tag);
         return false; // لا حاجة للتحديث / No update needed
       }
 
       log('Prayer times cache is invalid, updating...', name: _tag);
+
+      final previous = Location.instance.position;
+      if (previous == null ||
+          (previous.latitude - currentLocation.latitude).abs() > 0.01 ||
+          (previous.longitude - currentLocation.longitude).abs() > 0.01) {
+        Location.instance.updateCoordinates(
+          currentLocation.latitude,
+          currentLocation.longitude,
+        );
+        AdhanController.instance.state.localizedCity.value = '';
+      }
 
       // تحديث أوقات الصلاة
       // Update prayer times
@@ -74,14 +110,6 @@ class PrayerBackgroundManager {
   /// Get current location
   static Future<LatLng?> _getCurrentLocation() async {
     try {
-      if (!InternetConnectionController.instance.isConnected) {
-        final stored = PrayerCacheManager.getStoredLocation();
-        if (stored != null) {
-          log('No internet: using stored location', name: _tag);
-          return stored;
-        }
-      }
-
       final position = await LocationHelper().fetchCurrentPosition;
       if (position != null) {
         return LatLng(position.latitude, position.longitude);
@@ -89,41 +117,48 @@ class PrayerBackgroundManager {
     } catch (e) {
       log('Error getting location: $e', name: _tag);
     }
-    return null;
+    return PrayerCacheManager.getStoredLocation();
   }
 
   /// تنفيذ المهام اليومية
   /// Execute daily tasks
-  static Future<void> executeDailyTasks() async {
+  static Future<void> executeDailyTasks({bool Function()? shouldContinue}) async {
     try {
       log('Executing daily tasks...', name: _tag);
 
       // تحديث أوقات الصلاة
       // Update prayer times
       await checkAndUpdatePrayerTimes();
+      if (shouldContinue?.call() == false) return;
 
       // تحديث البيانات الشهرية في الخلفية
       // Update monthly data in background
       await AdhanController.instance.updateMonthlyDataInBackground();
+      if (shouldContinue?.call() == false) return;
 
       // تنظيف البيانات القديمة
       // Clean up old data
       await AdhanController.instance.cleanupOldData();
+      if (shouldContinue?.call() == false) return;
 
       // تحديث التاريخ الهجري في الويدجت
       // Update Hijri date in widget
       // await HijriWidgetConfig().updateHijriDate();
 
-      // جلب الإشعارات الجديدة
-      // Fetch new notifications
-      await LocalNotificationsController.instance.fetchNewNotifications();
-
       // جدولة تنبيهات رمضان
       // Schedule Ramadan notifications
       await scheduleRamadanNotificationsIfNeeded();
+      if (shouldContinue?.call() == false) return;
 
       // تحديث تاريخ آخر تشغيل للمهام اليومية
       // Update last daily task run date
+      final location = PrayerCacheManager.getStoredLocation();
+      if (location == null ||
+          !MonthlyPrayerCache.isMonthlyDataValid(currentLocation: location) ||
+          AdhanController.instance.state.prayerTimes == null) {
+        log('Daily prayer data is incomplete; will retry', name: _tag);
+        return;
+      }
       await _updateLastDailyTaskRun();
 
       log('Daily tasks completed successfully', name: _tag);
@@ -203,13 +238,14 @@ class PrayerBackgroundManager {
 
   /// تنفيذ المهام الدورية (كل 20 دقيقة)
   /// Execute periodic tasks (every 20 minutes)
-  static Future<void> executePeriodicTasks() async {
+  static Future<void> executePeriodicTasks({bool Function()? shouldContinue}) async {
     try {
       log('Executing periodic tasks...', name: _tag);
 
       // التحقق من أوقات الصلاة
       // Check prayer times
       final updated = await checkAndUpdatePrayerTimes();
+      if (shouldContinue?.call() == false) return;
 
       // تجديد نافذة إشعارات الإقامة (اليوم+الغد على iOS) حتى مع صلاحية الكاش —
       // iOS لا ينفّذ كودًا عند ظهور إشعار، فالنافذة تتقدم بالتجديد الدوري.
@@ -221,6 +257,7 @@ class PrayerBackgroundManager {
       } catch (e) {
         log('Iqama notifications refresh failed: $e', name: _tag);
       }
+      if (shouldContinue?.call() == false) return;
 
       // تجديد نافذة تذكيرات ما قبل الصلاة بنفس منطق الإقامة أعلاه.
       try {
@@ -228,6 +265,7 @@ class PrayerBackgroundManager {
       } catch (e) {
         log('Prayer reminders refresh failed: $e', name: _tag);
       }
+      if (shouldContinue?.call() == false) return;
 
       // تجديد فترات التصميت (يوسّع تسليح المنبّهات الأصلي ويصحح الانحراف).
       try {
@@ -235,6 +273,7 @@ class PrayerBackgroundManager {
       } catch (e) {
         log('Prayer silence refresh failed: $e', name: _tag);
       }
+      if (shouldContinue?.call() == false) return;
 
       // تحديث ويدجت الصلوات في كل مرة - Update prayers widget every time
       if (Platform.isIOS || Platform.isAndroid) {
@@ -244,6 +283,7 @@ class PrayerBackgroundManager {
           log('Periodic widget update failed: $e', name: _tag);
         }
       }
+      if (shouldContinue?.call() == false) return;
 
       // تجديد نافذة الإشعار الدائم (حدود الغد) — الكرونومتر الأصلي نفسه
       // يستمر، هذا التجديد يضمن قلب النصوص عند الحدود بعد قتل التطبيق.
@@ -252,11 +292,12 @@ class PrayerBackgroundManager {
       } catch (e) {
         log('Countdown notification refresh failed: $e', name: _tag);
       }
+      if (shouldContinue?.call() == false) return;
 
       // التحقق من المهام اليومية إذا لزم الأمر
       // Check daily tasks if needed
       if (await _shouldExecuteDailyTasks()) {
-        await executeDailyTasks();
+        await executeDailyTasks(shouldContinue: shouldContinue);
       }
 
       log(
@@ -280,9 +321,9 @@ class PrayerBackgroundManager {
       final lastRunDate = DateTime.parse(lastRun);
       final now = DateTime.now();
 
-      // تنفيذ المهام اليومية إذا مرت 24 ساعة
-      // Execute daily tasks if 24 hours have passed
-      return now.difference(lastRunDate).inHours >= 24;
+      return lastRunDate.year != now.year ||
+          lastRunDate.month != now.month ||
+          lastRunDate.day != now.day;
     } catch (e) {
       log('Error checking daily tasks need: $e', name: _tag);
       return true; // في حالة الخطأ، نفذ المهام / On error, execute tasks
@@ -294,7 +335,10 @@ class PrayerBackgroundManager {
   static Future<void> _updateLastDailyTaskRun() async {
     try {
       final storage = GetStorage();
-      storage.write('last_daily_task_run', DateTime.now().toIso8601String());
+      await storage.write(
+        'last_daily_task_run',
+        DateTime.now().toIso8601String(),
+      );
     } catch (e) {
       log('Error updating last daily task run: $e', name: _tag);
     }

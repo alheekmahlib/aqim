@@ -13,6 +13,10 @@ class AdhanController extends GetxController {
   @override
   Future<void> onInit() async {
     super.onInit();
+    if (BGServices.isHeadless) {
+      getShared;
+      return;
+    }
     if (GeneralController.instance.state.activeLocation.value) {
       // if (Platform.isAndroid || Platform.isIOS) {
       //   geo.setLocaleIdentifier('en');
@@ -41,28 +45,34 @@ class AdhanController extends GetxController {
       // GeneralController تستدعيها بالفعل مع await. الاستدعاء المزدوج
       // كان يسبب سباق (race condition) يؤدي لبيانات خاطئة في الويدجت.
       Future.delayed(
-          const Duration(seconds: 8),
-          () async =>
-              await PrayersNotificationsCtrl.instance.reschedulePrayers());
+        const Duration(seconds: 8),
+        () async => await PrayersNotificationsCtrl.instance.reschedulePrayers(),
+      );
       updateProgressBar();
       // Start periodic watcher after initial data likely loaded
       Future.delayed(const Duration(seconds: 10), () {
         updateCurrentPrayer();
       });
-      Future.delayed(const Duration(seconds: 2),
-          () async => state.location = await localizedLocation);
+      Future.delayed(
+        const Duration(seconds: 2),
+        () async => state.location = await localizedLocation,
+      );
       return;
     }
 
     if (retries <= 0) {
-      log('Timers not started: prayer data never became ready after retries',
-          name: 'AdhanController');
+      log(
+        'Timers not started: prayer data never became ready after retries',
+        name: 'AdhanController',
+      );
       return;
     }
 
     // أعد المحاولة بعد ثانيتين
-    Future.delayed(const Duration(seconds: 2),
-        () => _startTimersWhenReady(retries: retries - 1));
+    Future.delayed(
+      const Duration(seconds: 2),
+      () => _startTimersWhenReady(retries: retries - 1),
+    );
   }
 
   @override
@@ -100,30 +110,48 @@ class AdhanController extends GetxController {
   Future<void> initTimes() async {
     // Guard: لا تحاول قراءة الأوقات إذا لم تكن مهيأة بعد
     if (state.prayerTimes == null || state.sunnahTimes == null) {
-      log('initTimes skipped: prayer data not ready yet',
-          name: 'AdhanController');
+      log(
+        'initTimes skipped: prayer data not ready yet',
+        name: 'AdhanController',
+      );
       return;
     }
     log('====================');
     log('Updating times...');
     log('====================');
     await Future.wait([
-      getPrayerTime(0, state.prayerTimes!.fajr)
-          .then((v) => state.fajrTime.value = v),
-      getPrayerTime(1, state.prayerTimes!.sunrise)
-          .then((v) => state.sunriseTime.value = v),
-      getPrayerTime(2, state.prayerTimes!.dhuhr)
-          .then((v) => state.dhuhrTime.value = v),
-      getPrayerTime(3, state.prayerTimes!.asr)
-          .then((v) => state.asrTime.value = v),
-      getPrayerTime(4, state.prayerTimes!.maghrib)
-          .then((v) => state.maghribTime.value = v),
-      getPrayerTime(5, state.prayerTimes!.isha)
-          .then((v) => state.ishaTime.value = v),
-      getPrayerTime(6, state.sunnahTimes!.middleOfTheNight)
-          .then((v) => state.midnightTime.value = v),
-      getPrayerTime(7, state.sunnahTimes!.lastThirdOfTheNight)
-          .then((v) => state.lastThirdTime.value = v),
+      getPrayerTime(
+        0,
+        state.prayerTimes!.fajr,
+      ).then((v) => state.fajrTime.value = v),
+      getPrayerTime(
+        1,
+        state.prayerTimes!.sunrise,
+      ).then((v) => state.sunriseTime.value = v),
+      getPrayerTime(
+        2,
+        state.prayerTimes!.dhuhr,
+      ).then((v) => state.dhuhrTime.value = v),
+      getPrayerTime(
+        3,
+        state.prayerTimes!.asr,
+      ).then((v) => state.asrTime.value = v),
+      getPrayerTime(
+        4,
+        state.prayerTimes!.maghrib,
+      ).then((v) => state.maghribTime.value = v),
+      getPrayerTime(
+        5,
+        state.prayerTimes!.isha,
+      ).then((v) => state.ishaTime.value = v),
+      getPrayerTime(
+        6,
+        state.sunnahTimes!.middleOfTheNight,
+      ).then((v) => state.midnightTime.value = v),
+      getPrayerTime(
+        7,
+        state.sunnahTimes!.lastThirdOfTheNight,
+      ).then((v) => state.lastThirdTime.value = v),
     ]);
     log('Times updated, calling update...');
     // update();
@@ -137,17 +165,19 @@ class AdhanController extends GetxController {
       state.dateComponents = DateComponents.from(state.now);
 
       if (!state.autoCalculationMethod.value) {
-        state.params =
-            (await state.selectedCountry.value.getCalculationParameters());
+        state.params = (await state.selectedCountry.value
+            .getCalculationParameters());
       } else {
-        final method =
-            await getCalculationParametersFromJson(Location.instance.country);
+        final method = await getCalculationParametersFromJson(
+          Location.instance.country,
+        );
         if (method != null) {
           state.params = method.getParameters();
         } else {
           // Offline/Localization safe: إذا كان اسم الدولة ليس بالإنجليزية
           // (فتفشل المطابقة في madhabV2.json)، استخدم params المخزنة من الكاش الشهري.
-          state.params = _readMonthlyCachedParams() ??
+          state.params =
+              _readMonthlyCachedParams() ??
               CalculationMethod.other.getParameters();
         }
       }
@@ -161,11 +191,15 @@ class AdhanController extends GetxController {
 
       state.params
         ..madhab = getMadhab(state.isHanafi)
-        ..highLatitudeRule =
-            await getHighLatitudeRule(state.highLatitudeRuleIndex.value);
+        ..highLatitudeRule = await getHighLatitudeRule(
+          state.highLatitudeRuleIndex.value,
+        );
 
-      state.prayerTimesNow =
-          PrayerTimes(state.coordinates, state.dateComponents, state.params);
+      state.prayerTimesNow = PrayerTimes(
+        state.coordinates,
+        state.dateComponents,
+        state.params,
+      );
       state.sunnahTimes = SunnahTimes(state.prayerTimesNow!);
       state.prayerTimes = state.prayerTimesNow;
       // update();
@@ -175,10 +209,9 @@ class AdhanController extends GetxController {
 
   CalculationParameters? _readMonthlyCachedParams() {
     try {
-      final raw = GetStorage().read(MonthlyPrayerCache.MONTHLY_PRAYER_DATA);
-      if (raw is! Map) return null;
-      final monthly =
-          MonthlyPrayerData.fromJson(Map<String, dynamic>.from(raw));
+      final raw = MonthlyPrayerCache.dataForMonth(DateTime.now());
+      if (raw == null) return null;
+      final monthly = MonthlyPrayerData.fromJson(raw);
       return monthly.params;
     } catch (e) {
       log('Failed to read monthly cached params: $e', name: 'AdhanController');
@@ -188,10 +221,11 @@ class AdhanController extends GetxController {
 
   /// تهيئة بيانات الأذان المخزنة مع التحقق من الحاجة للتحديث
   /// Initialize stored adhan data with update check
-  Future<void> initializeStoredAdhan(
-      {LatLng? currentLocation,
-      LatLng? newLocation,
-      bool forceUpdate = false}) async {
+  Future<void> initializeStoredAdhan({
+    LatLng? currentLocation,
+    LatLng? newLocation,
+    bool forceUpdate = false,
+  }) async {
     try {
       final bool isOffline = !InternetConnectionController.instance.isConnected;
 
@@ -212,9 +246,11 @@ class AdhanController extends GetxController {
       }
 
       // Offline: استخدم البيانات المخزنة قدر الإمكان (موقع + صلوات) بدون محاولة "تحديث".
-      if (isOffline) {
-        log('Offline mode: using stored location/prayer data',
-            name: 'AdhanController');
+      if (isOffline && !forceUpdate) {
+        log(
+          'Offline mode: using stored location/prayer data',
+          name: 'AdhanController',
+        );
 
         // 1) جرّب الكاش الشهري (حتى لو لم نتحقق من صلاحيته عبر isMonthlyDataValid).
         if (await _loadFromMonthlyCache()) {
@@ -243,7 +279,8 @@ class AdhanController extends GetxController {
       // First: Try to use monthly cache system
       if (!forceUpdate &&
           MonthlyPrayerCache.isMonthlyDataValid(
-              currentLocation: currentLocation)) {
+            currentLocation: currentLocation,
+          )) {
         log('Using monthly cached prayer data', name: 'AdhanController');
 
         if (await _loadFromMonthlyCache()) {
@@ -338,8 +375,10 @@ class AdhanController extends GetxController {
     if (Platform.isIOS || Platform.isAndroid || Platform.isMacOS) {
       Future.delayed(const Duration(milliseconds: 500), () {
         PrayersWidgetConfig().updatePrayersDate();
-        log('Widget update triggered after prayer times initialization',
-            name: 'AdhanController');
+        log(
+          'Widget update triggered after prayer times initialization',
+          name: 'AdhanController',
+        );
       });
     }
   }
@@ -408,7 +447,8 @@ class AdhanController extends GetxController {
       final currentLocation = PrayerCacheManager.getStoredLocation();
       if (currentLocation != null &&
           MonthlyPrayerCache.isMonthlyDataValid(
-              currentLocation: currentLocation)) {
+            currentLocation: currentLocation,
+          )) {
         if (await _loadFromMonthlyCache()) {
           return;
         }
@@ -436,12 +476,13 @@ class AdhanController extends GetxController {
   Future<List<String>> getCountryList() async {
     // Normalize existing cache (useful after hot-reload or legacy code paths)
     if (state.countries.isNotEmpty) {
-      final normalized = state.countries
-          .map((c) => c.trim())
-          .where((c) => c.isNotEmpty)
-          .toSet()
-          .toList()
-        ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+      final normalized =
+          state.countries
+              .map((c) => c.trim())
+              .where((c) => c.isNotEmpty)
+              .toSet()
+              .toList()
+            ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
       state.countries = normalized;
       return state.countries;
     }
@@ -523,8 +564,9 @@ class AdhanController extends GetxController {
     final Duration wait = _timeUntilNextPrayerChange();
 
     // Safety: ensure at least 1s to avoid zero/negative durations
-    final Duration safeWait =
-        wait.inSeconds <= 0 ? const Duration(seconds: 1) : wait;
+    final Duration safeWait = wait.inSeconds <= 0
+        ? const Duration(seconds: 1)
+        : wait;
 
     _currentPrayerTimer = Timer(safeWait, () {
       final currentIndex = getCurrentPrayerByDateTime();
@@ -582,23 +624,30 @@ class AdhanController extends GetxController {
 
       // أولاً: محاولة الحصول على البيانات من التخزين الشهري
       // First: Try to get data from monthly cache
-      final cachedDayData =
-          MonthlyPrayerCache.getPrayerTimesForDate(selectedDate);
+      final cachedDayData = MonthlyPrayerCache.getPrayerTimesForDate(
+        selectedDate,
+      );
       if (cachedDayData != null) {
-        log('Using monthly cached data for selected date',
-            name: 'AdhanController');
+        log(
+          'Using monthly cached data for selected date',
+          name: 'AdhanController',
+        );
         await _loadSelectedDateFromCache(cachedDayData);
         return;
       }
 
       // ثانياً: حساب البيانات يدوياً إذا لم تكن متوفرة في التخزين
       // Second: Calculate manually if not available in cache
-      log('Calculating prayer times for selected date manually',
-          name: 'AdhanController');
+      log(
+        'Calculating prayer times for selected date manually',
+        name: 'AdhanController',
+      );
       await _calculateSelectedDateManually(selectedDate);
     } catch (e) {
-      log('Error calculating prayer times for date: $e',
-          name: 'AdhanController');
+      log(
+        'Error calculating prayer times for date: $e',
+        name: 'AdhanController',
+      );
     }
   }
 
@@ -607,22 +656,38 @@ class AdhanController extends GetxController {
   Future<void> _loadSelectedDateFromCache(DayPrayerTimes cachedData) async {
     // تحويل البيانات المخزنة إلى النصوص المطلوبة للواجهة
     await Future.wait([
-      getPrayerTime(0, cachedData.fajr)
-          .then((v) => state.selectedDateFajrTime.value = v),
-      getPrayerTime(1, cachedData.sunrise)
-          .then((v) => state.selectedDateSunriseTime.value = v),
-      getPrayerTime(2, cachedData.dhuhr)
-          .then((v) => state.selectedDateDhuhrTime.value = v),
-      getPrayerTime(3, cachedData.asr)
-          .then((v) => state.selectedDateAsrTime.value = v),
-      getPrayerTime(4, cachedData.maghrib)
-          .then((v) => state.selectedDateMaghribTime.value = v),
-      getPrayerTime(5, cachedData.isha)
-          .then((v) => state.selectedDateIshaTime.value = v),
-      getPrayerTime(6, cachedData.midnight)
-          .then((v) => state.selectedDateMidnightTime.value = v),
-      getPrayerTime(7, cachedData.lastThird)
-          .then((v) => state.selectedDateLastThirdTime.value = v),
+      getPrayerTime(
+        0,
+        cachedData.fajr,
+      ).then((v) => state.selectedDateFajrTime.value = v),
+      getPrayerTime(
+        1,
+        cachedData.sunrise,
+      ).then((v) => state.selectedDateSunriseTime.value = v),
+      getPrayerTime(
+        2,
+        cachedData.dhuhr,
+      ).then((v) => state.selectedDateDhuhrTime.value = v),
+      getPrayerTime(
+        3,
+        cachedData.asr,
+      ).then((v) => state.selectedDateAsrTime.value = v),
+      getPrayerTime(
+        4,
+        cachedData.maghrib,
+      ).then((v) => state.selectedDateMaghribTime.value = v),
+      getPrayerTime(
+        5,
+        cachedData.isha,
+      ).then((v) => state.selectedDateIshaTime.value = v),
+      getPrayerTime(
+        6,
+        cachedData.midnight,
+      ).then((v) => state.selectedDateMidnightTime.value = v),
+      getPrayerTime(
+        7,
+        cachedData.lastThird,
+      ).then((v) => state.selectedDateLastThirdTime.value = v),
     ]);
 
     // تحديث الواجهة
@@ -638,15 +703,17 @@ class AdhanController extends GetxController {
     state.dateComponents = DateComponents.from(selectedDate);
 
     if (!state.autoCalculationMethod.value) {
-      state.params =
-          (await state.selectedCountry.value.getCalculationParameters());
+      state.params = (await state.selectedCountry.value
+          .getCalculationParameters());
     } else {
-      final method =
-          await getCalculationParametersFromJson(Location.instance.country);
+      final method = await getCalculationParametersFromJson(
+        Location.instance.country,
+      );
       if (method != null) {
         state.params = method.getParameters();
       } else {
-        state.params = _readMonthlyCachedParams() ??
+        state.params =
+            _readMonthlyCachedParams() ??
             CalculationMethod.other.getParameters();
       }
     }
@@ -654,30 +721,50 @@ class AdhanController extends GetxController {
     state.params.adjustments = state.adjustments;
     state.params
       ..madhab = getMadhab(state.isHanafi)
-      ..highLatitudeRule =
-          await getHighLatitudeRule(state.highLatitudeRuleIndex.value);
+      ..highLatitudeRule = await getHighLatitudeRule(
+        state.highLatitudeRuleIndex.value,
+      );
 
-    state.selectedDatePrayerTimes =
-        PrayerTimes(state.coordinates, state.dateComponents, state.params);
+    state.selectedDatePrayerTimes = PrayerTimes(
+      state.coordinates,
+      state.dateComponents,
+      state.params,
+    );
     state.selectedDateSunnahTimes = SunnahTimes(state.selectedDatePrayerTimes!);
 
     await Future.wait([
-      getPrayerTime(0, state.selectedDatePrayerTimes!.fajr)
-          .then((v) => state.selectedDateFajrTime.value = v),
-      getPrayerTime(1, state.selectedDatePrayerTimes!.sunrise)
-          .then((v) => state.selectedDateSunriseTime.value = v),
-      getPrayerTime(2, state.selectedDatePrayerTimes!.dhuhr)
-          .then((v) => state.selectedDateDhuhrTime.value = v),
-      getPrayerTime(3, state.selectedDatePrayerTimes!.asr)
-          .then((v) => state.selectedDateAsrTime.value = v),
-      getPrayerTime(4, state.selectedDatePrayerTimes!.maghrib)
-          .then((v) => state.selectedDateMaghribTime.value = v),
-      getPrayerTime(5, state.selectedDatePrayerTimes!.isha)
-          .then((v) => state.selectedDateIshaTime.value = v),
-      getPrayerTime(6, state.selectedDateSunnahTimes!.middleOfTheNight)
-          .then((v) => state.selectedDateMidnightTime.value = v),
-      getPrayerTime(7, state.selectedDateSunnahTimes!.lastThirdOfTheNight)
-          .then((v) => state.selectedDateLastThirdTime.value = v),
+      getPrayerTime(
+        0,
+        state.selectedDatePrayerTimes!.fajr,
+      ).then((v) => state.selectedDateFajrTime.value = v),
+      getPrayerTime(
+        1,
+        state.selectedDatePrayerTimes!.sunrise,
+      ).then((v) => state.selectedDateSunriseTime.value = v),
+      getPrayerTime(
+        2,
+        state.selectedDatePrayerTimes!.dhuhr,
+      ).then((v) => state.selectedDateDhuhrTime.value = v),
+      getPrayerTime(
+        3,
+        state.selectedDatePrayerTimes!.asr,
+      ).then((v) => state.selectedDateAsrTime.value = v),
+      getPrayerTime(
+        4,
+        state.selectedDatePrayerTimes!.maghrib,
+      ).then((v) => state.selectedDateMaghribTime.value = v),
+      getPrayerTime(
+        5,
+        state.selectedDatePrayerTimes!.isha,
+      ).then((v) => state.selectedDateIshaTime.value = v),
+      getPrayerTime(
+        6,
+        state.selectedDateSunnahTimes!.middleOfTheNight,
+      ).then((v) => state.selectedDateMidnightTime.value = v),
+      getPrayerTime(
+        7,
+        state.selectedDateSunnahTimes!.lastThirdOfTheNight,
+      ).then((v) => state.selectedDateLastThirdTime.value = v),
     ]);
 
     // تحديث الواجهة
@@ -698,23 +785,35 @@ class AdhanController extends GetxController {
       final currentLocation = PrayerCacheManager.getStoredLocation();
       if (currentLocation != null &&
           GeneralController.instance.state.activeLocation.value) {
-        log('Updating monthly prayer data in background',
-            name: 'AdhanController');
+        log(
+          'Updating monthly prayer data in background',
+          name: 'AdhanController',
+        );
 
         final now = DateTime.now();
-        await MonthlyPrayerCache.saveMonthlyPrayerData(
-          location: currentLocation,
-          params: state.params,
-          month: DateTime(now.year, now.month, 1),
+        final currentCacheValid = MonthlyPrayerCache.isMonthlyDataValid(
+          currentLocation: currentLocation,
         );
+        if (!currentCacheValid) {
+          await MonthlyPrayerCache.saveMonthlyPrayerData(
+            location: currentLocation,
+            params: state.params,
+            month: DateTime(now.year, now.month, 1),
+          );
+        }
 
         // أيضاً تحديث الشهر التالي للاستعداد
         final nextMonth = DateTime(now.year, now.month + 1, 1);
-        await MonthlyPrayerCache.saveMonthlyPrayerData(
-          location: currentLocation,
-          params: state.params,
-          month: nextMonth,
-        );
+        if (!MonthlyPrayerCache.isMonthlyDataValid(
+          currentLocation: currentLocation,
+          date: nextMonth,
+        )) {
+          await MonthlyPrayerCache.saveMonthlyPrayerData(
+            location: currentLocation,
+            params: state.params,
+            month: nextMonth,
+          );
+        }
 
         log('Monthly data updated successfully', name: 'AdhanController');
       }
@@ -731,7 +830,8 @@ class AdhanController extends GetxController {
       final currentLocation = PrayerCacheManager.getStoredLocation();
       if (currentLocation != null &&
           MonthlyPrayerCache.isMonthlyDataValid(
-              currentLocation: currentLocation)) {
+            currentLocation: currentLocation,
+          )) {
         log('Cleaning up old daily cache data', name: 'AdhanController');
         PrayerCacheManager.clearCache();
       }

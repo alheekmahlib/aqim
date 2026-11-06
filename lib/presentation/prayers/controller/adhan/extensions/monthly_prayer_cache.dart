@@ -13,6 +13,40 @@ class MonthlyPrayerCache {
   static const String MONTHLY_PRAYER_DATA = 'MONTHLY_PRAYER_DATA';
   static const String MONTHLY_CACHE_DATE = 'MONTHLY_CACHE_DATE';
   static const String MONTHLY_CACHE_LOCATION = 'MONTHLY_CACHE_LOCATION';
+  static const String _monthlyDataByMonth = 'MONTHLY_PRAYER_DATA_BY_MONTH_V2';
+
+  static Map<String, dynamic> _settingsSnapshot() {
+    final auto = _storage.read(AUTO_CALCULATION) ?? true;
+    final location = _storage.read(CURRENT_LOCATION);
+    return {
+      'auto': auto,
+      'country': auto
+          ? (location is Map ? location['country'] ?? '' : '')
+          : _storage.read(PRAYER_CALCULATION_COUNTRY) ?? 'Saudi Arabia',
+      for (final key in [
+        ADJUSTMENT_FAJR, ADJUSTMENT_SUNRISE, ADJUSTMENT_DHUHR,
+        ADJUSTMENT_ASR, ADJUSTMENT_MAGHRIB, ADJUSTMENT_ISHA,
+        ADJUSTMENT_MIDNIGHT, 'ADJUSTMENT_LAST_THIRD',
+      ]) key: _storage.read(key) ?? 0,
+    };
+  }
+
+  static String _monthKey(DateTime date) =>
+      '${date.year}-${date.month.toString().padLeft(2, '0')}';
+
+  static Map<String, dynamic>? dataForMonth(DateTime date) {
+    final raw = _storage.read(_monthlyDataByMonth);
+    if (raw is Map && raw[_monthKey(date)] is Map) {
+      return Map<String, dynamic>.from(raw[_monthKey(date)] as Map);
+    }
+    final legacy = _storage.read(MONTHLY_PRAYER_DATA);
+    if (legacy is Map) {
+      final data = Map<String, dynamic>.from(legacy);
+      final parsed = MonthlyPrayerData.fromJson(data);
+      if (parsed.year == date.year && parsed.month == date.month) return data;
+    }
+    return null;
+  }
 
   /// حفظ بيانات الصلاة لشهر كامل
   /// Save prayer data for a complete month
@@ -22,8 +56,10 @@ class MonthlyPrayerCache {
     required DateTime month,
   }) async {
     try {
-      log('Calculating monthly prayer data for ${month.month}/${month.year}',
-          name: _tag);
+      log(
+        'Calculating monthly prayer data for ${month.month}/${month.year}',
+        name: _tag,
+      );
 
       // حساب بيانات الشهر الكامل
       final monthlyData = await _calculateMonthlyPrayerTimes(
@@ -33,9 +69,23 @@ class MonthlyPrayerCache {
       );
 
       // حفظ البيانات
-      await _storage.write(MONTHLY_PRAYER_DATA, monthlyData.toJson());
+      final existing = _storage.read(_monthlyDataByMonth);
+      final months = existing is Map
+          ? Map<String, dynamic>.from(existing)
+          : <String, dynamic>{};
+      final payload = monthlyData.toJson()
+        ..['settingsSnapshot'] = _settingsSnapshot();
+      months[_monthKey(month)] = payload;
+      await _storage.write(_monthlyDataByMonth, months);
+      // Keep the legacy current-month key for older consumers.
+      final now = DateTime.now();
+      if (month.year == now.year && month.month == now.month) {
+        await _storage.write(MONTHLY_PRAYER_DATA, payload);
+      }
       await _storage.write(
-          MONTHLY_CACHE_DATE, DateTime.now().toIso8601String());
+        MONTHLY_CACHE_DATE,
+        DateTime.now().toIso8601String(),
+      );
       await _storage.write(MONTHLY_CACHE_LOCATION, {
         'latitude': location.latitude,
         'longitude': location.longitude,
@@ -49,11 +99,12 @@ class MonthlyPrayerCache {
 
   /// التحقق من صحة البيانات الشهرية المخزنة
   /// Check if cached monthly data is valid
-  static bool isMonthlyDataValid({required LatLng currentLocation}) {
+  static bool isMonthlyDataValid({required LatLng currentLocation, DateTime? date}) {
     try {
-      final storedData = _storage.read(MONTHLY_PRAYER_DATA);
+      final requestedDate = date ?? DateTime.now();
+      final storedData = dataForMonth(requestedDate);
       final storedDate = _storage.read(MONTHLY_CACHE_DATE);
-      final storedLocation = _storage.read(MONTHLY_CACHE_LOCATION);
+      final storedLocation = storedData?['location'];
 
       if (storedData == null || storedDate == null || storedLocation == null) {
         return false;
@@ -66,9 +117,15 @@ class MonthlyPrayerCache {
 
       // التحقق من أن البيانات تغطي الشهر الحالي
       final monthlyData = MonthlyPrayerData.fromJson(storedData);
-      final now = DateTime.now();
+      if (!monthlyData.containsDate(requestedDate)) {
+        return false;
+      }
 
-      if (!monthlyData.containsDate(now)) {
+      final snapshot = storedData['settingsSnapshot'];
+      final currentSettings = _settingsSnapshot();
+      if (snapshot is! Map || currentSettings.entries.any(
+        (entry) => snapshot[entry.key] != entry.value,
+      )) {
         return false;
       }
 
@@ -90,7 +147,8 @@ class MonthlyPrayerCache {
   static bool _areParamsValid(CalculationParameters storedParams) {
     try {
       final isHanafi = _storage.read(SHAFI) ?? true;
-      final expectedMadhab = isHanafi ? Madhab.hanafi : Madhab.shafi;
+      // Match AdhanController.getMadhab(), which interprets SHAFI as true.
+      final expectedMadhab = isHanafi ? Madhab.shafi : Madhab.hanafi;
       if (storedParams.madhab != expectedMadhab) return false;
 
       final ruleIndex = _storage.read(HIGH_LATITUDE_RULE) ?? 0;
@@ -120,7 +178,7 @@ class MonthlyPrayerCache {
   /// Get prayer times for specific date from cached data
   static DayPrayerTimes? getPrayerTimesForDate(DateTime date) {
     try {
-      final storedData = _storage.read(MONTHLY_PRAYER_DATA);
+      final storedData = dataForMonth(date);
       if (storedData == null) return null;
 
       final monthlyData = MonthlyPrayerData.fromJson(storedData);
@@ -198,6 +256,7 @@ class MonthlyPrayerCache {
   /// Clear cached monthly data
   static void clearMonthlyCache() {
     try {
+      _storage.remove(_monthlyDataByMonth);
       _storage.remove(MONTHLY_PRAYER_DATA);
       _storage.remove(MONTHLY_CACHE_DATE);
       _storage.remove(MONTHLY_CACHE_LOCATION);
@@ -312,8 +371,19 @@ class MonthlyPrayerData {
       },
       'calculatedAt': calculatedAt.toIso8601String(),
       'params': {
+        'method': params.method.name,
         'fajrAngle': params.fajrAngle,
         'ishaAngle': params.ishaAngle,
+        'ishaInterval': params.ishaInterval,
+        'maghribAngle': params.maghribAngle,
+        'methodAdjustments': {
+          'fajr': params.methodAdjustments.fajr,
+          'sunrise': params.methodAdjustments.sunrise,
+          'dhuhr': params.methodAdjustments.dhuhr,
+          'asr': params.methodAdjustments.asr,
+          'maghrib': params.methodAdjustments.maghrib,
+          'isha': params.methodAdjustments.isha,
+        },
         'madhab': params.madhab.toString(),
         'highLatitudeRule': params.highLatitudeRule.toString(),
       },
@@ -333,16 +403,38 @@ class MonthlyPrayerData {
     final paramsJson = json['params'] as Map<String, dynamic>;
 
     // إعادة بناء معاملات الحساب
+    final method = CalculationMethod.values.firstWhere(
+      (value) => value.name == paramsJson['method'],
+      orElse: () => CalculationMethod.other,
+    );
+    final adjustments = paramsJson['methodAdjustments'];
     final params = CalculationParameters(
+      method: method,
       fajrAngle: paramsJson['fajrAngle']?.toDouble() ?? 18.0,
-    )..ishaAngle = paramsJson['ishaAngle']?.toDouble() ?? 17.0;
+      ishaAngle: paramsJson.containsKey('ishaInterval')
+          ? paramsJson['ishaAngle']?.toDouble()
+          : paramsJson['ishaAngle']?.toDouble() ?? 17.0,
+      ishaInterval: paramsJson['ishaInterval'] ?? 0,
+      maghribAngle: paramsJson['maghribAngle']?.toDouble(),
+      methodAdjustments: adjustments is Map
+          ? PrayerAdjustments(
+              fajr: adjustments['fajr'] ?? 0,
+              sunrise: adjustments['sunrise'] ?? 0,
+              dhuhr: adjustments['dhuhr'] ?? 0,
+              asr: adjustments['asr'] ?? 0,
+              maghrib: adjustments['maghrib'] ?? 0,
+              isha: adjustments['isha'] ?? 0,
+            )
+          : null,
+    );
 
     // تعيين المذهب
     final madhabStr = paramsJson['madhab'] ?? 'Madhab.shafi';
     params.madhab = madhabStr.contains('hanafi') ? Madhab.hanafi : Madhab.shafi;
 
     // تعيين قاعدة خطوط العرض العليا
-    final ruleStr = paramsJson['highLatitudeRule'] ??
+    final ruleStr =
+        paramsJson['highLatitudeRule'] ??
         'HighLatitudeRule.middle_of_the_night';
     params.highLatitudeRule = HighLatitudeRule.values.firstWhere(
       (rule) => rule.toString() == ruleStr,

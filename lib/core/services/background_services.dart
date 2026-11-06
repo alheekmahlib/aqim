@@ -7,11 +7,21 @@ import 'dart:io' show Platform;
 import 'package:background_fetch/background_fetch.dart';
 import 'package:flutter/services.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:get/get.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
 import '/core/services/prayer_background_manager.dart';
+import 'internet_connection_controller.dart';
+import 'connectivity_service.dart';
+import 'location/locations.dart';
+import '../../presentation/prayers/features/presentation/prayer_features_binding.dart';
 import '../../presentation/feedback/controller/feedback_controller.dart';
 import '../../presentation/prayers/prayers.dart';
 import '../widgets/home_widget/home_widget.dart';
+import '../widgets/local_notification/controller/local_notifications_controller.dart';
 
 /// مُعالج المهام في الخلفية (headless)
 @pragma('vm:entry-point')
@@ -19,15 +29,46 @@ void backgroundFetchHeadlessTask(HeadlessEvent task) async {
   final taskId = task.taskId;
   if (task.timeout) {
     log('Headless task timed-out: $taskId', name: 'Background service');
+    _timedOutTasks.add(taskId);
     BackgroundFetch.finish(taskId);
     return;
   }
   log('Headless event received: $taskId', name: 'Background service');
-  await _executeBackgroundTask(taskId);
-  BackgroundFetch.finish(taskId);
+  try {
+    BGServices.isHeadless = true;
+    WidgetsFlutterBinding.ensureInitialized();
+    await GetStorage.init();
+    await GetStorage.init('AdhanSounds');
+    if (_timedOutTasks.contains(taskId)) return;
+    Location.instance.restoreFromStorage();
+    if (!Get.isRegistered<InternetConnectionService>()) {
+      Get.put(InternetConnectionService(), permanent: true);
+    }
+    PrayerFeaturesBinding().dependencies();
+    tz.initializeTimeZones();
+    try {
+      final zone = await FlutterTimezone.getLocalTimezone();
+      tz.setLocalLocation(tz.getLocation(zone.identifier));
+    } catch (e) {
+      log('Unable to set local timezone: $e', name: 'Background service');
+    }
+    if (_timedOutTasks.contains(taskId)) return;
+    await AdhanController.instance.initializeStoredAdhan();
+    if (_timedOutTasks.contains(taskId)) return;
+    await _executeBackgroundTask(taskId);
+  } catch (e, stack) {
+    log(
+      'Headless task failed: $e',
+      name: 'Background service',
+      stackTrace: stack,
+    );
+  } finally {
+    if (!_timedOutTasks.remove(taskId)) BackgroundFetch.finish(taskId);
+  }
 }
 
 class BGServices {
+  static bool isHeadless = false;
   static Timer? _midnightTimer;
 
   Future<void> registerTask() async {
@@ -42,7 +83,7 @@ class BGServices {
             requiresCharging: false,
             requiresStorageNotLow: false,
             requiresDeviceIdle: false,
-            requiredNetworkType: NetworkType.ANY,
+            requiredNetworkType: NetworkType.NONE,
           ),
           _onFetch,
           _onTimeOut,
@@ -63,25 +104,12 @@ class BGServices {
           log('Error on Background Service $e', name: 'Background service');
         });
 
-    // مهمة دورية كل 20 دقيقة (Android فقط — على iOS يكفي configure)
     if (Platform.isAndroid) {
+      // Remove the redundant task installed by earlier versions.
       try {
-        await BackgroundFetch.scheduleTask(
-          TaskConfig(
-            taskId: 'com.transistorsoft.fetchNotifications',
-            delay: 20 * 60 * 1000, // 20 minutes
-            stopOnTerminate: false,
-            enableHeadless: true,
-            requiresBatteryNotLow: false,
-            requiresCharging: false,
-            requiresStorageNotLow: false,
-            requiresDeviceIdle: false,
-            periodic: true,
-            requiredNetworkType: NetworkType.ANY,
-          ),
-        );
+        await BackgroundFetch.stop('com.transistorsoft.fetchNotifications');
       } catch (e) {
-        log('Task Scheduling Error: $e', name: 'Background service');
+        log('Could not remove old task: $e', name: 'Background service');
       }
     }
 
@@ -138,7 +166,15 @@ class BackgroundTaskHandler {
 }
 
 /// المنطق المشترك لجميع المهام — يُستدعى من كل المسارات
+bool _backgroundTaskRunning = false;
+final Set<String> _timedOutTasks = <String>{};
+
 Future<void> _executeBackgroundTask(String taskId) async {
+  if (_backgroundTaskRunning) {
+    log('Skipping overlapping task: $taskId', name: 'Background service');
+    return;
+  }
+  _backgroundTaskRunning = true;
   log('Executing task: $taskId', name: 'Background service');
 
   try {
@@ -146,14 +182,25 @@ Future<void> _executeBackgroundTask(String taskId) async {
     final storage = GetStorage();
 
     // المهام الدورية (إشعارات وغيرها)
-    await PrayerBackgroundManager.executePeriodicTasks();
+    await PrayerBackgroundManager.executePeriodicTasks(
+      shouldContinue: () => !_timedOutTasks.contains(taskId),
+    );
+    if (_timedOutTasks.contains(taskId)) return;
 
     // فحص ردود المشرف على ملاحظات المستخدم (مثل تطبيق القرآن).
     try {
-      await FeedbackController.checkNewRepliesBackground();
+      if (InternetConnectionController.instance.isConnected) {
+        await FeedbackController.checkNewRepliesBackground();
+        final today = DateTime.now().toIso8601String().substring(0, 10);
+        if (storage.read('last_background_posts_date') != today &&
+            await LocalNotificationsController.instance.fetchNewNotifications()) {
+          await storage.write('last_background_posts_date', today);
+        }
+      }
     } catch (e) {
       log('feedback replies check failed: $e', name: 'Background service');
     }
+    if (_timedOutTasks.contains(taskId)) return;
 
     // التحقق من تغيّر التاريخ (يوم جديد بعد منتصف الليل)
     final today = DateTime.now().toIso8601String().substring(0, 10);
@@ -176,8 +223,6 @@ Future<void> _executeBackgroundTask(String taskId) async {
           name: 'Background service',
         );
       }
-      await PrayerBackgroundManager.executeDailyTasks();
-
       if (Platform.isIOS || Platform.isAndroid) {
         // await HijriWidgetConfig.initialize();
         await PrayersWidgetConfig.initialize();
@@ -187,7 +232,7 @@ Future<void> _executeBackgroundTask(String taskId) async {
 
       // لا نكتب التاريخ إلا إذا نجح تحديث ويدجت الصلوات فعلاً
       if (PrayersWidgetConfig.lastUpdateSucceeded) {
-        storage.write('last_widget_update_date', today);
+        await storage.write('last_widget_update_date', today);
       } else {
         log(
           'Prayer widget update failed — will retry on next background task',
@@ -197,16 +242,22 @@ Future<void> _executeBackgroundTask(String taskId) async {
     }
   } catch (e) {
     log('Error in background task ($taskId): $e', name: 'Background service');
+  } finally {
+    _backgroundTaskRunning = false;
   }
 }
 
 Future<void> _onFetch(String taskId) async {
   log('Event received $taskId', name: 'Background service');
-  await _executeBackgroundTask(taskId);
-  BackgroundFetch.finish(taskId);
+  try {
+    await _executeBackgroundTask(taskId);
+  } finally {
+    if (!_timedOutTasks.remove(taskId)) BackgroundFetch.finish(taskId);
+  }
 }
 
 Future<void> _onTimeOut(String taskId) async {
   log('Task timeout: $taskId', name: 'Background service');
+  _timedOutTasks.add(taskId);
   BackgroundFetch.finish(taskId);
 }

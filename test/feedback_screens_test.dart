@@ -29,6 +29,11 @@ void main() {
 
   setUp(() async {
     Get.reset();
+    final dir = await Directory.systemTemp.createTemp('aqim_feedback_screen_');
+    addTearDown(() async {
+      await GetStorage().save();
+      await dir.delete(recursive: true);
+    });
 
     // GetStorage يعتمد path_provider — نحاكي قناته بمجلد مؤقت.
     const pathProviderChannel = MethodChannel(
@@ -36,7 +41,7 @@ void main() {
     );
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(pathProviderChannel, (call) async {
-          return Directory.systemTemp.path;
+          return dir.path;
         });
 
     await GetStorage.init();

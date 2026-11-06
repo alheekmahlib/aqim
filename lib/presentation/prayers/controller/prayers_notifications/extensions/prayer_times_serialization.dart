@@ -35,6 +35,9 @@ extension PrayerTimesSerialization on AdhanState {
       'calculationMethod': calculationMethodString.value,
       'fajrAngle': params.fajrAngle,
       'ishaAngle': params.ishaAngle,
+      'ishaInterval': params.ishaInterval,
+      'maghribAngle': params.maghribAngle,
+      'method': params.method.name,
       'madhab': params.madhab == Madhab.hanafi ? 'hanafi' : 'shafi',
       'highLatitudeRule': params.highLatitudeRule.toString(),
       'isHanafi': isHanafi,
@@ -70,9 +73,19 @@ extension PrayerTimesSerialization on AdhanState {
       dateComponents = DateComponents.from(DateTime.now());
 
       // استرداد معاملات الحساب / Restore calculation parameters
+      final method = CalculationMethod.values.firstWhere(
+        (value) => value.name == json['method'],
+        orElse: () => CalculationMethod.other,
+      );
+      final defaults = method.getParameters();
       params = CalculationParameters(
-          fajrAngle: json['fajrAngle']?.toDouble() ?? 18.0)
-        ..ishaAngle = json['ishaAngle']?.toDouble() ?? 17.0;
+        method: method,
+        fajrAngle: json['fajrAngle']?.toDouble() ?? 18.0,
+        ishaAngle: json['ishaAngle']?.toDouble(),
+        ishaInterval: json['ishaInterval'] ?? 0,
+        maghribAngle: json['maghribAngle']?.toDouble(),
+        methodAdjustments: defaults.methodAdjustments,
+      );
 
       // استرداد المذهب / Restore madhab
       params.madhab = json['madhab'] == 'hanafi' ? Madhab.hanafi : Madhab.shafi;
@@ -85,6 +98,7 @@ extension PrayerTimesSerialization on AdhanState {
       );
 
       adjustments = OurPrayerAdjustments.fromJson(json['adjustments'] ?? {});
+      params.adjustments = adjustments;
 
       // استرداد الإعدادات / Restore settings
       autoCalculationMethod.value = json['autoCalculationMethod'] ?? true;
@@ -107,12 +121,15 @@ extension PrayerTimesSerialization on AdhanState {
   /// التحقق من صحة البيانات المخزنة
   /// Validate stored prayer data
   bool _isValidPrayerData(Map<String, dynamic> json) {
-    final requiredFields = ['latitude', 'longitude', 'fajrAngle', 'ishaAngle'];
+    final requiredFields = ['latitude', 'longitude', 'fajrAngle'];
 
     for (String field in requiredFields) {
       if (!json.containsKey(field) || json[field] == null) {
         return false;
       }
+    }
+    if (json['ishaAngle'] == null && (json['ishaInterval'] ?? 0) <= 0) {
+      return false;
     }
 
     // التحقق من صحة الإحداثيات / Validate coordinates

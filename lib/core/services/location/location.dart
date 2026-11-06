@@ -13,6 +13,26 @@ class Location {
 
   Location._();
 
+  /// Update the coordinates without assigning the previous place's address.
+  void updateCoordinates(double latitude, double longitude) {
+    updateLocation(
+      city: '',
+      country: '',
+      position: Position(
+        latitude: latitude,
+        longitude: longitude,
+        timestamp: DateTime.now(),
+        accuracy: 0,
+        altitude: 0,
+        heading: 0,
+        speed: 0,
+        speedAccuracy: 0,
+        altitudeAccuracy: 0,
+        headingAccuracy: 0,
+      ),
+    );
+  }
+
   /// تحديث الموقع وحفظه في التخزين
   /// Update location and save to storage
   void updateLocation({

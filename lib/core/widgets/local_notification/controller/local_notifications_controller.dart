@@ -31,7 +31,7 @@ class LocalNotificationsController extends GetxController {
   int get unreadCount =>
       postsList.where((n) => n.appName == 'zad' && !n.opened).length;
 
-  Future<void> fetchNewNotifications() async {
+  Future<bool> fetchNewNotifications() async {
     // box.remove('lastSeenPostId');
     // box.remove('readPosts');
     try {
@@ -76,11 +76,14 @@ class LocalNotificationsController extends GetxController {
         }
 
         await box.write('lastSeenPostId', newLastSeenPostId);
+        return true;
       } else {
         log('Failed to load posts, status code: ${response.left.message}');
+        return false;
       }
     } catch (e) {
       log('Error fetching notifications: $e');
+      return false;
     }
   }
 

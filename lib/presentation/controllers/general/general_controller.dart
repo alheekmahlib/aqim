@@ -31,6 +31,12 @@ class GeneralController extends GetxController with WidgetsBindingObserver {
   void onInit() async {
     state.activeLocation.value = state.box.read(ACTIVE_LOCATION) ?? false;
 
+    if (BGServices.isHeadless) {
+      Location.instance.restoreFromStorage();
+      super.onInit();
+      return;
+    }
+
     if (state.activeLocation.value) {
       // استرداد بيانات الموقع المحفوظة
       // Restore saved location data
@@ -70,6 +76,7 @@ class GeneralController extends GetxController with WidgetsBindingObserver {
 
   @override
   void onClose() {
+    BGServices.cancelForegroundMidnightTimer();
     WidgetsBinding.instance.removeObserver(this);
     super.onClose();
   }
@@ -100,7 +107,7 @@ class GeneralController extends GetxController with WidgetsBindingObserver {
 
       // إعادة جدولة Timer منتصف الليل عند العودة للتطبيق
       // Reschedule foreground midnight timer on resume
-      if (Platform.isIOS || Platform.isAndroid) {
+      if (state.activeLocation.value && (Platform.isIOS || Platform.isAndroid)) {
         BGServices.scheduleForegroundMidnightTimer();
       }
 
@@ -240,6 +247,15 @@ class GeneralController extends GetxController with WidgetsBindingObserver {
           .isLocationServiceEnabled();
 
       final stored = PrayerCacheManager.getStoredLocation();
+      final previousCountry = Location.instance.country;
+      // Show the last known prayer times before waiting for GPS or the network.
+      if (stored != null &&
+          Location.instance.position != null &&
+          AdhanController.instance.state.prayerTimes == null) {
+        await AdhanController.instance.initializeStoredAdhan(
+          currentLocation: stored,
+        );
+      }
       final shouldUseStoredOnly =
           (!isConnected || !locationServiceEnabled) && stored != null;
 
@@ -266,6 +282,12 @@ class GeneralController extends GetxController with WidgetsBindingObserver {
       final effectiveLocation = pos != null
           ? LatLng(pos.latitude, pos.longitude)
           : stored;
+      final moved = stored != null && effectiveLocation != null &&
+          ((stored.latitude - effectiveLocation.latitude).abs() > 0.01 ||
+              (stored.longitude - effectiveLocation.longitude).abs() > 0.01);
+      if (moved) AdhanController.instance.state.localizedCity.value = '';
+      final countryChanged = Location.instance.country.isNotEmpty &&
+          Location.instance.country != previousCountry;
 
       log('Location activated: $pos', name: 'Main');
       state.box.write(ACTIVE_LOCATION, true);
@@ -274,9 +296,13 @@ class GeneralController extends GetxController with WidgetsBindingObserver {
 
       await AdhanController.instance.initializeStoredAdhan(
         newLocation: effectiveLocation,
+        forceUpdate: moved ||
+            (countryChanged &&
+                AdhanController.instance.state.autoCalculationMethod.value),
       );
-      AdhanController.instance.state.location =
-          await AdhanController.instance.localizedLocation;
+      final locationName = await AdhanController.instance.localizedLocation;
+      AdhanController.instance.state.location = locationName;
+      AdhanController.instance.state.localizedCity.value = locationName;
       if (refreshUI) {
         Get.forceAppUpdate();
       }

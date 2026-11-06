@@ -11,13 +11,16 @@ class MoonPrayerCard extends StatelessWidget {
     final background = context.theme.colorScheme.primary;
 
     Widget solarTime(IconData icon, String label, String time) => Expanded(
-      child: Row(
-        mainAxisAlignment: .center,
-        children: [
-          Icon(icon, color: gold, size: 28),
-          const Gap(8),
-          _SolarTime(label: label, time: time, textColor: ink),
-        ],
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Row(
+          mainAxisAlignment: .center,
+          children: [
+            Icon(icon, color: gold, size: 28),
+            const Gap(8),
+            _SolarTime(label: label, time: time, textColor: ink),
+          ],
+        ),
       ),
     );
 
@@ -129,6 +132,7 @@ class MoonPrayerCard extends StatelessWidget {
                 child: customLottie(
                   LottieConstants.assetsLottieCloud,
                   width: Get.width,
+                  isRepeat: !MediaQuery.disableAnimationsOf(context),
                 ),
               ),
             ),

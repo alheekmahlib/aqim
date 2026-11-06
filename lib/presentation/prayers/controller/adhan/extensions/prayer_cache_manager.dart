@@ -4,6 +4,7 @@ part of '../../../prayers.dart';
 /// Prayer times cache manager
 class PrayerCacheManager {
   static const String _tag = 'PrayerCacheManager';
+  static const String _prayerLocationKey = 'PRAYER_TIME_LOCATION_V2';
   static final GetStorage _storage = GetStorage();
 
   /// التحقق من صحة البيانات المخزنة
@@ -14,7 +15,11 @@ class PrayerCacheManager {
       // Check for basic data existence
       final storedDate = _storage.read(PRAYER_TIME_DATE);
       final storedPrayerTimes = _storage.read(PRAYER_TIME);
-      final storedLocation = _storage.read(CURRENT_LOCATION);
+      final locationForPrayer = _storage.read(_prayerLocationKey);
+      final legacyData = locationForPrayer == null && storedPrayerTimes is String
+          ? jsonDecode(storedPrayerTimes)
+          : null;
+      final storedLocation = locationForPrayer ?? legacyData;
 
       if (storedDate == null || storedPrayerTimes == null) {
         log('Missing basic prayer data', name: _tag);
@@ -118,6 +123,10 @@ class PrayerCacheManager {
       // حفظ الموقع إذا تم توفيره
       // Save location if provided
       if (location != null) {
+        _storage.write(_prayerLocationKey, {
+          'latitude': location.latitude,
+          'longitude': location.longitude,
+        });
         final existing = _storage.read(CURRENT_LOCATION);
         final merged = (existing is Map)
             ? Map<String, dynamic>.from(existing)
@@ -141,6 +150,7 @@ class PrayerCacheManager {
     try {
       _storage.remove(PRAYER_TIME_DATE);
       _storage.remove(PRAYER_TIME);
+      _storage.remove(_prayerLocationKey);
       log('Cache cleared successfully', name: _tag);
     } catch (e) {
       log('Error clearing cache: $e', name: _tag);

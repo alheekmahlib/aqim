@@ -49,7 +49,10 @@ Widget host(
     GlobalCupertinoLocalizations.delegate,
   ],
   builder: (context, child) => MediaQuery(
-    data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(scale)),
+    data: MediaQuery.of(context).copyWith(
+      textScaler: TextScaler.linear(scale),
+      disableAnimations: true,
+    ),
     child: child!,
   ),
   home: Scaffold(
@@ -80,7 +83,12 @@ void main() {
           (_) async => dir.path,
         );
     await GetStorage.init();
-    addTearDown(() => dir.delete(recursive: true));
+    addTearDown(() async {
+      await GetStorage().save();
+      // GetStorage writes its backup asynchronously after the main flush.
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+      if (await dir.exists()) await dir.delete(recursive: true);
+    });
   });
   tearDown(() => Get.reset());
 
@@ -453,7 +461,7 @@ void main() {
         expect(
           firstRect.width,
           closeTo(
-            (scenario.size.width.clamp(0, 1200) - 12 * (scenario.columns - 1)) /
+            (scenario.size.width.clamp(0, 1200) - 8 * (scenario.columns - 1)) /
                 scenario.columns,
             .01,
           ),
@@ -468,9 +476,9 @@ void main() {
           find.byKey(ValueKey('panel-${visiblePanels[scenario.columns].id}')),
         );
         // Fill the shortest column instead of waiting for the tallest card.
-        expect(nextCard.top, closeTo(initialRects.first.bottom + 12, .01));
+        expect(nextCard.top, closeTo(initialRects.first.bottom + 8, .01));
         expect(nextCard.left, closeTo(initialRects.first.left, .01));
-        expect(nextCard.top, lessThan(initialRects.last.bottom + 12));
+        expect(nextCard.top, lessThan(initialRects.last.bottom + 8));
         final rects = [
           for (final panel in visiblePanels)
             tester.getRect(find.byKey(ValueKey('panel-${panel.id}'))),

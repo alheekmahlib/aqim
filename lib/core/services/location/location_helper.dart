@@ -18,8 +18,10 @@ class LocationHelper {
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
-          log('message',
-              error: LocationException('Location permissions are denied.'));
+          log(
+            'message',
+            error: LocationException('Location permissions are denied.'),
+          );
           throw LocationException('Location permissions are denied.');
         }
       }
@@ -39,8 +41,10 @@ class LocationHelper {
     try {
       // For Huawei devices, we rely on the regular Android permissions
       // which are already handled by the Geolocator package
-      log('Huawei location permissions checked via Geolocator',
-          name: 'LocationHelper');
+      log(
+        'Huawei location permissions checked via Geolocator',
+        name: 'LocationHelper',
+      );
     } catch (e) {
       log('Error with Huawei location permissions: $e', name: 'LocationHelper');
       throw LocationException('Failed to verify Huawei location permissions.');
@@ -52,8 +56,10 @@ class LocationHelper {
     // Location services disabled: keep the restored/stored location instead
     // of throwing and aborting the prayer-cache load downstream.
     if (!await Geolocator.isLocationServiceEnabled()) {
-      log('Location services are disabled; keeping stored location',
-          name: 'LocationHelper');
+      log(
+        'Location services are disabled; keeping stored location',
+        name: 'LocationHelper',
+      );
       return;
     }
 
@@ -84,8 +90,8 @@ class LocationHelper {
           hms_location.FusedLocationProviderClient locationClient =
               hms_location.FusedLocationProviderClient();
 
-          hms_location.Location hwLocation =
-              await locationClient.getLastLocation();
+          hms_location.Location hwLocation = await locationClient
+              .getLastLocation();
 
           if (hwLocation.latitude != null && hwLocation.longitude != null) {
             currentPosition = Position(
@@ -101,15 +107,21 @@ class LocationHelper {
               headingAccuracy: 0.0,
             );
             GeneralController.instance.state.activeLocation.value = true;
-            log('Successfully obtained position from Huawei Location Kit',
-                name: 'LocationHelper');
+            log(
+              'Successfully obtained position from Huawei Location Kit',
+              name: 'LocationHelper',
+            );
           } else {
-            log('Huawei Location Kit returned null coordinates, falling back to Geolocator',
-                name: 'LocationHelper');
+            log(
+              'Huawei Location Kit returned null coordinates, falling back to Geolocator',
+              name: 'LocationHelper',
+            );
           }
         } catch (e) {
-          log('HMS Location error (falling back to Geolocator): $e',
-              name: 'LocationHelper');
+          log(
+            'HMS Location error (falling back to Geolocator): $e',
+            name: 'LocationHelper',
+          );
           // Force fallback to Geolocator
           useHuaweiLocation = false;
         }
@@ -140,6 +152,18 @@ class LocationHelper {
         }
       }
 
+      // Preserve new coordinates even if the address lookup fails. Do not
+      // associate an old city or country with a substantially different place.
+      final oldPosition = Location.instance.position;
+      final moved =
+          oldPosition == null ||
+          (oldPosition.latitude - currentPosition.latitude).abs() > 0.01 ||
+          (oldPosition.longitude - currentPosition.longitude).abs() > 0.01;
+      Location().updateLocation(
+        city: moved ? '' : Location.instance.city,
+        country: moved ? '' : Location.instance.country,
+        position: currentPosition,
+      );
       try {
         await _reverseGeocode(currentPosition);
         GetStorage().write(ACTIVE_LOCATION, true);
@@ -148,8 +172,10 @@ class LocationHelper {
         // نجاح الحصول على الإحداثيات أهم من اسم المدينة؛ لا نوقف تفعيل الموقع.
         GetStorage().write(ACTIVE_LOCATION, true);
         GeneralController.instance.state.activeLocation.value = true;
-        log('Reverse geocoding failed (location remains active): $e',
-            name: 'LocationHelper');
+        log(
+          'Reverse geocoding failed (location remains active): $e',
+          name: 'LocationHelper',
+        );
       }
     }
   }
@@ -186,8 +212,10 @@ class LocationHelper {
     try {
       await _reverseGeocode(position);
     } catch (e) {
-      log('Reverse geocoding failed on desktop (location remains active): $e',
-          name: 'LocationHelper');
+      log(
+        'Reverse geocoding failed on desktop (location remains active): $e',
+        name: 'LocationHelper',
+      );
     }
     GetStorage().write(ACTIVE_LOCATION, true);
     GeneralController.instance.state.activeLocation.value = true;
@@ -231,8 +259,10 @@ class LocationHelper {
   }
 
   set currentLocation(LatLng value) {
-    GetStorage().write(CURRENT_LOCATION,
-        {'latitude': value.latitude, 'longitude': value.longitude});
+    GetStorage().write(CURRENT_LOCATION, {
+      'latitude': value.latitude,
+      'longitude': value.longitude,
+    });
     _currentLocation = value;
   }
 
@@ -261,13 +291,15 @@ class LocationHelper {
 
     if (useHuaweiLocation) {
       try {
-        log('Attempting to use Huawei Location Kit for position',
-            name: 'Background service');
+        log(
+          'Attempting to use Huawei Location Kit for position',
+          name: 'Background service',
+        );
         hms_location.FusedLocationProviderClient locationClient =
             hms_location.FusedLocationProviderClient();
 
-        hms_location.Location hwLocation =
-            await locationClient.getLastLocation();
+        hms_location.Location hwLocation = await locationClient
+            .getLastLocation();
 
         if (hwLocation.latitude != null && hwLocation.longitude != null) {
           currentPosition = Position(
@@ -282,15 +314,21 @@ class LocationHelper {
             altitudeAccuracy: 0.0,
             headingAccuracy: 0.0,
           );
-          log('Huawei Location Kit position obtained: (${currentPosition.latitude}, ${currentPosition.longitude})',
-              name: 'Background service');
+          log(
+            'Huawei Location Kit position obtained: (${currentPosition.latitude}, ${currentPosition.longitude})',
+            name: 'Background service',
+          );
         } else {
-          log('Huawei Location Kit returned null coordinates, falling back to Geolocator',
-              name: 'Background service');
+          log(
+            'Huawei Location Kit returned null coordinates, falling back to Geolocator',
+            name: 'Background service',
+          );
         }
       } catch (e) {
-        log('HMS Location error (falling back to Geolocator): $e',
-            name: 'Background service');
+        log(
+          'HMS Location error (falling back to Geolocator): $e',
+          name: 'Background service',
+        );
         // Force fallback to Geolocator
         useHuaweiLocation = false;
       }
@@ -314,8 +352,10 @@ class LocationHelper {
       );
     }
 
-    log('Fetched current position: (${currentPosition.latitude}, ${currentPosition.longitude})',
-        name: 'Background service');
+    log(
+      'Fetched current position: (${currentPosition.latitude}, ${currentPosition.longitude})',
+      name: 'Background service',
+    );
 
     return currentPosition;
   }
@@ -337,8 +377,10 @@ class LocationHelper {
 
     if (useHuaweiLocation) {
       try {
-        log('Attempting to set up Huawei Location updates',
-            name: 'LocationHelper');
+        log(
+          'Attempting to set up Huawei Location updates',
+          name: 'LocationHelper',
+        );
 
         hms_location.FusedLocationProviderClient locationClient =
             hms_location.FusedLocationProviderClient();
@@ -346,37 +388,44 @@ class LocationHelper {
         // For Huawei, we need to periodically check for location updates
         // since direct streaming is not supported in the same way
         Timer.periodic(
-            Duration(milliseconds: interval?.inMilliseconds ?? 10000),
-            (timer) async {
-          try {
-            hms_location.Location hwLocation =
-                await locationClient.getLastLocation();
-            if (hwLocation.latitude != null && hwLocation.longitude != null) {
-              Position position = Position(
-                latitude: hwLocation.latitude!,
-                longitude: hwLocation.longitude!,
-                timestamp: DateTime.now(),
-                accuracy: hwLocation.horizontalAccuracyMeters ?? 0.0,
-                altitude: hwLocation.altitude ?? 0.0,
-                heading: 0.0,
-                speed: hwLocation.speed ?? 0.0,
-                speedAccuracy: 0.0,
-                altitudeAccuracy: 0.0,
-                headingAccuracy: 0.0,
+          Duration(milliseconds: interval?.inMilliseconds ?? 10000),
+          (timer) async {
+            try {
+              hms_location.Location hwLocation = await locationClient
+                  .getLastLocation();
+              if (hwLocation.latitude != null && hwLocation.longitude != null) {
+                Position position = Position(
+                  latitude: hwLocation.latitude!,
+                  longitude: hwLocation.longitude!,
+                  timestamp: DateTime.now(),
+                  accuracy: hwLocation.horizontalAccuracyMeters ?? 0.0,
+                  altitude: hwLocation.altitude ?? 0.0,
+                  heading: 0.0,
+                  speed: hwLocation.speed ?? 0.0,
+                  speedAccuracy: 0.0,
+                  altitudeAccuracy: 0.0,
+                  headingAccuracy: 0.0,
+                );
+                onLocationUpdate(position);
+              }
+            } catch (e) {
+              log(
+                'Error getting Huawei location update: $e',
+                name: 'LocationHelper',
               );
-              onLocationUpdate(position);
             }
-          } catch (e) {
-            log('Error getting Huawei location update: $e',
-                name: 'LocationHelper');
-          }
-        });
+          },
+        );
 
-        log('Huawei location updates setup successfully',
-            name: 'LocationHelper');
+        log(
+          'Huawei location updates setup successfully',
+          name: 'LocationHelper',
+        );
       } catch (e) {
-        log('Error setting up Huawei location updates (falling back to Geolocator): $e',
-            name: 'LocationHelper');
+        log(
+          'Error setting up Huawei location updates (falling back to Geolocator): $e',
+          name: 'LocationHelper',
+        );
         // Force fallback to Geolocator
         useHuaweiLocation = false;
         _requestGeolocatorUpdates(onLocationUpdate, interval);

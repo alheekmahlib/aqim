@@ -182,6 +182,16 @@ class CountryPickerBottomSheet extends StatelessWidget {
                           onTap: () {
                             controller.adhanCtrl.state.selectedCountry.value =
                                 country;
+                            controller.adhanCtrl.state.box.write(
+                              PRAYER_CALCULATION_COUNTRY,
+                              country,
+                            );
+                            unawaited(() async {
+                              await controller.adhanCtrl.initializeStoredAdhan(
+                                forceUpdate: true,
+                              );
+                              await PrayersNotificationsCtrl.instance.reschedulePrayers();
+                            }());
                             _disposeControllerIfNeeded();
                             Get.back();
                           },

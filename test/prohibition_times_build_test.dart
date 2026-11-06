@@ -5,6 +5,7 @@ import 'package:aqim/presentation/prayers/prayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 
 /// محاكاة path_provider حتى يعمل GetStorage داخل بيئة الاختبار.
@@ -33,6 +34,7 @@ void main() {
     final dir = await Directory.systemTemp.createTemp('almasjid_prohibition');
     addTearDown(() async => dir.delete(recursive: true));
     PathProviderPlatform.instance = _FakePathProvider(dir.path);
+    await GetStorage.init();
   });
 
   PrayerTimes buildPrayerTimes() => PrayerTimes(
@@ -45,8 +47,6 @@ void main() {
     'قراءة prohibitionTimesBool أثناء البناء لا تستدعي update (لا setState during build)',
     (WidgetTester tester) async {
       final controller = _TestAdhanController();
-      // تصريف مؤقت GetStorage الداخلي حتى لا يبقى معلقًا عند نهاية الاختبار
-      await controller.state.box.initStorage;
       controller.state.prayerTimes = buildPrayerTimes();
 
       // نسختان بنفس المعرف تمامًا كتكوين الشاشة (عمودي/أفقي)

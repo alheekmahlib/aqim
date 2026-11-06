@@ -28,21 +28,27 @@ class NominatimReverseGeocodingService {
 
     await _respectRateLimit();
 
-    final response = await Dio().get(
-      'https://nominatim.openstreetmap.org/reverse',
-      queryParameters: {
-        'format': 'json',
-        'lat': latitude,
-        'lon': longitude,
-        'addressdetails': '1',
-        'accept-language': lang,
-      },
-      options: Options(
-        headers: const {
-          'User-Agent': 'Aqim/1.0 (contact: haozo89@gmail.com)',
-        },
-      ),
-    );
+    final response =
+        await Dio(
+          BaseOptions(
+            connectTimeout: const Duration(seconds: 5),
+            receiveTimeout: const Duration(seconds: 5),
+          ),
+        ).get(
+          'https://nominatim.openstreetmap.org/reverse',
+          queryParameters: {
+            'format': 'json',
+            'lat': latitude,
+            'lon': longitude,
+            'addressdetails': '1',
+            'accept-language': lang,
+          },
+          options: Options(
+            headers: const {
+              'User-Agent': 'Aqim/1.0 (contact: haozo89@gmail.com)',
+            },
+          ),
+        );
 
     if (response.statusCode != 200 || response.data is! Map) {
       throw LocationException('Nominatim reverse geocoding failed');
@@ -65,9 +71,7 @@ class NominatimReverseGeocodingService {
       address['state'],
     ]);
 
-    final country = _pickFirstNonEmpty([
-      address['country'],
-    ]);
+    final country = _pickFirstNonEmpty([address['country']]);
 
     final result = (
       city: city.isNotEmpty ? city : 'Unknown',
@@ -107,10 +111,13 @@ class NominatimReverseGeocodingService {
   }
 
   Future<void> _writeCache(
-      String cacheId, ({String city, String country}) v) async {
+    String cacheId,
+    ({String city, String country}) v,
+  ) async {
     final raw = _box.read(_cacheKey);
-    final map =
-        (raw is Map) ? Map<String, dynamic>.from(raw) : <String, dynamic>{};
+    final map = (raw is Map)
+        ? Map<String, dynamic>.from(raw)
+        : <String, dynamic>{};
 
     map[cacheId] = {
       'city': v.city,

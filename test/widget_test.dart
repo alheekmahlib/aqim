@@ -1,31 +1,15 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:aqim/core/services/languages/dependency_inj.dart' as dep;
-import 'package:aqim/my_app.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:get/get.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    Map<String, Map<String, String>> languages = await dep.init();
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(MyApp(languages: languages));
+  TestWidgetsFlutterBinding.ensureInitialized();
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
-
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
-
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+  test('loads the application translations', () async {
+    final languages = await dep.init();
+    expect(languages, isNotEmpty);
+    expect(languages.values.every((translations) => translations.isNotEmpty), isTrue);
+    expect(languages.keys.any((locale) => locale.startsWith('ar_')), isTrue);
+    Get.reset();
   });
 }

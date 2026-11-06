@@ -35,15 +35,8 @@ extension AdhanGetters on AdhanController {
       final cityOk = result.city.trim().isNotEmpty && result.city != 'Unknown';
       final countryOk =
           result.country.trim().isNotEmpty && result.country != 'Unknown';
-      if (cityOk && countryOk) {
-        Location().updateLocation(
-          city: result.city,
-          country: result.country,
-          position: pos,
-        );
-      }
-
-      return '${result.city}\n${result.country}';
+      if (cityOk && countryOk) return '${result.city}\n${result.country}';
+      return '$storedCity\n$storedCountry';
     } catch (_) {
       return '$storedCity\n$storedCountry';
     }
@@ -760,6 +753,9 @@ extension AdhanGetters on AdhanController {
     state.highLatitudeRuleIndex.value = state.box.read(HIGH_LATITUDE_RULE) ?? 0;
     state.autoCalculationMethod.value =
         state.box.read(AUTO_CALCULATION) ?? true;
+    state.selectedCountry.value = state.box.read<String>(PRAYER_CALCULATION_COUNTRY) ??
+        (PrayerCacheManager.getCachedPrayerData()?['selectedCountry'] as String?) ??
+        'Saudi Arabia';
     state.iqamaOffsets = IqamaOffsets.fromGetStorage();
     state.iqamaNotificationsEnabled.value =
         state.box.read(IQAMA_NOTIFICATIONS_ENABLED) ?? false;

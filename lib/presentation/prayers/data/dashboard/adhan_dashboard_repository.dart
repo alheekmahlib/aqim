@@ -97,7 +97,10 @@ class AdhanDashboardRepository implements DashboardDataRepository {
       DateTime.utc(date.year, date.month, date.day, 12),
     );
     final showIqama = adhan.state.showIqamaTimes.value;
-    final location = await readLocationName();
+    // Prayer data must not wait for a reverse-geocoding request.
+    final location = adhan.state.localizedCity.value.isNotEmpty
+        ? adhan.state.localizedCity.value
+        : '${Location.instance.city}\n${Location.instance.country}';
     return DashboardData(
       date: date,
       location: location,

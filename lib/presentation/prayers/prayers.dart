@@ -50,6 +50,7 @@ import '../../../core/utils/constants/svg_constants.dart';
 import '../../../core/utils/helpers/date_formatter.dart';
 import '../../../core/widgets/reactive_number_text.dart';
 import '../../core/services/internet_connection_controller.dart';
+import '../../core/services/background_services.dart';
 import '../../core/services/languages/localization_controller.dart';
 import '../../core/utils/constants/lottie.dart';
 import '../../core/utils/constants/lottie_constants.dart';
