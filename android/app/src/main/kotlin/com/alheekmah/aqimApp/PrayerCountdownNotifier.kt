@@ -64,6 +64,7 @@ object PrayerCountdownNotifier {
     const val NOTIFICATION_ID = 19000
 
     const val ACTION_BOUNDARY = "com.alheekmah.aqimApp.PRAYER_COUNTDOWN_BOUNDARY"
+    const val ACTION_REFRESH = "com.alheekmah.aqimApp.PRAYER_COUNTDOWN_REFRESH"
     const val EXTRA_INDEX = "index"
 
     /// معرّف ثابت للمنبّه المسلّح الوحيد في أي لحظة.
@@ -73,6 +74,7 @@ object PrayerCountdownNotifier {
     private const val KEY_ENABLED = "enabled"
     private const val KEY_CURRENT = "current"
     private const val KEY_ENTRIES = "entries"
+    private const val KEY_REFRESH_LABEL = "refresh_label"
 
     private fun prefs(context: Context): SharedPreferences =
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
@@ -81,7 +83,7 @@ object PrayerCountdownNotifier {
 
     /** يستقبل الحالة الراهنة والحدود الجاهزة من Dart: يخزّنها، ينشر
      *  الراهنة، ويسلّح الحدّ القادم. */
-    fun syncBoundaries(context: Context, current: Map<String, Any?>, entries: List<Map<String, Any?>>) {
+    fun syncBoundaries(context: Context, current: Map<String, Any?>, entries: List<Map<String, Any?>>, refreshLabel: String) {
         val currentJson = mapToJson(current)
         val entriesJson = JSONArray()
         for (entry in entries) {
@@ -91,6 +93,7 @@ object PrayerCountdownNotifier {
             .putBoolean(KEY_ENABLED, true)
             .putString(KEY_CURRENT, currentJson.toString())
             .putString(KEY_ENTRIES, entriesJson.toString())
+            .putString(KEY_REFRESH_LABEL, refreshLabel)
             .apply()
 
         post(context, PrayerCountdownData.fromJson(currentJson))
@@ -107,9 +110,9 @@ object PrayerCountdownNotifier {
     /** استلام حدّ صلاة: انشر بيانات الحدّ ثم سلّح التالي. */
     fun onBoundary(context: Context, index: Int) {
         val entries = readEntries(context) ?: return
-        val entry = entries.optJSONObject(index) ?: return
-        post(context, PrayerCountdownData.fromJson(entry))
-        armNext(context)
+        if (entries.optJSONObject(index) == null) return
+        // A delayed alarm must show the latest elapsed boundary, not its old index.
+        onSystemEvent(context)
     }
 
     /** حدث نظام (إقلاع/وقت/منطقة/تاريخ/لغة): إعادة نشر وتسليح إن كانت
@@ -179,12 +182,20 @@ object PrayerCountdownNotifier {
         )
         // العنوان/النص القياسيان احتياط وصولية (قارئات الشاشة) فقط؛
         // العرض الفعلي هو التخطيط المخصص أعلاه.
+        val refreshIntent = PendingIntent.getBroadcast(
+            context, 4243,
+            Intent(context, CountdownNotificationReceiver::class.java).setAction(ACTION_REFRESH),
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
         return Notification.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle("${data.nextLabel}: ${data.nextName} ${data.nextTime}")
             .setContentText("${data.elapsedLabel} ${data.prevName}")
             .setCustomContentView(buildViews(context, data))
             .setContentIntent(openAppIntent)
+            .addAction(Notification.Action.Builder(
+                null, prefs(context).getString(KEY_REFRESH_LABEL, "Refresh"), refreshIntent
+            ).build())
             .setOngoing(true)
             .setOnlyAlertOnce(true)
             .setCategory(Notification.CATEGORY_STOPWATCH)

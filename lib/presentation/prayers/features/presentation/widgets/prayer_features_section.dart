@@ -15,9 +15,14 @@ import 'prayer_features_status.dart';
 import 'prayer_timing_settings_sheet.dart';
 
 class PrayerFeaturesSection extends StatelessWidget {
-  const PrayerFeaturesSection({super.key, required this.controller});
+  const PrayerFeaturesSection({
+    super.key,
+    required this.controller,
+    this.features,
+  });
 
   final PrayerFeatureSettingsController controller;
+  final Set<PrayerFeature>? features;
 
   @override
   Widget build(BuildContext context) =>
@@ -27,23 +32,40 @@ class PrayerFeaturesSection extends StatelessWidget {
         builder: (controller) => Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              child: Text(
-                'prayerFeaturesTitle'.tr,
-                style: TextStyle(
-                  fontFamily: 'cairo',
-                  fontSize: 17,
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.inversePrimary,
+            if (features == null)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: Text(
+                  'prayerFeaturesTitle'.tr,
+                  style: TextStyle(
+                    fontFamily: 'cairo',
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.inversePrimary,
+                  ),
                 ),
               ),
-            ),
             PrayerFeaturesStatus(controller: controller),
+            if (features != null &&
+                features!.length == 1 &&
+                features!.contains(PrayerFeature.silence) &&
+                controller.availability(PrayerFeature.silence) ==
+                    PrayerFeatureAvailability.unsupported)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: Text(
+                  'prayerFeaturesFocusHint'.tr,
+                  style: TextStyle(
+                    fontFamily: 'cairo',
+                    color: Theme.of(context).colorScheme.inversePrimary,
+                  ),
+                ),
+              ),
             for (final feature in PrayerFeature.values.where(
               (feature) =>
+                  (features == null || features!.contains(feature)) &&
                   controller.availability(feature) !=
-                  PrayerFeatureAvailability.unsupported,
+                      PrayerFeatureAvailability.unsupported,
             )) ...[
               PrayerFeatureToggle(
                 key: ValueKey('feature-${feature.name}'),
@@ -91,7 +113,8 @@ class PrayerFeaturesSection extends StatelessWidget {
                     borderRadius: 8,
                     withShape: false,
                     useGradient: false,
-                    onPressed: () => context.customBottomSheet(
+                    onPressed: () => context.customSettingsPage(
+                      context: context,
                       textTitle: feature.timingTitleKey,
                       containerColor: Theme.of(
                         context,

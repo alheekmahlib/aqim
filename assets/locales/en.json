@@ -1209,5 +1209,15 @@
   "customAdhanUnplayable": "Could not play the file; make sure it is valid.",
   "customAdhanConversionFailed": "Could not prepare the iOS notification copy for this file.",
   "customAdhanImportFailed": "Import failed; the current selection is unchanged.",
-  "customAdhanLoadFailed": "Could not load custom muezzins."
+  "customAdhanLoadFailed": "Could not load custom muezzins.",
+  "countdownRefresh": "Refresh",
+  "prayerSettingsLocation": "Location and calculation",
+  "prayerSettingsLocationDesc": "Location, calculation method, madhab and high latitudes",
+  "prayerSettingsTimesDesc": "Adjust prayer and iqama times",
+  "prayerSettingsSound": "Adhan and sound",
+  "prayerSettingsSoundDesc": "Adhan sound and ways to stop it",
+  "prayerSettingsNotifications": "Notifications and reminders",
+  "prayerSettingsNotificationsDesc": "Prayer reminders, iqama and countdown notifications",
+  "prayerSettingsSilent": "Silent mode",
+  "prayerSettingsSilentDesc": "Silent mode during prayer and its duration"
 }

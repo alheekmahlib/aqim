@@ -1090,5 +1090,15 @@
   "customAdhanUnplayable": "Dosya çalınamadı; geçerli olduğundan emin olun.",
   "customAdhanConversionFailed": "iOS bildirim kopyası hazırlanamadı.",
   "customAdhanImportFailed": "İçe aktarma başarısız; mevcut seçim değişmedi.",
-  "customAdhanLoadFailed": "Özel müezzinler yüklenemedi."
+  "customAdhanLoadFailed": "Özel müezzinler yüklenemedi.",
+  "countdownRefresh": "Yenile",
+  "prayerSettingsLocation": "Konum ve hesaplama",
+  "prayerSettingsLocationDesc": "Konum, hesaplama yöntemi, mezhep ve yüksek enlemler",
+  "prayerSettingsTimesDesc": "Namaz ve kamet vakitlerini ayarla",
+  "prayerSettingsSound": "Ezan ve ses",
+  "prayerSettingsSoundDesc": "Ezan sesi ve durdurma yöntemleri",
+  "prayerSettingsNotifications": "Bildirimler ve hatırlatıcılar",
+  "prayerSettingsNotificationsDesc": "Namaz hatırlatıcıları, kamet ve geri sayım",
+  "prayerSettingsSilent": "Sessiz mod",
+  "prayerSettingsSilentDesc": "Namaz sırasında sessiz mod ve süresi"
 }

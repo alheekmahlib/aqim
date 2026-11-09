@@ -103,19 +103,19 @@ class PrayerCountdownNotificationService {
       final next = snapshot.next;
       if (next == null) return;
 
-      if (Platform.isIOS) {
-        await _syncLiveActivity(snapshot, next);
-        return;
-      }
-
       final entries = buildBoundaryEntries(
         slots: slots,
         now: now,
         buildData: _buildDisplayData,
       );
+      if (Platform.isIOS) {
+        await _syncLiveActivity(snapshot, next, entries);
+        return;
+      }
       try {
         await _channel
             .invokeMethod('syncBoundaries', {
+              'refreshLabel': 'countdownRefresh'.tr,
               'current': _currentDisplayData(snapshot, next).toMap(),
               'entries': entries.map((e) => e.toMap()).toList(),
             })
@@ -143,6 +143,7 @@ class PrayerCountdownNotificationService {
   Future<void> _syncLiveActivity(
     CountdownSnapshot snapshot,
     CountdownSlot next,
+    List<CountdownBoundaryEntry> entries,
   ) async {
     final data = _currentDisplayData(snapshot, next);
     try {
@@ -155,6 +156,8 @@ class PrayerCountdownNotificationService {
             'prevAtMillis': data.prevAt?.millisecondsSinceEpoch,
             'nextLabel': data.nextLabel,
             'elapsedLabel': data.elapsedLabel,
+            'entries': entries.map((e) => e.toMap()).toList(),
+            'refreshLabel': 'countdownRefresh'.tr,
           })
           .timeout(_channelTimeout);
     } on TimeoutException {

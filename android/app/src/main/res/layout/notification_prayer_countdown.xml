@@ -9,7 +9,9 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:layoutDirection="locale"
-    android:baselineAligned="false">
+    android:baselineAligned="false"
+    android:paddingTop="4dp"
+    android:paddingBottom="4dp">
 
     <LinearLayout
         android:layout_width="0dp"
@@ -24,21 +26,23 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             style="@android:style/TextAppearance.Material.Notification"
-            android:textSize="11sp" />
+            android:textSize="12sp" />
 
         <TextView
             android:id="@+id/prayer_countdown_next_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             style="@android:style/TextAppearance.Material.Notification.Title"
-            android:textSize="14sp" />
+            android:textSize="15sp"
+            android:maxLines="1"
+            android:ellipsize="end" />
 
         <Chronometer
             android:id="@+id/prayer_countdown_next_chrono"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             style="@android:style/TextAppearance.Material.Notification.Time"
-            android:textSize="20sp"
+            android:textSize="23sp"
             android:textStyle="bold"
             android:countDown="true" />
     </LinearLayout>
@@ -51,7 +55,8 @@
             android:layout_height="match_parent"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="4dp"
-            android:background="@android:color/darker_gray" />
+            android:background="@android:color/darker_gray"
+            android:alpha="0.35" />
 
     <LinearLayout
         android:layout_width="0dp"
@@ -66,21 +71,23 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             style="@android:style/TextAppearance.Material.Notification"
-            android:textSize="11sp" />
+            android:textSize="12sp" />
 
         <TextView
             android:id="@+id/prayer_countdown_prev_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             style="@android:style/TextAppearance.Material.Notification.Title"
-            android:textSize="14sp" />
+            android:textSize="15sp"
+            android:maxLines="1"
+            android:ellipsize="end" />
 
         <Chronometer
             android:id="@+id/prayer_countdown_elapsed_chrono"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             style="@android:style/TextAppearance.Material.Notification.Time"
-            android:textSize="20sp"
+            android:textSize="18sp"
             android:textStyle="bold" />
     </LinearLayout>
 </LinearLayout>

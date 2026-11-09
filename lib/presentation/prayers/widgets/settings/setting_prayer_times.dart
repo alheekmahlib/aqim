@@ -3,9 +3,11 @@ part of '../../prayers.dart';
 class SettingPrayerTimes extends StatelessWidget {
   final int? listNum;
   final bool isOnePrayer;
+  final bool showGeneralOptions;
   const SettingPrayerTimes({
     super.key,
     this.listNum,
+    this.showGeneralOptions = true,
     required this.isOnePrayer,
   });
 
@@ -192,7 +194,7 @@ class SettingPrayerTimes extends StatelessWidget {
               );
             },
           ),
-          if (!isOnePrayer) ...[
+          if (!isOnePrayer && showGeneralOptions) ...[
             const Gap(8),
             CustomSwitchWidget<AdhanController>(
               controller: adhanCtrl,

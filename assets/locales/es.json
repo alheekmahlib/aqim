@@ -1090,5 +1090,15 @@
   "customAdhanUnplayable": "No se pudo reproducir el archivo; verifica que sea válido.",
   "customAdhanConversionFailed": "No se pudo preparar la copia de notificación de iOS.",
   "customAdhanImportFailed": "Error al importar; la selección actual no cambió.",
-  "customAdhanLoadFailed": "No se pudieron cargar los muecines personalizados."
+  "customAdhanLoadFailed": "No se pudieron cargar los muecines personalizados.",
+  "countdownRefresh": "Actualizar",
+  "prayerSettingsLocation": "Ubicación y cálculo",
+  "prayerSettingsLocationDesc": "Ubicación, método de cálculo, escuela y latitudes altas",
+  "prayerSettingsTimesDesc": "Ajustar horarios de oración e iqama",
+  "prayerSettingsSound": "Adhán y sonido",
+  "prayerSettingsSoundDesc": "Sonido del adhán y formas de detenerlo",
+  "prayerSettingsNotifications": "Notificaciones y recordatorios",
+  "prayerSettingsNotificationsDesc": "Recordatorios, iqama y cuenta regresiva",
+  "prayerSettingsSilent": "Modo silencioso",
+  "prayerSettingsSilentDesc": "Modo silencioso durante la oración y su duración"
 }

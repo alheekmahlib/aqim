@@ -1090,5 +1090,15 @@
   "customAdhanUnplayable": "Berkas tidak dapat diputar; pastikan valid.",
   "customAdhanConversionFailed": "Gagal menyiapkan salinan notifikasi iOS.",
   "customAdhanImportFailed": "Impor gagal; pilihan saat ini tidak berubah.",
-  "customAdhanLoadFailed": "Gagal memuat muezzin kustom."
+  "customAdhanLoadFailed": "Gagal memuat muezzin kustom.",
+  "countdownRefresh": "Perbarui",
+  "prayerSettingsLocation": "Lokasi dan perhitungan",
+  "prayerSettingsLocationDesc": "Lokasi, metode perhitungan, mazhab dan lintang tinggi",
+  "prayerSettingsTimesDesc": "Atur waktu salat dan ikamah",
+  "prayerSettingsSound": "Azan dan suara",
+  "prayerSettingsSoundDesc": "Suara azan dan cara menghentikannya",
+  "prayerSettingsNotifications": "Notifikasi dan pengingat",
+  "prayerSettingsNotificationsDesc": "Pengingat salat, ikamah dan hitung mundur",
+  "prayerSettingsSilent": "Mode senyap",
+  "prayerSettingsSilentDesc": "Mode senyap saat salat dan durasinya"
 }

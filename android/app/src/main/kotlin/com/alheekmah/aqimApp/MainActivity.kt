@@ -92,7 +92,7 @@ class MainActivity : FlutterActivity() {
                 "syncBoundaries" -> {
                     val current = call.argument<Map<String, Any?>>("current") ?: emptyMap()
                     val entries = call.argument<List<Map<String, Any?>>>("entries") ?: emptyList()
-                    PrayerCountdownNotifier.syncBoundaries(this, current, entries)
+                    PrayerCountdownNotifier.syncBoundaries(this, current, entries, call.argument<String>("refreshLabel") ?: "Refresh")
                     result.success(true)
                 }
                 "cancel" -> {

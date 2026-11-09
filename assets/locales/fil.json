@@ -1090,5 +1090,15 @@
   "customAdhanUnplayable": "Hindi mapatugtog ang file; siguraduhing wasto ito.",
   "customAdhanConversionFailed": "Hindi maihanda ang iOS notification copy ng file.",
   "customAdhanImportFailed": "Nabigo ang import; hindi nagbago ang kasalukuyang pinili.",
-  "customAdhanLoadFailed": "Hindi ma-load ang mga custom na muezzin."
+  "customAdhanLoadFailed": "Hindi ma-load ang mga custom na muezzin.",
+  "countdownRefresh": "I-refresh",
+  "prayerSettingsLocation": "Lokasyon at pagkalkula",
+  "prayerSettingsLocationDesc": "Lokasyon, paraan ng pagkalkula, madhab at mataas na latitude",
+  "prayerSettingsTimesDesc": "Ayusin ang oras ng panalangin at iqama",
+  "prayerSettingsSound": "Adhan at tunog",
+  "prayerSettingsSoundDesc": "Tunog ng adhan at mga paraan ng paghinto",
+  "prayerSettingsNotifications": "Mga abiso at paalala",
+  "prayerSettingsNotificationsDesc": "Paalala sa panalangin, iqama at countdown",
+  "prayerSettingsSilent": "Silent mode",
+  "prayerSettingsSilentDesc": "Silent mode habang nagdarasal at tagal nito"
 }

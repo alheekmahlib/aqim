@@ -1090,5 +1090,15 @@
   "customAdhanUnplayable": "ফাইলটি চালানো গেল না; অনুগ্রহ করে যাচাই করুন।",
   "customAdhanConversionFailed": "এই ফাইলের iOS নোটিফিকেশন কপি তৈরি করা যায়নি।",
   "customAdhanImportFailed": "ইমপোর্ট ব্যর্থ; বর্তমান নির্বাচন অপরিবর্তিত।",
-  "customAdhanLoadFailed": "কাস্টম মুয়াজ্জিন লোড করা যায়নি।"
+  "customAdhanLoadFailed": "কাস্টম মুয়াজ্জিন লোড করা যায়নি।",
+  "countdownRefresh": "রিফ্রেশ",
+  "prayerSettingsLocation": "অবস্থান ও গণনা",
+  "prayerSettingsLocationDesc": "অবস্থান, গণনা পদ্ধতি, মাযহাব ও উচ্চ অক্ষাংশ",
+  "prayerSettingsTimesDesc": "নামাজ ও ইকামতের সময় সমন্বয়",
+  "prayerSettingsSound": "আজান ও শব্দ",
+  "prayerSettingsSoundDesc": "আজানের শব্দ ও বন্ধ করার উপায়",
+  "prayerSettingsNotifications": "বিজ্ঞপ্তি ও স্মরণিকা",
+  "prayerSettingsNotificationsDesc": "নামাজের স্মরণিকা, ইকামত ও কাউন্টডাউন",
+  "prayerSettingsSilent": "নীরব মোড",
+  "prayerSettingsSilentDesc": "নামাজের সময় নীরব মোড ও তার সময়কাল"
 }

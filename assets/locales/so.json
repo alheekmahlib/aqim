@@ -1090,5 +1090,15 @@
   "customAdhanUnplayable": "Faylka lama ciyaarin; hubi inuu sax yahay.",
   "customAdhanConversionFailed": "Lama diyaarin karin nuqulka ogeysiiska iOS.",
   "customAdhanImportFailed": "Soo galku wuu fashilmay; doorashada hadda ma bedelan.",
-  "customAdhanLoadFailed": "Lama soo dejin karo muezzinada gaarka ah."
+  "customAdhanLoadFailed": "Lama soo dejin karo muezzinada gaarka ah.",
+  "countdownRefresh": "Cusboonaysii",
+  "prayerSettingsLocation": "Goobta iyo xisaabinta",
+  "prayerSettingsLocationDesc": "Goobta, habka xisaabinta, madhabka iyo loolka sare",
+  "prayerSettingsTimesDesc": "Hagaaji waqtiyada salaadda iyo iqaamada",
+  "prayerSettingsSound": "Aadaanka iyo codka",
+  "prayerSettingsSoundDesc": "Codka aadaanka iyo sida loo joojiyo",
+  "prayerSettingsNotifications": "Ogeysiisyada iyo xusuusinta",
+  "prayerSettingsNotificationsDesc": "Xusuusinta salaadda, iqaamada iyo tirinta",
+  "prayerSettingsSilent": "Habka aamusan",
+  "prayerSettingsSilentDesc": "Habka aamusan xilliga salaadda iyo muddadiisa"
 }

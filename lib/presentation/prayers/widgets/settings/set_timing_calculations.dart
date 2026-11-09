@@ -48,22 +48,15 @@ class SetTimingCalculations extends StatelessWidget {
             ),
           ),
           const Gap(4),
-          CustomSwitchWidget<AdhanController>(
-            controller: AdhanController.instance,
+          _PrayerCalculationChoice(
             title: 'shafie',
-            startPadding: 16.0,
-            endPadding: 16.0,
-            value: !adhanCtrl.state.isHanafi,
-            // value: (!adhanCtrl.state.isHanafi).obs,
-            onChanged: (v) => adhanCtrl.hanafiOnTap(!v),
+            selected: !adhanCtrl.state.isHanafi,
+            onTap: () => adhanCtrl.hanafiOnTap(false),
           ),
-          CustomSwitchWidget<AdhanController>(
-            controller: AdhanController.instance,
+          _PrayerCalculationChoice(
             title: 'hanafe',
-            startPadding: 16.0,
-            endPadding: 16.0,
-            value: adhanCtrl.state.isHanafi,
-            onChanged: adhanCtrl.hanafiOnTap,
+            selected: adhanCtrl.state.isHanafi,
+            onTap: () => adhanCtrl.hanafiOnTap(true),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -81,40 +74,59 @@ class SetTimingCalculations extends StatelessWidget {
             ),
           ),
           const Gap(32),
-          CustomSwitchWidget<AdhanController>(
-            controller: AdhanController.instance,
+          _PrayerCalculationChoice(
             title: 'middleOfTheNight',
-            startPadding: 16.0,
-            endPadding: 16.0,
-            value: adhanCtrl.state.middleOfTheNight.value,
-            onChanged: (bool value) async {
-              await adhanCtrl.getHighLatitudeRule(0);
-            },
+            selected: adhanCtrl.state.middleOfTheNight.value,
+            onTap: () => adhanCtrl.getHighLatitudeRule(0),
           ),
-          CustomSwitchWidget<AdhanController>(
-            controller: AdhanController.instance,
+          _PrayerCalculationChoice(
             title: 'SeventhOfTheNight',
-            startPadding: 16.0,
-            endPadding: 16.0,
-            value: adhanCtrl.state.seventhOfTheNight.value,
-            onChanged: (bool value) async {
-              await adhanCtrl.getHighLatitudeRule(1);
-            },
+            selected: adhanCtrl.state.seventhOfTheNight.value,
+            onTap: () => adhanCtrl.getHighLatitudeRule(1),
           ),
-          CustomSwitchWidget<AdhanController>(
-            controller: AdhanController.instance,
+          _PrayerCalculationChoice(
             title: 'usingTheAngle',
-            startPadding: 16.0,
-            endPadding: 16.0,
-            value: adhanCtrl.state.twilightAngle.value,
-            onChanged: (bool value) async {
-              await adhanCtrl.getHighLatitudeRule(2);
-            },
+            selected: adhanCtrl.state.twilightAngle.value,
+            onTap: () => adhanCtrl.getHighLatitudeRule(2),
           ),
-          const Gap(8),
-          const SettingPrayerTimes(isOnePrayer: false),
         ],
       ),
     );
   }
+}
+
+class _PrayerCalculationChoice extends StatelessWidget {
+  const _PrayerCalculationChoice({
+    required this.title,
+    required this.selected,
+    required this.onTap,
+  });
+  final String title;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+    selected: selected,
+    inMutuallyExclusiveGroup: true,
+    child: Material(
+      color: Colors.transparent,
+      child: ListTile(
+        dense: true,
+        onTap: onTap,
+        leading: Icon(
+          selected ? Icons.radio_button_checked : Icons.radio_button_unchecked,
+          color: context.theme.colorScheme.inversePrimary,
+        ),
+        title: Text(
+          title.tr,
+          style: TextStyle(
+            fontFamily: 'cairo',
+            fontWeight: FontWeight.bold,
+            color: context.theme.colorScheme.inversePrimary,
+          ),
+        ),
+      ),
+    ),
+  );
 }

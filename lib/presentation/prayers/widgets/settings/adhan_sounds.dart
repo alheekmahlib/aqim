@@ -10,7 +10,8 @@ class AdhanSounds extends StatelessWidget {
     return SizedBox(
       height: 37,
       child: ContainerButtonWidget(
-        onPressed: () => customBottomSheet(
+        onPressed: () => context.customSettingsPage(
+          context: context,
           textTitle: 'adhanSounds',
           child: bottomSheetWidget(context),
           containerColor: context.theme.colorScheme.primaryContainer,
@@ -44,7 +45,8 @@ class AdhanSounds extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: ListView(
                 children: [
-                  if (customAdhanEnabled && Get.isRegistered<CustomAdhanController>())
+                  if (customAdhanEnabled &&
+                      Get.isRegistered<CustomAdhanController>())
                     CustomAdhanSection(
                       controller: Get.find<CustomAdhanController>(),
                     ),

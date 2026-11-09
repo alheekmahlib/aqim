@@ -1090,5 +1090,15 @@
   "customAdhanUnplayable": "فایلەکە لێنەدرا؛ دڵنیابە لە دروستییەکەی.",
   "customAdhanConversionFailed": "ئامادەکردنی کۆپی ئاگادارکردنەوەی iOS بۆ ئەم فایلە سەرکەوتوو نەبوو.",
   "customAdhanImportFailed": "هاوردەکردن سەرکەوتوو نەبوو؛ هەڵبژاردەکە نەگۆڕا.",
-  "customAdhanLoadFailed": "بارکردنی بانگخەرە تایبەتەکان سەرکەوتوو نەبوو."
+  "customAdhanLoadFailed": "بارکردنی بانگخەرە تایبەتەکان سەرکەوتوو نەبوو.",
+  "countdownRefresh": "نوێکردنەوە",
+  "prayerSettingsLocation": "شوێن و ژماردنی کاتەکان",
+  "prayerSettingsLocationDesc": "شوێن، شێوازی ژماردن، مەزهەب و پانی بەرز",
+  "prayerSettingsTimesDesc": "ڕێکخستنی کاتی نوێژ و قامەت",
+  "prayerSettingsSound": "ئەزان و دەنگ",
+  "prayerSettingsSoundDesc": "دەنگی ئەزان و ڕێگاکانی وەستاندنی",
+  "prayerSettingsNotifications": "ئاگادارکردنەوە و بیرخستنەوە",
+  "prayerSettingsNotificationsDesc": "بیرخستنەوەی نوێژ، قامەت و کاتژمێری پاشەوە",
+  "prayerSettingsSilent": "دۆخی بێدەنگ",
+  "prayerSettingsSilentDesc": "دۆخی بێدەنگ لە کاتی نوێژ و ماوەکەی"
 }

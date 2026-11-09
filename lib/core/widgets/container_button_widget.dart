@@ -40,6 +40,7 @@ class ContainerButtonWidget extends StatelessWidget {
 
   /// Glass intensity in Liquid Glass mode (ignored in classic themes).
   final GlassVariant glassVariant;
+  final bool glassBackdrop;
 
   const ContainerButtonWidget({
     super.key,
@@ -68,6 +69,7 @@ class ContainerButtonWidget extends StatelessWidget {
     this.horizontalPadding,
     this.verticalPadding,
     this.glassVariant = GlassVariant.subtle,
+    this.glassBackdrop = true,
   });
 
   @override
@@ -89,6 +91,7 @@ class ContainerButtonWidget extends StatelessWidget {
     return GlassContainer(
       radius: borderRadius ?? 16.0,
       variant: glassVariant,
+      useBackdrop: glassBackdrop,
       onTap: onPressed,
       child: SizedBox(
         height: (height ?? 56),

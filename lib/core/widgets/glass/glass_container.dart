@@ -31,6 +31,7 @@ class GlassContainer extends StatelessWidget {
     this.onTap,
     this.backgroundColor,
     this.border,
+    this.useBackdrop = true,
   });
 
   final Widget child;
@@ -44,6 +45,9 @@ class GlassContainer extends StatelessWidget {
 
   /// Classic-mode border.
   final BoxBorder? border;
+
+  /// Avoid a second backdrop filter on an existing glass surface.
+  final bool useBackdrop;
 
   @override
   Widget build(BuildContext context) {
@@ -67,6 +71,18 @@ class GlassContainer extends StatelessWidget {
         );
       }
       return classic;
+    }
+
+    if (!useBackdrop) {
+      return Material(
+        color: Colors.white.withValues(alpha: .08),
+        shape: RoundedRectangleBorder(
+          borderRadius: borderRadius,
+          side: BorderSide(color: Colors.white.withValues(alpha: .22)),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: onTap == null ? content : InkWell(onTap: onTap, child: content),
+      );
     }
 
     final glass = LiquidGlass.withOwnLayer(

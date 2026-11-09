@@ -21,6 +21,8 @@ struct PrayerCountdownAttributes: ActivityAttributes {
     var nextTimeText: String
     var prevName: String
     var prevAt: Date
+    var nextLabel: String?
+    var refreshLabel: String?
   }
 
   /// نصوص ثابتة مترجمة تمرَّر عند الإنشاء (تتغير فقط مع تغير اللغة).
@@ -37,7 +39,7 @@ enum PrayerCountdownLiveActivityController {
   static func sync(
     nextName: String, nextAt: Date, nextTimeText: String,
     prevName: String, prevAt: Date,
-    nextLabel: String, elapsedLabel: String
+    nextLabel: String, elapsedLabel: String, refreshLabel: String
   ) async {
     let authInfo = ActivityAuthorizationInfo()
     NSLog("PrayerCountdown: sync - areActivitiesEnabled=\(authInfo.areActivitiesEnabled)")
@@ -50,7 +52,9 @@ enum PrayerCountdownLiveActivityController {
       nextAt: nextAt,
       nextTimeText: nextTimeText,
       prevName: prevName,
-      prevAt: prevAt
+      prevAt: prevAt,
+      nextLabel: nextLabel,
+      refreshLabel: refreshLabel
     )
     let content = ActivityContent(state: state, staleDate: nextAt)
 
@@ -110,6 +114,7 @@ enum PrayerCountdownChannel {
         // يقفز التاريخ ~56 ألف عام للأمام فيظهر العدّ بمئات ملايين الساعات.
         let nextAt = Date(timeIntervalSince1970: ((args["nextAtMillis"] as? NSNumber)?.doubleValue ?? 0) / 1000.0)
         let prevAt = Date(timeIntervalSince1970: ((args["prevAtMillis"] as? NSNumber)?.doubleValue ?? 0) / 1000.0)
+        UserDefaults.standard.set(args["entries"] as? [[String: Any]] ?? [], forKey: "prayerCountdownBoundaries")
         Task {
           await PrayerCountdownLiveActivityController.sync(
             nextName: args["nextName"] as? String ?? "",
@@ -118,7 +123,8 @@ enum PrayerCountdownChannel {
             prevName: args["prevName"] as? String ?? "",
             prevAt: prevAt,
             nextLabel: args["nextLabel"] as? String ?? "",
-            elapsedLabel: args["elapsedLabel"] as? String ?? ""
+            elapsedLabel: args["elapsedLabel"] as? String ?? "",
+            refreshLabel: args["refreshLabel"] as? String ?? "Refresh"
           )
         }
         result(true)
@@ -127,6 +133,7 @@ enum PrayerCountdownChannel {
           result(true)
           return
         }
+        UserDefaults.standard.removeObject(forKey: "prayerCountdownBoundaries")
         Task {
           await PrayerCountdownLiveActivityController.cancelAll()
         }

@@ -2,10 +2,10 @@
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
     android:minWidth="110dp"
     android:minHeight="80dp"
-    android:resizeMode="none"
+    android:resizeMode="horizontal|vertical"
     android:updatePeriodMillis="0"
     android:initialLayout="@layout/prayer_widget_layout_small"
-    android:targetCellWidth="5"
-    android:targetCellHeight="1"
+    android:targetCellWidth="2"
+    android:targetCellHeight="2"
     android:widgetCategory="home_screen|keyguard"
     android:previewImage="@mipmap/launcher_icon"/>

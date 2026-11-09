@@ -1090,5 +1090,15 @@
   "customAdhanUnplayable": "فائل چلائی نہیں جا سکی؛ درست ہونے کی تصدیق کریں۔",
   "customAdhanConversionFailed": "اس فائل کا iOS اطلاعیاتی نقل تیار نہیں ہو سکا۔",
   "customAdhanImportFailed": "درآمد ناکام؛ موجودہ انتخاب تبدیل نہیں ہوا۔",
-  "customAdhanLoadFailed": "کسٹم مؤذن لوڈ نہیں ہو سکے۔"
+  "customAdhanLoadFailed": "کسٹم مؤذن لوڈ نہیں ہو سکے۔",
+  "countdownRefresh": "تازہ کریں",
+  "prayerSettingsLocation": "مقام اور اوقات کا حساب",
+  "prayerSettingsLocationDesc": "مقام، حساب کا طریقہ، مسلک اور بلند عرض بلد",
+  "prayerSettingsTimesDesc": "نماز اور اقامت کے اوقات درست کریں",
+  "prayerSettingsSound": "اذان اور آواز",
+  "prayerSettingsSoundDesc": "اذان کی آواز اور اسے روکنے کے طریقے",
+  "prayerSettingsNotifications": "اطلاعات اور یاد دہانیاں",
+  "prayerSettingsNotificationsDesc": "نماز کی یاد دہانی، اقامت اور کاؤنٹ ڈاؤن",
+  "prayerSettingsSilent": "خاموش موڈ",
+  "prayerSettingsSilentDesc": "نماز کے دوران خاموش موڈ اور اس کا دورانیہ"
 }

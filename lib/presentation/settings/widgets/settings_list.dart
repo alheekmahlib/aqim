@@ -89,6 +89,7 @@ class SettingsList extends StatelessWidget {
     return SizedBox(
       height: 45,
       child: ContainerButtonWidget(
+        glassBackdrop: false,
         onPressed: onTap,
         backgroundColor: context.theme.colorScheme.primaryContainer,
         svgColor: context.theme.colorScheme.surface,

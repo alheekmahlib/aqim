@@ -4,12 +4,14 @@ import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
+import android.os.Bundle
+import es.antonborri.home_widget.HomeWidgetPlugin
 import android.os.Build
 import android.os.SystemClock
 import android.widget.RemoteViews
 import android.view.View
 import android.content.SharedPreferences
-import androidx.core.net.toUri
 import es.antonborri.home_widget.HomeWidgetProvider
 import com.alheekmah.aqimApp.R
 import java.text.SimpleDateFormat
@@ -61,12 +63,23 @@ open class PrayerWidget : HomeWidgetProvider() {
         }
     }
 
-    protected open fun resolveLayout(manager: AppWidgetManager, appWidgetId: Int): Int {
+    override fun onAppWidgetOptionsChanged(context: Context, manager: AppWidgetManager, appWidgetId: Int, newOptions: Bundle) {
+        super.onAppWidgetOptionsChanged(context, manager, appWidgetId, newOptions)
+        updateAppWidget(context, manager, appWidgetId, HomeWidgetPlugin.getData(context))
+    }
+
+    protected open fun resolveLayout(context: Context, manager: AppWidgetManager, appWidgetId: Int): Int {
         val options = manager.getAppWidgetOptions(appWidgetId)
-        val minW = options.getInt(OPTION_APPWIDGET_MIN_WIDTH)
-        val minH = options.getInt(OPTION_APPWIDGET_MIN_HEIGHT)
-        val useLarge = (minW >= 250 || minH >= 150)
-        return if (useLarge) R.layout.prayer_widget_layout_large else R.layout.prayer_widget_layout_small
+        // The minimum dimensions describe different orientations. Select the
+        // matching pair so a tall portrait widget does not remain in medium mode.
+        val landscape = context.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+        val width = options.getInt(if (landscape) AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH else OPTION_APPWIDGET_MIN_WIDTH)
+        val height = options.getInt(if (landscape) OPTION_APPWIDGET_MIN_HEIGHT else AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT)
+        return when {
+            width >= 250 && height >= 240 -> R.layout.prayer_widget_layout_large
+            width >= 250 && height >= 110 -> R.layout.prayer_widget_layout_medium
+            else -> R.layout.prayer_widget_layout_small
+        }
     }
 
     protected open fun updateAppWidget(
@@ -203,7 +216,7 @@ open class PrayerWidget : HomeWidgetProvider() {
         var currentEpoch = if (monthlyCurrentEpoch > 0) monthlyCurrentEpoch else prefs.getLong("current_prayer_epoch", -1L)
         var nextEpoch = if (monthlyNextEpoch > 0) monthlyNextEpoch else prefs.getLong("next_prayer_epoch", -1L)
 
-        val layoutId = resolveLayout(manager, appWidgetId)
+        val layoutId = resolveLayout(context, manager, appWidgetId)
         val views = RemoteViews(context.packageName, layoutId)
 
         // Set layout direction based on app_language (RTL for ar/ur/fa)
@@ -214,26 +227,44 @@ open class PrayerWidget : HomeWidgetProvider() {
             } catch (_: Exception) {}
         }
 
-        // Mirror progress bar fill direction for RTL by flipping scaleX
-        try {
-            views.setFloat(R.id.progress, "setScaleX", if (rtl) -1f else 1f)
-        } catch (_: Exception) {}
-
         // Fill header/date if present (large layout) أو الصغير
         setTextIfExists(context, views, R.id.hijri_day_overlay, hijriDay)
         setTextIfExists(context, views, R.id.hijri_year_weekday, toArabicDigits(hijriYear, lang) + " " + dayName)
-        setTextIfExists(context, views, R.id.hijri_day_overlay_small, hijriDay)
-        setTextIfExists(context, views, R.id.hijri_year_weekday_small, toArabicDigits(hijriYear, lang) + " " + dayName)
         // Render hijri watermark icon if view exists
         try {
             val assetPath = "flutter_assets/assets/svg/hijri/${hijriMonthIdx}.svg"
             renderSvgAssetToBitmap(context, assetPath, 96f, 54f)?.let {
                 views.setImageViewBitmap(R.id.hijri_icon, it)
             }
-            renderSvgAssetToBitmap(context, assetPath, 72f, 44f)?.let {
-                views.setImageViewBitmap(R.id.hijri_icon_small, it)
-            }
         } catch (_: Exception) {}
+
+        // Use the app's translations, since its language may differ from the system language.
+        val nextLabel = try {
+            context.assets.open("flutter_assets/assets/locales/$lang.json").bufferedReader().use {
+                JSONObject(it.readText()).optString("nextPrayer", "Next prayer")
+            }
+        } catch (_: Exception) {
+            if (lang == "ar") "الصلاة القادمة" else "Next prayer"
+        }
+        setTextIfExists(context, views, R.id.widget_next_label, nextLabel)
+        val remainingLabel = try {
+            context.assets.open("flutter_assets/assets/locales/$lang.json").bufferedReader().use {
+                JSONObject(it.readText()).optString("timeLeft:", "Time remaining").trimEnd(':', '：', ' ')
+            }
+        } catch (_: Exception) {
+            if (lang == "ar") "المتبقي" else "Time remaining"
+        }
+        setTextIfExists(context, views, R.id.widget_remaining_label,
+            if (lang == "ar") "المتبقي" else remainingLabel)
+        val nightPrayerNames = listOf("fajr_name", "maghrib_name", "isha_name")
+            .mapNotNull { prefs.getString(it, null) }
+        views.setImageViewResource(R.id.widget_prayer_icon,
+            if (nextPrayerName in nightPrayerNames) R.drawable.ic_moon else R.drawable.ic_widget_sun)
+
+        // The same logo used by the iOS widget, rendered from the bundled SVG.
+        renderSvgAssetToBitmap(context, "flutter_assets/assets/svg/logo/aqem_logo_stroke.svg", 32f, 18f)?.let {
+            views.setImageViewBitmap(R.id.widget_logo, it)
+        }
 
         // Current / Next (both layouts have next_prayer_name/time in some form)
         setTextIfExists(context, views, R.id.current_prayer_name, currentPrayerName)
@@ -268,22 +299,16 @@ open class PrayerWidget : HomeWidgetProvider() {
         // Fill names/times in large grid if present (monthly data overrides stale prefs)
         setTextIfExists(context, views, R.id.fajr_name, prefs.getString("fajr_name", "الفجر")?:"الفجر")
         setTextIfExists(context, views, R.id.fajr_time, monthlyFajr ?: prefs.getString("fajr_time", "--:--")?:"--:--")
-        setImageResIfExists(views, R.id.fajr_icon, R.drawable.ic_moon)
         setTextIfExists(context, views, R.id.sunrise_name, prefs.getString("shuroq_name", "الشروق")?:"الشروق")
         setTextIfExists(context, views, R.id.sunrise_time, monthlySunrise ?: prefs.getString("shuroq_time", "--:--")?:"--:--")
-        setImageResIfExists(views, R.id.sunrise_icon, R.drawable.ic_sun)
         setTextIfExists(context, views, R.id.dhuhr_name, prefs.getString("dhuhr_name", "الظهر")?:"الظهر")
         setTextIfExists(context, views, R.id.dhuhr_time, monthlyDhuhr ?: prefs.getString("dhuhr_time", "--:--")?:"--:--")
-        setImageResIfExists(views, R.id.dhuhr_icon, R.drawable.ic_sun)
         setTextIfExists(context, views, R.id.asr_name, prefs.getString("asr_name", "العصر")?:"العصر")
         setTextIfExists(context, views, R.id.asr_time, monthlyAsr ?: prefs.getString("asr_time", "--:--")?:"--:--")
-        setImageResIfExists(views, R.id.asr_icon, R.drawable.ic_sun)
         setTextIfExists(context, views, R.id.maghrib_name, prefs.getString("maghrib_name", "المغرب")?:"المغرب")
         setTextIfExists(context, views, R.id.maghrib_time, monthlyMaghrib ?: prefs.getString("maghrib_time", "--:--")?:"--:--")
-        setImageResIfExists(views, R.id.maghrib_icon, R.drawable.ic_moon)
         setTextIfExists(context, views, R.id.isha_name, prefs.getString("isha_name", "العشاء")?:"العشاء")
         setTextIfExists(context, views, R.id.isha_time, monthlyIsha ?: prefs.getString("isha_time", "--:--")?:"--:--")
-        setImageResIfExists(views, R.id.isha_icon, R.drawable.ic_moon)
 
         // Midnight / last third
         setTextIfExists(context, views, R.id.midnight_name, prefs.getString("muntasaf_allayl_name", "منتصف الليل")?:"منتصف الليل")
@@ -293,25 +318,25 @@ open class PrayerWidget : HomeWidgetProvider() {
 
         // Highlight NEXT prayer (small layout) ليتطابق مع الكبير
         val nextSmall = nextPrayerName
-        setBackgroundIfExists(views, R.id.pill_fajr, if (nextSmall.contains("فجر")) R.drawable.bg_pill_selected else R.drawable.bg_pill_unselected)
-        setBackgroundIfExists(views, R.id.pill_dhuhr, if (nextSmall.contains("ظهر")) R.drawable.bg_pill_selected else R.drawable.bg_pill_unselected)
-        setBackgroundIfExists(views, R.id.pill_asr, if (nextSmall.contains("عصر")) R.drawable.bg_pill_selected else R.drawable.bg_pill_unselected)
-        setBackgroundIfExists(views, R.id.pill_maghrib, if (nextSmall.contains("مغرب")) R.drawable.bg_pill_selected else R.drawable.bg_pill_unselected)
-        setBackgroundIfExists(views, R.id.pill_isha, if (nextSmall.contains("عشاء")) R.drawable.bg_pill_selected else R.drawable.bg_pill_unselected)
+        setBackgroundIfExists(views, R.id.pill_fajr, if (nextSmall == (prefs.getString("fajr_name", "الفجر") ?: "الفجر")) R.drawable.bg_pill_selected else R.drawable.bg_pill_unselected)
+        setBackgroundIfExists(views, R.id.pill_dhuhr, if (nextSmall == (prefs.getString("dhuhr_name", "الظهر") ?: "الظهر")) R.drawable.bg_pill_selected else R.drawable.bg_pill_unselected)
+        setBackgroundIfExists(views, R.id.pill_asr, if (nextSmall == (prefs.getString("asr_name", "العصر") ?: "العصر")) R.drawable.bg_pill_selected else R.drawable.bg_pill_unselected)
+        setBackgroundIfExists(views, R.id.pill_maghrib, if (nextSmall == (prefs.getString("maghrib_name", "المغرب") ?: "المغرب")) R.drawable.bg_pill_selected else R.drawable.bg_pill_unselected)
+        setBackgroundIfExists(views, R.id.pill_isha, if (nextSmall == (prefs.getString("isha_name", "العشاء") ?: "العشاء")) R.drawable.bg_pill_selected else R.drawable.bg_pill_unselected)
 
         // Highlight next prayer within rows (large layout)
         val next = nextPrayerName
-        setBackgroundIfExists(views, R.id.row_fajr, if (next.contains("فجر")) R.drawable.bg_pill_selected else R.drawable.bg_pill_unselected)
-        setBackgroundIfExists(views, R.id.row_sunrise, if (next.contains("شروق") || next.contains("الشروق")) R.drawable.bg_pill_selected else R.drawable.bg_pill_unselected)
-        setBackgroundIfExists(views, R.id.row_dhuhr, if (next.contains("ظهر")) R.drawable.bg_pill_selected else R.drawable.bg_pill_unselected)
-        setBackgroundIfExists(views, R.id.row_asr, if (next.contains("عصر")) R.drawable.bg_pill_selected else R.drawable.bg_pill_unselected)
-        setBackgroundIfExists(views, R.id.row_maghrib, if (next.contains("مغرب")) R.drawable.bg_pill_selected else R.drawable.bg_pill_unselected)
-        setBackgroundIfExists(views, R.id.row_isha, if (next.contains("عشاء")) R.drawable.bg_pill_selected else R.drawable.bg_pill_unselected)
+        setBackgroundIfExists(views, R.id.row_fajr, if (next == (prefs.getString("fajr_name", "الفجر") ?: "الفجر")) R.drawable.bg_pill_selected else R.drawable.bg_pill_unselected)
+        setBackgroundIfExists(views, R.id.row_sunrise, if (next == (prefs.getString("shuroq_name", "الشروق") ?: "الشروق")) R.drawable.bg_pill_selected else R.drawable.bg_pill_unselected)
+        setBackgroundIfExists(views, R.id.row_dhuhr, if (next == (prefs.getString("dhuhr_name", "الظهر") ?: "الظهر")) R.drawable.bg_pill_selected else R.drawable.bg_pill_unselected)
+        setBackgroundIfExists(views, R.id.row_asr, if (next == (prefs.getString("asr_name", "العصر") ?: "العصر")) R.drawable.bg_pill_selected else R.drawable.bg_pill_unselected)
+        setBackgroundIfExists(views, R.id.row_maghrib, if (next == (prefs.getString("maghrib_name", "المغرب") ?: "المغرب")) R.drawable.bg_pill_selected else R.drawable.bg_pill_unselected)
+        setBackgroundIfExists(views, R.id.row_isha, if (next == (prefs.getString("isha_name", "العشاء") ?: "العشاء")) R.drawable.bg_pill_selected else R.drawable.bg_pill_unselected)
 
         // Click: open app
-        val intent = Intent(Intent.ACTION_VIEW).apply {
+        val intent = Intent(Intent.ACTION_MAIN).apply {
             setClassName(context.packageName, "com.alheekmah.aqimApp.MainActivity")
-            data = "app://open/prayers".toUri()
+            addCategory(Intent.CATEGORY_LAUNCHER)
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
             putExtra("widgetClicked", "PrayerWidget")
         }
