@@ -501,7 +501,7 @@
     "type": "text",
     "placeholders": {}
   },
-  "What'sNewDetails10": "۞ Se añadieron los horarios de Iqama con la posibilidad de personalizar la hora y las notificaciones.\n۞ Se mejoró la lógica de notificaciones.\n۞ Mejoras de rendimiento.",
+  "What'sNewDetails10": "۞ Se añadieron más opciones a la pantalla de oración para que puedas elegir cómo se muestran los horarios de oración.\n۞ Se añadió una notificación persistente para mostrar la próxima oración.\n۞ Mejoras de rendimiento y estabilidad.",
   "@What'sNewDetails10": {
     "type": "text",
     "placeholders": {}

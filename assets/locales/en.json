@@ -501,7 +501,7 @@
     "type": "text",
     "placeholders": {}
   },
-  "What'sNewDetails10": "۞ Added Iqama times with the ability to customize the time and notifications.\n۞ Improved notification logic.\n۞ Performance improvements.",
+  "What'sNewDetails10": "۞ Added more options to the prayer screen so you can choose how prayer times are displayed.\n۞ Added a persistent notification to show the upcoming prayer.\n۞ Performance and stability improvements.",
   "@What'sNewDetails10": {
     "type": "text",
     "placeholders": {}

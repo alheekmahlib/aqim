@@ -501,7 +501,7 @@
     "type": "text",
     "placeholders": {}
   },
-  "What'sNewDetails10": "۞ İkamet vakitleri eklendi; saat ve bildirimleri özelleştirme imkânıyla.\n۞ Bildirim mantığı iyileştirildi.\n۞ Performans iyileştirmeleri.",
+  "What'sNewDetails10": "۞ Namaz ekranına, namaz vakitlerinin nasıl görüntüleneceğini seçebileceğiniz daha fazla seçenek eklendi.\n۞ Gelecek namazı gösteren kalıcı bir bildirim eklendi.\n۞ Performans ve kararlılık iyileştirmeleri.",
   "@What'sNewDetails10": {
     "type": "text",
     "placeholders": {}
