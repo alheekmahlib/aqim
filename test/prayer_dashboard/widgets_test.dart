@@ -68,9 +68,9 @@ void main() {
     final fonts = FontLoader('cairo')
       ..addFont(rootBundle.load('assets/fonts/Cairo-Regular.ttf'));
     await fonts.load();
-    final solarFonts = FontLoader('packages/solar_icons/SolarIconsBold')
+    final solarFonts = FontLoader('packages/solar_icons/SolarIcons')
       ..addFont(
-        rootBundle.load('packages/solar_icons/fonts/SolarIconsBold.ttf'),
+        rootBundle.load('packages/solar_icons/fonts/SolarIcons.ttf'),
       );
     await solarFonts.load();
     final materialFonts = FontLoader('MaterialIcons')
@@ -327,10 +327,13 @@ void main() {
       await tester.tap(find.byType(CustomSwitch).first);
       await tester.pumpAndSettle();
       expect(controller.layout.value.panels.first.visible, isFalse);
-      await tester.drag(
-        find.byType(ReorderableDragStartListener).first,
-        const Offset(0, 170),
-      );
+      final first = find.byKey(const ValueKey('current_prayer'));
+      final second = find.byKey(const ValueKey('location_date'));
+      final gesture = await tester.startGesture(tester.getCenter(first));
+      await tester.pump(const Duration(milliseconds: 600));
+      await gesture.moveTo(tester.getCenter(second));
+      await tester.pump(const Duration(milliseconds: 300));
+      await gesture.up();
       await tester.pumpAndSettle();
       expect(
         controller.layout.value.panels.first.panel,

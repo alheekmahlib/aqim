@@ -11,18 +11,9 @@ class DashboardPanelPreview extends StatelessWidget {
     child: IgnorePointer(
       child: TickerMode(
         enabled: false,
-        child: Container(
-          width: 88,
-          height: 80,
-          padding: const EdgeInsets.all(5),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: Theme.of(
-                context,
-              ).colorScheme.inversePrimary.withValues(alpha: .2),
-            ),
-          ),
+        child: SizedBox(
+          width: 158,
+          height: 140,
           child: ClipRect(
             child: MediaQuery(
               data: MediaQuery.of(context).copyWith(
