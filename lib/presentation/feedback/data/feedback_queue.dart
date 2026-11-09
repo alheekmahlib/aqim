@@ -96,7 +96,12 @@ class FeedbackQueue {
     final staged = _stagedPathsOf(payload);
     final urls = await _uploadStaged(staged);
     final body = <String, dynamic>{'body': payload['body']?.toString() ?? ''};
-    if (urls.isNotEmpty) body['media_urls'] = urls;
+    final existing = payload['media_urls'];
+    final mediaUrls = <String>[
+      if (existing is List) ...existing.map((e) => e.toString()),
+      ...urls,
+    ];
+    if (mediaUrls.isNotEmpty) body['media_urls'] = mediaUrls;
 
     final endpoint =
         '${ApiConstants.feedbackApiUrl}${ApiConstants.feedbackEndpoint}/$token${ApiConstants.feedbackReplySuffix}';

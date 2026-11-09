@@ -16,11 +16,11 @@ import '../data/darwin_notification_sound.dart';
 import '../data/in_app_adhan_session.dart';
 import '../data/local_adhan_playback_control.dart';
 import '../data/local_adhan_stop_gestures.dart';
-import '../data/stored_custom_adhan_repository.dart';
-import '../domain/custom_adhan_repository.dart';
 import '../data/pending_prayer_feature_capabilities.dart';
 import '../data/prayer_feature_capabilities_policy.dart';
+import '../data/stored_custom_adhan_repository.dart';
 import '../data/stored_prayer_feature_settings.dart';
+import '../domain/custom_adhan_repository.dart';
 import '../domain/prayer_feature.dart';
 import '../domain/prayer_feature_capabilities.dart';
 import '../domain/prayer_feature_settings.dart';
@@ -100,12 +100,12 @@ class PrayerFeaturesBinding extends Bindings {
           repository: Get.find<CustomAdhanRepository>(),
           selector: customSelector,
           pickAudioFile: () async {
-            final result = await FilePicker.platform.pickFiles(
+            final result = await FilePicker.pickFiles(
               type: FileType.custom,
               allowedExtensions:
                   StoredCustomAdhanRepository.supportedExtensions,
             );
-            return result?.files.single.path;
+            return result.single.path;
           },
           reschedule: PrayersNotificationsCtrl.instance.reschedulePrayers,
           selectStandardAdhan: (index) async =>

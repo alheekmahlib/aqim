@@ -509,65 +509,59 @@ class FeedbackController extends GetxController {
   /// يستخدم `file_picker` لأن `image_picker` لا تدعم سطح المكتب.
   /// يتحقق من النوع والحجم والحد الأقصى.
   Future<String?> pickImages() async {
-    if (selectedFiles.length >= maxFiles) return 'feedbackMaxFiles';
+    if (selectedFiles.length >= maxFiles) return 'feedback_max_files';
 
     try {
-      final result = await FilePicker.platform.pickFiles(
-        type: FileType.image,
-        allowMultiple: true,
-        withData: false,
-      );
-      if (result == null || result.files.isEmpty) return null; // ألغى المستخدم
+      // منذ file_picker v13: pickFiles تُرجع List<PlatformFile> مباشرة
+      // (قائمة فارغة عند الإلغاء) والاختيار المتعدد هو السلوك الافتراضي.
+      final files = await FilePicker.pickFiles(type: FileType.image);
+      if (files.isEmpty) return null; // ألغى المستخدم
 
-      for (final pf in result.files) {
+      for (final pf in files) {
         if (selectedFiles.length >= maxFiles) break;
         final path = pf.path;
         if (path == null || path.isEmpty) continue;
         final ext = _extension(path);
 
         if (!_allowedImageExts.contains(ext)) {
-          return 'feedbackInvalidType';
+          return 'feedback_invalid_type';
         }
-        if (pf.size > _maxImageBytes) {
-          return 'feedbackFileTooLarge';
+        if ((pf.lengthSync() ?? 0) > _maxImageBytes) {
+          return 'feedback_file_too_large';
         }
         selectedFiles.add(File(path));
       }
       return null; // نجاح
     } catch (e) {
       log('pickImages error: $e', name: 'FeedbackController');
-      return 'feedbackInvalidType';
+      return 'feedback_invalid_type';
     }
   }
 
   /// يفتح حوار اختيار فيديو واحد. يعمل على كل المنصات بما فيها macOS.
   Future<String?> pickVideo() async {
-    if (selectedFiles.length >= maxFiles) return 'feedbackMaxFiles';
+    if (selectedFiles.length >= maxFiles) return 'feedback_max_files';
 
     try {
-      final result = await FilePicker.platform.pickFiles(
-        type: FileType.video,
-        allowMultiple: false,
-        withData: false,
-      );
-      if (result == null || result.files.isEmpty) return null; // ألغى المستخدم
+      // pickFile (جديد في v13) لاختيار ملف واحد — تُرجع null عند الإلغاء.
+      final pf = await FilePicker.pickFile(type: FileType.video);
+      if (pf == null) return null; // ألغى المستخدم
 
-      final pf = result.files.first;
       final path = pf.path;
       if (path == null || path.isEmpty) return null;
       final ext = _extension(path);
 
       if (!_allowedVideoExts.contains(ext)) {
-        return 'feedbackInvalidType';
+        return 'feedback_invalid_type';
       }
-      if (pf.size > _maxVideoBytes) {
-        return 'feedbackFileTooLarge';
+      if ((pf.lengthSync() ?? 0) > _maxVideoBytes) {
+        return 'feedback_file_too_large';
       }
       selectedFiles.add(File(path));
       return null; // نجاح
     } catch (e) {
       log('pickVideo error: $e', name: 'FeedbackController');
-      return 'feedbackInvalidType';
+      return 'feedback_invalid_type';
     }
   }
 

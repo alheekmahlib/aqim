@@ -3,6 +3,8 @@ import 'dart:io' show Directory, File, FileSystemException;
 import 'package:aqim/presentation/feedback/controller/feedback_controller.dart';
 import 'package:aqim/presentation/feedback/data/feedback_media_staging.dart';
 import 'package:aqim/presentation/feedback/data/feedback_queue.dart';
+import 'package:aqim/presentation/feedback/data/models/feedback_model.dart';
+import 'package:aqim/presentation/feedback/data/models/feedback_thread.dart';
 import 'package:connectivity_kit/connectivity_kit.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -71,6 +73,23 @@ void main() {
     expect(task.payload['app_source'], FeedbackController.appSource);
     // لم يصل شيء للخادم → لا token محفوظ بعد.
     expect(GetStorage().read<List<dynamic>>('feedback_tokens'), isNull);
+  });
+
+  test('إرسال رد دون اتصال يحفظه مع رمز المحادثة في الطابور', () async {
+    final c = FeedbackController.instance;
+    c.openThread.value = FeedbackThread(
+      feedback: FeedbackModel.fromJson({'token': 'thread-token'}),
+      replies: const [],
+    );
+
+    final result = await c.sendReply('رد تجريبي');
+
+    expect(result.isRight, isTrue);
+    expect(result.right.id, isEmpty);
+    final task = queue.pendingTasks.single;
+    expect(task.type, FeedbackQueue.replyType);
+    expect(task.payload['token'], 'thread-token');
+    expect(task.payload['body'], 'رد تجريبي');
   });
 
   test('stage تنقل الملف إلى مجلد دائم وcleanup تحذفه مع مجلده', () async {

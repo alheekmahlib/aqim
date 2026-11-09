@@ -37,6 +37,7 @@ Future<void> initializeApp() async {
   await GetStorage.init();
 
   Get.put(service, permanent: true);
+  await service.init();
   Get.put(ConnectionController(), permanent: true);
   // خدمة الاتصال + طابور الملاحظات: إرسال مؤجَّل يستأنف تلقائيًا عند
   // عودة الاتصال.
