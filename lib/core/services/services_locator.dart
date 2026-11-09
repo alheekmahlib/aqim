@@ -9,12 +9,12 @@ import 'package:timezone/timezone.dart' as tz;
 
 import '/core/widgets/local_notification/controller/local_notifications_controller.dart';
 import '/presentation/controllers/settings_controller.dart';
-import '../../presentation/calendar/events.dart';
 import '../../presentation/controllers/theme_controller.dart';
 import '../../presentation/feedback/controller/feedback_controller.dart';
 import '../../presentation/ourApp/controller/our_apps_controller.dart';
-import '../../presentation/prayers/prayers.dart';
 import '../../presentation/prayers/features/presentation/prayer_features_binding.dart';
+import '../../presentation/prayers/prayers.dart';
+import '../../presentation/ramadan/events.dart';
 import '../../presentation/splash/splash.dart';
 import '../../presentation/whats_new/whats_new.dart';
 import '../utils/helpers/rate_app_helper.dart';

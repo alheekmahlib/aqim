@@ -227,43 +227,46 @@ class _ModernStatItem extends StatelessWidget {
 class _EmptyQadaState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Row(
       children: [
         Container(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: context.theme.colorScheme.surface.withValues(alpha: .1),
-            shape: BoxShape.circle,
+            color: context.theme.colorScheme.surface.withValues(alpha: .12),
+            borderRadius: BorderRadius.circular(14),
           ),
           child: Icon(
             SolarIconsBold.checkCircle,
-            size: 48,
-            color: context.theme.colorScheme.surface.withValues(alpha: .5),
-          ),
-        ),
-        const Gap(16),
-        Text(
-          'noMissedDays'.tr,
-          style: TextStyle(
-            fontSize: 16,
-            fontFamily: 'cairo',
-            fontWeight: FontWeight.bold,
-            height: 1.4,
+            size: 28,
             color: context.theme.colorScheme.surface,
           ),
         ),
-        const Gap(8),
-        Text(
-          'tapCalendarToAddMissedDays'.tr,
-          style: TextStyle(
-            fontSize: 12,
-            fontFamily: 'cairo',
-            height: 1.4,
-            color: context.theme.colorScheme.inversePrimary.withValues(
-              alpha: 0.5,
-            ),
+        const Gap(12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'noMissedDays'.tr,
+                style: TextStyle(
+                  fontFamily: 'cairo',
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: context.theme.colorScheme.inversePrimary,
+                ),
+              ),
+              Text(
+                'tapCalendarToAddMissedDays'.tr,
+                style: TextStyle(
+                  fontFamily: 'cairo',
+                  fontSize: 12,
+                  color: context.theme.colorScheme.inversePrimary.withValues(
+                    alpha: .8,
+                  ),
+                ),
+              ),
+            ],
           ),
-          textAlign: TextAlign.center,
         ),
       ],
     );

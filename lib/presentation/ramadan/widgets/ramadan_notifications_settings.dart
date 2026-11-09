@@ -272,7 +272,7 @@ class _ModernNotificationTile extends StatelessWidget {
                     fontSize: 16,
                     fontFamily: 'cairo',
                     fontWeight: FontWeight.bold,
-                    color: value ? color : color.withValues(alpha: .5),
+                    color: value ? color : color.withValues(alpha: .8),
                   ),
                 ),
                 const Gap(2),

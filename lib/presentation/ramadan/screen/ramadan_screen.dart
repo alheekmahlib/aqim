@@ -25,6 +25,7 @@ class RamadanScreen extends StatelessWidget {
               _sectionTitle(context, 'qadaSection'),
               const Gap(16),
               const QadaProgressWidget(),
+              const Gap(16),
               const QadaCalendarWidget(),
               const Gap(20),
               _sectionTitle(context, 'quranSection'),
@@ -58,8 +59,9 @@ class RamadanScreen extends StatelessWidget {
             fontSize: 16,
             fontFamily: 'cairo',
             fontWeight: FontWeight.bold,
-            color:
-                context.theme.colorScheme.inversePrimary.withValues(alpha: .6),
+            color: context.theme.colorScheme.inversePrimary.withValues(
+              alpha: .6,
+            ),
           ),
         ),
         const Gap(8),

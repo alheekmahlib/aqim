@@ -7,10 +7,10 @@ import '../../core/utils/constants/extensions/bottom_sheet_extension.dart';
 import '../../core/utils/constants/extensions/extensions.dart';
 import '../../core/utils/constants/extensions/svg_extensions.dart';
 import '../../core/utils/helpers/glass_tokens.dart';
-import '../calendar/events.dart';
 import '../prayers/prayers.dart';
 import '../prayers_of_cites/cites.dart';
 import '../qibla/qibla.dart';
+import '../ramadan/events.dart';
 import '../settings/screens/settings_screen.dart';
 import '../teaching_prayer/teaching.dart';
 

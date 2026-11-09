@@ -14,8 +14,8 @@ import '/core/widgets/app_bar_widget.dart';
 import '../../core/utils/constants/extensions/bottom_sheet_extension.dart';
 import '../../core/utils/constants/svg_constants.dart';
 import '../../core/widgets/glass/glass_container.dart';
-import '../calendar/events.dart';
 import '../prayers/prayers.dart';
+import '../ramadan/events.dart';
 
 part 'controller/teaching_prayer_controller.dart';
 part 'data/model/sunnahs_and_heresies_model.dart';

@@ -14,8 +14,6 @@ class QadaCalendarWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Gap(16),
-
         // أسماء الأيام
         Container(
           padding: const EdgeInsets.symmetric(vertical: 10),
@@ -30,8 +28,7 @@ class QadaCalendarWidget extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: weekDays
                 .map(
-                  (day) => SizedBox(
-                    width: 40,
+                  (day) => Expanded(
                     child: Text(
                       day.tr,
                       textAlign: TextAlign.center,
@@ -54,9 +51,17 @@ class QadaCalendarWidget extends StatelessWidget {
 
         // شبكة الأيام
         Obx(() {
-          final _ = ctrl.missedDays.length;
-          final __ = ctrl.fastedDays.length;
           final daysInMonth = ctrl.ramadanDaysCount;
+          // Capture both reactive lists here: GridView builds its cells later,
+          // outside the Obx callback that establishes subscriptions.
+          final missedDays = ctrl.missedDays
+              .where((day) => day.year == ctrl.hijriNow.hYear && day.month == 9)
+              .map((day) => day.day)
+              .toSet();
+          final fastedDays = ctrl.fastedDays
+              .where((day) => day.year == ctrl.hijriNow.hYear && day.month == 9)
+              .map((day) => day.day)
+              .toSet();
 
           // حساب يوم الأسبوع لأول يوم رمضان (الجمعة = 5، السبت = 6، الأحد = 0...)
           final firstDayOfRamadan = HijriDate.fromHijri(
@@ -86,8 +91,8 @@ class QadaCalendarWidget extends StatelessWidget {
               }
 
               final day = index - startOffset + 1;
-              final isMissed = ctrl.isDayMissed(day);
-              final isFasted = ctrl.isDayFasted(day);
+              final isMissed = missedDays.contains(day);
+              final isFasted = fastedDays.contains(day);
 
               return _ModernDayCell(
                 day: day,
