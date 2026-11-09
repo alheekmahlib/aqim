@@ -69,11 +69,8 @@ class CountdownPrayerCard extends StatelessWidget {
                     shaderCallback: (bounds) => const LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.transparent,
-                        Colors.white10,
-                        Colors.white,
-                      ],
+                      colors: [Colors.transparent, Colors.white, Colors.white],
+                      stops: [0.0, 0.95, 1.0],
                     ).createShader(bounds),
                     child: ClipRRect(
                       borderRadius: const BorderRadius.only(

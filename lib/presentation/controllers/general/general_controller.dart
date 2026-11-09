@@ -2,13 +2,13 @@ import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:connectivity_kit/connectivity_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../../../core/services/background_services.dart';
-import '../../../core/services/internet_connection_controller.dart';
 import '../../../core/services/location/locations.dart';
 import '../../../core/utils/constants/shared_preferences_constants.dart';
 import '../../../core/widgets/home_widget/home_widget.dart';
@@ -107,7 +107,8 @@ class GeneralController extends GetxController with WidgetsBindingObserver {
 
       // إعادة جدولة Timer منتصف الليل عند العودة للتطبيق
       // Reschedule foreground midnight timer on resume
-      if (state.activeLocation.value && (Platform.isIOS || Platform.isAndroid)) {
+      if (state.activeLocation.value &&
+          (Platform.isIOS || Platform.isAndroid)) {
         BGServices.scheduleForegroundMidnightTimer();
       }
 
@@ -175,8 +176,8 @@ class GeneralController extends GetxController with WidgetsBindingObserver {
       // عند عدم وجود إنترنت ومع وجود موقع محفوظ: لا نعمل fetch لموقع جديد.
       final storedPosition = Location.instance.position;
       final hasStoredLocation = storedPosition != null;
-      final isConnected = InternetConnectionController.instance.isConnected;
-      if (!isConnected && hasStoredLocation) {
+      final controller = ConnectionController.instance;
+      if (!controller.isOnline && hasStoredLocation) {
         log(
           'No internet: using stored location without fetching a new one',
           name: 'GeneralController',
@@ -242,7 +243,7 @@ class GeneralController extends GetxController with WidgetsBindingObserver {
     }
     _isActivatingLocation = true;
     try {
-      final isConnected = InternetConnectionController.instance.isConnected;
+      final controller = ConnectionController.instance;
       final locationServiceEnabled = await LocationHelper.instance
           .isLocationServiceEnabled();
 
@@ -257,7 +258,7 @@ class GeneralController extends GetxController with WidgetsBindingObserver {
         );
       }
       final shouldUseStoredOnly =
-          (!isConnected || !locationServiceEnabled) && stored != null;
+          (!controller.isOnline || !locationServiceEnabled) && stored != null;
 
       if (shouldUseStoredOnly) {
         log(
@@ -282,11 +283,14 @@ class GeneralController extends GetxController with WidgetsBindingObserver {
       final effectiveLocation = pos != null
           ? LatLng(pos.latitude, pos.longitude)
           : stored;
-      final moved = stored != null && effectiveLocation != null &&
+      final moved =
+          stored != null &&
+          effectiveLocation != null &&
           ((stored.latitude - effectiveLocation.latitude).abs() > 0.01 ||
               (stored.longitude - effectiveLocation.longitude).abs() > 0.01);
       if (moved) AdhanController.instance.state.localizedCity.value = '';
-      final countryChanged = Location.instance.country.isNotEmpty &&
+      final countryChanged =
+          Location.instance.country.isNotEmpty &&
           Location.instance.country != previousCountry;
 
       log('Location activated: $pos', name: 'Main');
@@ -296,7 +300,8 @@ class GeneralController extends GetxController with WidgetsBindingObserver {
 
       await AdhanController.instance.initializeStoredAdhan(
         newLocation: effectiveLocation,
-        forceUpdate: moved ||
+        forceUpdate:
+            moved ||
             (countryChanged &&
                 AdhanController.instance.state.autoCalculationMethod.value),
       );

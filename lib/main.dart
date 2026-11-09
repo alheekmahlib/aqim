@@ -31,15 +31,16 @@ Future<void> main() async {
 
 Future<void> initializeApp() async {
   Future.delayed(const Duration(seconds: 0));
-  await GetStorage.init();
-  // خدمة الاتصال + طابور الملاحظات: إرسال مؤجَّل يستأنف تلقائيًا عند
-  // عودة الاتصال.
-  final connectionService = ConnectionService(
+  final service = ConnectionService(
     options: const ConnectionOptions(enableReachability: true),
   );
-  await connectionService.init();
-  Get.put(connectionService, permanent: true);
-  await FeedbackQueue.init(connectionService);
+  await GetStorage.init();
+
+  Get.put(service, permanent: true);
+  Get.put(ConnectionController(), permanent: true);
+  // خدمة الاتصال + طابور الملاحظات: إرسال مؤجَّل يستأنف تلقائيًا عند
+  // عودة الاتصال.
+  await FeedbackQueue.init(service);
   // Always initialize services (register controllers, timezone, etc.)
   await ServicesLocator().init();
   tz.initializeTimeZones();

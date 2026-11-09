@@ -5,23 +5,22 @@ import 'dart:developer' show log;
 import 'dart:io' show Platform;
 
 import 'package:background_fetch/background_fetch.dart';
+import 'package:connectivity_kit/connectivity_kit.dart';
 import 'package:flutter/services.dart';
-import 'package:get_storage/get_storage.dart';
-import 'package:get/get.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
+import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
 import '/core/services/prayer_background_manager.dart';
-import 'internet_connection_controller.dart';
-import 'connectivity_service.dart';
-import 'location/locations.dart';
-import '../../presentation/prayers/features/presentation/prayer_features_binding.dart';
 import '../../presentation/feedback/controller/feedback_controller.dart';
+import '../../presentation/prayers/features/presentation/prayer_features_binding.dart';
 import '../../presentation/prayers/prayers.dart';
 import '../widgets/home_widget/home_widget.dart';
 import '../widgets/local_notification/controller/local_notifications_controller.dart';
+import 'location/locations.dart';
 
 /// مُعالج المهام في الخلفية (headless)
 @pragma('vm:entry-point')
@@ -41,8 +40,8 @@ void backgroundFetchHeadlessTask(HeadlessEvent task) async {
     await GetStorage.init('AdhanSounds');
     if (_timedOutTasks.contains(taskId)) return;
     Location.instance.restoreFromStorage();
-    if (!Get.isRegistered<InternetConnectionService>()) {
-      Get.put(InternetConnectionService(), permanent: true);
+    if (!Get.isRegistered<ConnectionController>()) {
+      Get.put(ConnectionController(), permanent: true);
     }
     PrayerFeaturesBinding().dependencies();
     tz.initializeTimeZones();
@@ -170,6 +169,7 @@ bool _backgroundTaskRunning = false;
 final Set<String> _timedOutTasks = <String>{};
 
 Future<void> _executeBackgroundTask(String taskId) async {
+  final controller = ConnectionController.instance;
   if (_backgroundTaskRunning) {
     log('Skipping overlapping task: $taskId', name: 'Background service');
     return;
@@ -189,11 +189,12 @@ Future<void> _executeBackgroundTask(String taskId) async {
 
     // فحص ردود المشرف على ملاحظات المستخدم (مثل تطبيق القرآن).
     try {
-      if (InternetConnectionController.instance.isConnected) {
+      if (controller.isOnline) {
         await FeedbackController.checkNewRepliesBackground();
         final today = DateTime.now().toIso8601String().substring(0, 10);
         if (storage.read('last_background_posts_date') != today &&
-            await LocalNotificationsController.instance.fetchNewNotifications()) {
+            await LocalNotificationsController.instance
+                .fetchNewNotifications()) {
           await storage.write('last_background_posts_date', today);
         }
       }

@@ -1,12 +1,12 @@
 import 'dart:developer' show log;
 import 'dart:io' show Platform;
 
+import 'package:connectivity_kit/connectivity_kit.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:hijri_date/hijri_date.dart';
 import 'package:latlong2/latlong.dart';
 
 import '/core/services/location/locations.dart';
-import '/core/services/internet_connection_controller.dart';
 import '/core/services/notifications_helper.dart';
 import '/core/services/prayer_countdown_notification_service.dart';
 import '/core/widgets/home_widget/home_widget.dart';
@@ -33,16 +33,18 @@ class PrayerBackgroundManager {
 
       var resolvedCountry = false;
       final knownPosition = Location.instance.position;
+      final controller = ConnectionController.instance;
       if (Location.instance.country.isEmpty &&
           knownPosition != null &&
           (knownPosition.latitude - currentLocation.latitude).abs() <= 0.01 &&
           (knownPosition.longitude - currentLocation.longitude).abs() <= 0.01 &&
-          InternetConnectionController.instance.isConnected) {
+          controller.isOnline) {
         try {
-          final address = await NominatimReverseGeocodingService.instance.reverse(
-            latitude: currentLocation.latitude,
-            longitude: currentLocation.longitude,
-          );
+          final address = await NominatimReverseGeocodingService.instance
+              .reverse(
+                latitude: currentLocation.latitude,
+                longitude: currentLocation.longitude,
+              );
           if (address.country.isNotEmpty && address.country != 'Unknown') {
             Location.instance.updateLocation(
               city: address.city,
@@ -69,7 +71,8 @@ class PrayerBackgroundManager {
       );
 
       if ((isMonthlyValid || isDailyValid) &&
-          !(resolvedCountry && AdhanController.instance.state.autoCalculationMethod.value)) {
+          !(resolvedCountry &&
+              AdhanController.instance.state.autoCalculationMethod.value)) {
         log('Prayer times cache is valid, no update needed', name: _tag);
         return false; // لا حاجة للتحديث / No update needed
       }
@@ -122,7 +125,9 @@ class PrayerBackgroundManager {
 
   /// تنفيذ المهام اليومية
   /// Execute daily tasks
-  static Future<void> executeDailyTasks({bool Function()? shouldContinue}) async {
+  static Future<void> executeDailyTasks({
+    bool Function()? shouldContinue,
+  }) async {
     try {
       log('Executing daily tasks...', name: _tag);
 
@@ -238,7 +243,9 @@ class PrayerBackgroundManager {
 
   /// تنفيذ المهام الدورية (كل 20 دقيقة)
   /// Execute periodic tasks (every 20 minutes)
-  static Future<void> executePeriodicTasks({bool Function()? shouldContinue}) async {
+  static Future<void> executePeriodicTasks({
+    bool Function()? shouldContinue,
+  }) async {
     try {
       log('Executing periodic tasks...', name: _tag);
 

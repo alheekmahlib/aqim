@@ -18,8 +18,6 @@ import '../../presentation/ramadan/events.dart';
 import '../../presentation/splash/splash.dart';
 import '../../presentation/whats_new/whats_new.dart';
 import '../utils/helpers/rate_app_helper.dart';
-import 'connectivity_service.dart';
-import 'internet_connection_controller.dart';
 
 final sl = GetIt.instance;
 
@@ -78,9 +76,6 @@ class ServicesLocator {
     sl.registerLazySingleton<RamadanController>(
       () => Get.put<RamadanController>(RamadanController(), permanent: true),
     );
-
-    Get.put(InternetConnectionService(), permanent: true);
-    Get.put(InternetConnectionController(), permanent: true);
 
     // بوابة التقييم التلقائية: تعدّ الإطلاق وتخزّن الحالة داخل المنصة.
     RateAppHelper.initReviewGate();

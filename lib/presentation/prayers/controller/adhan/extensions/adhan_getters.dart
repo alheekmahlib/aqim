@@ -8,9 +8,10 @@ extension AdhanGetters on AdhanController {
     final storedCity = Location.instance.city;
     final storedCountry = Location.instance.country;
     final pos = Location.instance.position;
+    final controller = ConnectionController.instance;
 
     // Offline: لا نجري أي طلب شبكة، ونستخدم المخزون/الكاش فقط.
-    if (!InternetConnectionController.instance.isConnected) {
+    if (!controller.isOnline) {
       final hasStored =
           storedCity.trim().isNotEmpty || storedCountry.trim().isNotEmpty;
       if (hasStored) {
@@ -44,8 +45,9 @@ extension AdhanGetters on AdhanController {
 
   RxBool get isNoInternetAndDataNotInitialized {
     bool state = false;
+    final controller = ConnectionController.instance;
     state =
-        (!InternetConnectionController.instance.isConnected &&
+        (!controller.isOnline &&
         PrayerCacheManager.getCachedPrayerData() == null);
     return state.obs;
   }
@@ -753,8 +755,10 @@ extension AdhanGetters on AdhanController {
     state.highLatitudeRuleIndex.value = state.box.read(HIGH_LATITUDE_RULE) ?? 0;
     state.autoCalculationMethod.value =
         state.box.read(AUTO_CALCULATION) ?? true;
-    state.selectedCountry.value = state.box.read<String>(PRAYER_CALCULATION_COUNTRY) ??
-        (PrayerCacheManager.getCachedPrayerData()?['selectedCountry'] as String?) ??
+    state.selectedCountry.value =
+        state.box.read<String>(PRAYER_CALCULATION_COUNTRY) ??
+        (PrayerCacheManager.getCachedPrayerData()?['selectedCountry']
+            as String?) ??
         'Saudi Arabia';
     state.iqamaOffsets = IqamaOffsets.fromGetStorage();
     state.iqamaNotificationsEnabled.value =

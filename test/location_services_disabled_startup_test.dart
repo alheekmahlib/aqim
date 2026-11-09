@@ -1,12 +1,11 @@
 import 'dart:io';
 
 import 'package:adhan/adhan.dart';
-import 'package:aqim/core/services/connectivity_service.dart';
-import 'package:aqim/core/services/internet_connection_controller.dart';
 import 'package:aqim/core/services/location/locations.dart';
 import 'package:aqim/core/utils/constants/shared_preferences_constants.dart';
 import 'package:aqim/presentation/controllers/general/general_controller.dart';
 import 'package:aqim/presentation/prayers/prayers.dart';
+import 'package:connectivity_kit/connectivity_kit.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:geolocator/geolocator.dart';
@@ -139,8 +138,7 @@ void main() {
     originalGeolocator = GeolocatorPlatform.instance;
 
     // نفس ترتيب ServicesLocator في التطبيق
-    Get.put(InternetConnectionService());
-    Get.put(InternetConnectionController(), permanent: true);
+    Get.put(ConnectionController(), permanent: true);
     // تصريف المهام الدقيقة حتى تُحسم حالة الاتصال إلى "متصل"
     await Future<void>.delayed(Duration.zero);
     await Future<void>.delayed(Duration.zero);

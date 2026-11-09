@@ -227,7 +227,7 @@ class AdhanController extends GetxController {
     bool forceUpdate = false,
   }) async {
     try {
-      final bool isOffline = !InternetConnectionController.instance.isConnected;
+      final controller = ConnectionController.instance;
 
       // تعيين حالة التحميل إلى true
       state.isLoadingPrayerData.value = true;
@@ -246,7 +246,7 @@ class AdhanController extends GetxController {
       }
 
       // Offline: استخدم البيانات المخزنة قدر الإمكان (موقع + صلوات) بدون محاولة "تحديث".
-      if (isOffline && !forceUpdate) {
+      if (!controller.isOnline && !forceUpdate) {
         log(
           'Offline mode: using stored location/prayer data',
           name: 'AdhanController',

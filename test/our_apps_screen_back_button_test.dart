@@ -1,8 +1,7 @@
-import 'package:aqim/core/services/connectivity_service.dart';
-import 'package:aqim/core/services/internet_connection_controller.dart';
 import 'package:aqim/core/services/services_locator.dart';
 import 'package:aqim/presentation/ourApp/controller/our_apps_controller.dart';
 import 'package:aqim/presentation/ourApp/screen/our_apps_screen.dart';
+import 'package:connectivity_kit/connectivity_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -41,8 +40,7 @@ void main() {
       ),
     );
 
-    Get.put(InternetConnectionService());
-    InternetConnectionController.instance;
+    ConnectionController.instance;
     sl.registerLazySingleton<OurAppsController>(
       () => Get.put<OurAppsController>(OurAppsController(), permanent: true),
     );

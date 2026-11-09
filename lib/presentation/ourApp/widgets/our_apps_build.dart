@@ -1,8 +1,8 @@
+import 'package:connectivity_kit/connectivity_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '/core/utils/constants/lottie_constants.dart';
-import '../../../../core/services/internet_connection_controller.dart';
 import '../../../../core/services/services_locator.dart';
 import '../../../../core/utils/constants/extensions/extensions.dart';
 import '../../../../core/utils/constants/lottie.dart';
@@ -16,7 +16,8 @@ class OurAppsBuild extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ourApps = sl<OurAppsController>();
-    if (!InternetConnectionController.instance.isConnected) {
+    final controller = ConnectionController.instance;
+    if (!controller.isOnline) {
       return Center(
         child: customLottieWithColor(
           LottieConstants.assetsLottieNoInternet,
