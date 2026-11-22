@@ -501,7 +501,7 @@
     "type": "text",
     "placeholders": {}
   },
-  "What'sNewDetails10": "۞ Waxaa lagu daray doorashooyin dheeraad ah oo shaashadda salaadda ah si aad u doorato sida waqtiyada salaadda loo muujiyo.\n۞ Waxaa lagu daray ogeysiis joogto ah oo muujinaya salaadda xigta.\n۞ Hagaajin waxqabad iyo deganaansho.",
+  "What'sNewDetails10": "۞ Waxaa lagu daray doorashooyin dheeraad ah oo lagu wadaagi karo waqtiga salaadda soo socota.\n۞ Waxaa la hagaajiyay dhibka dib-u-dhigista jadwalka salaadaha.\n۞ Hagaajin waxqabad iyo deganaansho.",
   "@What'sNewDetails10": {
     "type": "text",
     "placeholders": {}
@@ -1100,5 +1100,35 @@
   "prayerSettingsNotifications": "Ogeysiisyada iyo xusuusinta",
   "prayerSettingsNotificationsDesc": "Xusuusinta salaadda, iqaamada iyo tirinta",
   "prayerSettingsSilent": "Habka aamusan",
-  "prayerSettingsSilentDesc": "Habka aamusan xilliga salaadda iyo muddadiisa"
+  "prayerSettingsSilentDesc": "Habka aamusan xilliga salaadda iyo muddadiisa",
+  "timeLeft": "Waqtiga hadhay",
+  "@timeLeft": {
+    "description": "timeLeft",
+    "type": "text",
+    "placeholders": {}
+  },
+  "prayerTimesTitle": "Waxtiyo salaadda",
+  "@prayerTimesTitle": {
+    "description": "prayerTimesTitle",
+    "type": "text",
+    "placeholders": {}
+  },
+  "shareDesignClassic": "Klasik",
+  "@shareDesignClassic": {
+    "description": "shareDesignClassic",
+    "type": "text",
+    "placeholders": {}
+  },
+  "shareDesignTimetable": "Jadwal maalintii",
+  "@shareDesignTimetable": {
+    "description": "shareDesignTimetable",
+    "type": "text",
+    "placeholders": {}
+  },
+  "shareDesignStory": "Story",
+  "@shareDesignStory": {
+    "description": "shareDesignStory",
+    "type": "text",
+    "placeholders": {}
+  }
 }

@@ -3,7 +3,6 @@ import 'dart:ui' show Locale;
 import 'package:aqim/presentation/prayers/features/data/local_prayer_reminder_scheduler.dart';
 import 'package:aqim/presentation/prayers/features/domain/prayer_feature_preferences.dart';
 import 'package:aqim/presentation/prayers/features/domain/prayer_id.dart';
-import 'package:aqim/presentation/prayers/features/domain/prayer_reminder_plan.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 
@@ -14,11 +13,13 @@ class _RecordingSchedulerDeps {
     this.days = 1,
     this.maxDays = 1,
     this.day0 = const {},
+    this.pendingIds,
   });
 
   final int days;
   final int maxDays;
   final Map<PrayerId, DateTime> day0;
+  final Future<Set<int>?> Function()? pendingIds;
 
   final scheduledIds = <int>[];
   final scheduledPayloads = <Map<String, String?>>[];
@@ -43,6 +44,7 @@ class _RecordingSchedulerDeps {
           scheduledPayloads.add(payload);
         },
     cancel: (id) async => cancelledIds.add(id),
+    pendingIds: pendingIds,
   );
 }
 
@@ -69,11 +71,8 @@ void main() {
       );
 
       expect(deps.scheduledIds, hasLength(5));
-      // يبدأ بالتنظيف الكامل لنطاقه ثم الجدولة.
-      expect(
-        deps.cancelledIds,
-        const PrayerReminderPlanner().idsInRange(1).toList(),
-      );
+      // ابنِ ثم قلّم: الخطة كاملة داخل النطاق فلا يُلغى شيء.
+      expect(deps.cancelledIds, isEmpty);
       for (final payload in deps.scheduledPayloads) {
         expect(payload['type'], 'prayer_reminder');
         expect(payload['sound_type'], 'bell');
@@ -90,6 +89,37 @@ void main() {
 
     expect(deps.scheduledIds, isEmpty);
     expect(deps.cancelledIds, isNotEmpty);
+  });
+
+  test('prunes ids beyond the scheduling window after building', () async {
+    final deps = _RecordingSchedulerDeps(day0: day0, days: 1, maxDays: 2);
+    await deps.build().synchronize(
+      PrayerFeaturePreferences(enabled: true, minutes: 10),
+    );
+
+    // يوم واحد مخطط (21100-21104)؛ معرفات اليوم الثاني خارج النافذة
+    // تُقلَّم بعد البناء (21110-21114).
+    expect(deps.scheduledIds, hasLength(5));
+    expect(
+      deps.cancelledIds.toSet(),
+      const {21110, 21111, 21112, 21113, 21114},
+    );
+  });
+
+  test('prune cancels only out-of-plan ids actually pending', () async {
+    // بقراءة المؤجلات: يُلغى فقط ما هو مؤجل فعلاً خارج الخطة.
+    final deps = _RecordingSchedulerDeps(
+      day0: day0,
+      days: 1,
+      maxDays: 2,
+      pendingIds: () async => const {21112},
+    );
+    await deps.build().synchronize(
+      PrayerFeaturePreferences(enabled: true, minutes: 10),
+    );
+
+    expect(deps.scheduledIds, hasLength(5));
+    expect(deps.cancelledIds, const [21112]);
   });
 
   test('reminder ids stay clear of the prayer notification blocks', () async {

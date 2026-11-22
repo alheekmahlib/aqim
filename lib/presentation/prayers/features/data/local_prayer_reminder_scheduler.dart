@@ -19,11 +19,20 @@ class LocalPrayerReminderScheduler implements PrayerReminderScheduler {
     required this.schedule,
     required this.cancel,
     this.now = DateTime.now,
+    this.yieldBetweenOps = _defaultYield,
+    this.pendingIds,
   });
 
   final DateTime? Function(PrayerId prayer, int dayOffset) prayerTimeFor;
   final int Function() daysToSchedule;
   final int Function() maxDaysToCancel;
+
+  /// يُستدعى بين عمليات الجدولة والإلغاء لإتاحة الـ UI thread للإطارات.
+  final Future<void> Function() yieldBetweenOps;
+
+  /// معرفات الإشعارات المؤجلة حاليًا؛ لإلغاء الفارق فقط. null (أو غيابها)
+  /// يعني التراجع للإلغاء الشامل للنطاق.
+  final Future<Set<int>?> Function()? pendingIds;
   final Future<void> Function({
     required int id,
     required DateTime time,
@@ -38,14 +47,10 @@ class LocalPrayerReminderScheduler implements PrayerReminderScheduler {
 
   final PrayerReminderPlanner planner = const PrayerReminderPlanner();
 
+  static Future<void> _defaultYield() => Future<void>.delayed(Duration.zero);
+
   @override
   Future<void> synchronize(PrayerFeaturePreferences preferences) async {
-    await cancelReminders();
-    if (!preferences.enabled) {
-      log('Prayer reminders disabled; cancelled all', name: 'PrayerReminders');
-      return;
-    }
-
     final days = daysToSchedule();
     final prayerTimesByDay = <Map<PrayerId, DateTime?>>[
       for (var day = 0; day < days; day++)
@@ -60,7 +65,10 @@ class LocalPrayerReminderScheduler implements PrayerReminderScheduler {
       prayerTimesByDay: prayerTimesByDay,
       now: now(),
     );
+    final plannedIds = reminders.map((reminder) => reminder.id).toSet();
 
+    // ابنِ أولًا فوق المعرفات الحالية ثم قلّم ما خرج عن الخطة؛ لا مسح شامل
+    // يسبق الجدولة كي لا تنشأ نافذة بلا تذكيرات إن قُطعت العملية.
     for (final reminder in reminders) {
       final prayerName = _prayerLabelKey(reminder.prayer).tr;
       await schedule(
@@ -78,9 +86,23 @@ class LocalPrayerReminderScheduler implements PrayerReminderScheduler {
           'prayer': reminder.prayer.name,
         },
       );
+      await yieldBetweenOps();
     }
+
+    // إلغاء الفارق فقط: ما خرج عن الخطة وهو مؤجل فعلاً (وإن تعذرت قراءة
+    // المؤجلات نُلغي النطاق كاملًا كما كان).
+    final pending = await pendingIds?.call();
+    for (final id in planner.idsInRange(maxDaysToCancel())) {
+      if (plannedIds.contains(id)) continue;
+      if (pending != null && !pending.contains(id)) continue;
+      await cancel(id);
+      await yieldBetweenOps();
+    }
+
     log(
-      'Scheduled ${reminders.length} prayer reminders over $days day(s)',
+      preferences.enabled
+          ? 'Scheduled ${reminders.length} prayer reminders over $days day(s)'
+          : 'Prayer reminders disabled; cancelled all',
       name: 'PrayerReminders',
     );
   }

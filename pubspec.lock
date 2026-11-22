@@ -13,10 +13,10 @@ packages:
     dependency: transitive
     description:
       name: android_file_picker
-      sha256: "868183c959e754e915954d8074c20cfa4cfdb4684b35ecc08378437be1a542d8"
+      sha256: b8462091dcdd075511a842272374be2232e917ee2a51ecdba4aca02bff529482
       url: "https://pub.dev"
     source: hosted
-    version: "2.1.3"
+    version: "2.2.1"
   ansicolor:
     dependency: transitive
     description:
@@ -37,10 +37,10 @@ packages:
     dependency: "direct main"
     description:
       name: archive
-      sha256: de5ac590b8155e4e676088d714bd41ea620449a6adc0f7950c5073874b287ddb
+      sha256: "2fda90592c0afd219c5e285618a98da835cd10df38372666093d25dfe457a2d0"
       url: "https://pub.dev"
     source: hosted
-    version: "4.6.0"
+    version: "4.7.1"
   args:
     dependency: transitive
     description:
@@ -69,10 +69,10 @@ packages:
     dependency: "direct main"
     description:
       name: background_fetch
-      sha256: a185b471f6ff93c0074e2da98fbdf1e0c5af5a83adb97dfe924a9ef06c9e0175
+      sha256: "5e18669e602f4ed91a18121c672cc7cfe5aa825b1a0acf81c3b81ddb9f0b4071"
       url: "https://pub.dev"
     source: hosted
-    version: "1.7.0"
+    version: "2.0.1"
   badges:
     dependency: "direct main"
     description:
@@ -367,10 +367,10 @@ packages:
     dependency: "direct main"
     description:
       name: file_picker
-      sha256: c64036857780d7125f011d543f89eedcb5df61da473668bace4eee9ab875284d
+      sha256: "5b99250437a4d34ee2cdc0686924452103540eaa1c248094b63f07f9d7216f6c"
       url: "https://pub.dev"
     source: hosted
-    version: "13.3.2"
+    version: "13.4.1"
   file_picker_darwin:
     dependency: transitive
     description:
@@ -383,26 +383,26 @@ packages:
     dependency: transitive
     description:
       name: file_picker_linux
-      sha256: eb00de71b123e91d3c61f389a05b8cc90f9cbe7e4c88da30ebe2f0442b281b61
+      sha256: cf3889644e8e54551f5c3a4f98b6b6ef5f0ef85c07d2a0c1a969538983be2f9b
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.3"
+    version: "2.0.5"
   file_picker_platform_interface:
     dependency: transitive
     description:
       name: file_picker_platform_interface
-      sha256: "336e7168306834a2b68e6168ed768e00d3fabeac23154d5793e277ca9f97cf20"
+      sha256: a2ef71c4628f92a4471d424576e3bf7042b40a2683c9f9a0e3033a7fc7f7763c
       url: "https://pub.dev"
     source: hosted
-    version: "4.2.0"
+    version: "4.3.0"
   file_picker_web:
     dependency: transitive
     description:
       name: file_picker_web
-      sha256: a2288008280aabe371aff029466b3405e60838e0a1d714767488c59b926c8b8c
+      sha256: "97f7085e3c4f5724595bbd94e8f380f7a690e9066140a5fb711e97ac45a02008"
       url: "https://pub.dev"
     source: hosted
-    version: "4.2.0"
+    version: "4.2.2"
   fixnum:
     dependency: transitive
     description:
@@ -468,10 +468,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_local_notifications
-      sha256: e99e9c6078d1359ba131b2c1eb8d68837170836a01bf2cea3cf2fa13e62ac2ac
+      sha256: "7d37d69ded3028af4f22531a0097a3baa478a384dff2e23e873707c93df3b704"
       url: "https://pub.dev"
     source: hosted
-    version: "23.0.0"
+    version: "23.0.3"
   flutter_local_notifications_linux:
     dependency: transitive
     description:
@@ -500,10 +500,10 @@ packages:
     dependency: transitive
     description:
       name: flutter_local_notifications_windows
-      sha256: c2d6efe9ba585d5f560d8b329131f00fe745834848e6221b22d1f62e0f0b16e2
+      sha256: "8e80ac29433c71e267493b397457e3a8430c5c1d9c76bb58a6971c016cdba3d7"
       url: "https://pub.dev"
     source: hosted
-    version: "4.0.0"
+    version: "4.0.1"
   flutter_localizations:
     dependency: "direct main"
     description: flutter
@@ -569,10 +569,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_svg
-      sha256: "100c19dcc4ff60083e95a44a6f44f3a1bb887d353c5d86f6a9b688aa3cb46236"
+      sha256: "4565a66f0a968f2e1ab4197854686990258aadab9572eb80a7655053a01dc302"
       url: "https://pub.dev"
     source: hosted
-    version: "2.3.2"
+    version: "2.5.0"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -1587,10 +1587,10 @@ packages:
     dependency: transitive
     description:
       name: windows_file_picker
-      sha256: "18452aa293de3b6961c6d05b0e71b4be7bb90c67635abdd3aa5c4e75dd875072"
+      sha256: cd1be37ada0abcfaa55bddb7410e8515844e35cd77669c35d9a28a15722299d8
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.1"
+    version: "2.0.2"
   wkt_parser:
     dependency: transitive
     description:

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 
 import '../../../../../../core/widgets/container_button_widget.dart';
@@ -46,7 +47,7 @@ class PrayerTimingSettingsSheet extends StatelessWidget {
                       .tr,
                   style: style,
                 ),
-                const SizedBox(height: 12),
+                const Gap(12),
                 Text(
                   'prayerFeaturesGlobal'.tr,
                   style: style.copyWith(fontWeight: FontWeight.bold),
@@ -58,7 +59,7 @@ class PrayerTimingSettingsSheet extends StatelessWidget {
                   enabled: controller.canEdit,
                   onAdjust: (delta) => controller.adjustMinutes(feature, delta),
                 ),
-                const SizedBox(height: 12),
+                const Gap(12),
                 Text('prayerFeaturesPerPrayerHelp'.tr, style: style),
                 for (final prayer in PrayerId.values)
                   Padding(

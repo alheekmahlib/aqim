@@ -35,20 +35,20 @@ extension AdhanUi on AdhanController {
   }
 
   Future<void> notificationOptionsOnTap(int i, int prayerIndex) async {
-    // await PrayersNotificationsCtrl.instance.scheduleDailyNotificationsForPrayer(
-    //   prayerIndex,
-    //   prayerNameList[prayerIndex]['title'],
-    //   notificationOptions[i]['title'],
-    // );
-    await NotifyHelper().scheduledNotification(
-      reminderId: 99999,
-      title: 'Fajr'.tr,
-      summary: 'وقت صلاة الفجر',
-      body: 'fajrBody'.tr,
-      isRepeats: false,
-      time: DateTime.now().add(const Duration(seconds: 10)),
-      payload: {'sound_type': 'sound'},
+    await PrayersNotificationsCtrl.instance.scheduleDailyNotificationsForPrayer(
+      prayerIndex,
+      prayerNameList[prayerIndex]['title'],
+      notificationOptions[i]['title'],
     );
+    // await NotifyHelper().scheduledNotification(
+    //   reminderId: 99999,
+    //   title: 'Fajr'.tr,
+    //   summary: 'وقت صلاة الفجر',
+    //   body: 'fajrBody'.tr,
+    //   isRepeats: false,
+    //   time: DateTime.now().add(const Duration(seconds: 10)),
+    //   payload: {'sound_type': 'sound'},
+    // );
     update(['change_notification']);
   }
 

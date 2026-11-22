@@ -501,7 +501,7 @@
     "type": "text",
     "placeholders": {}
   },
-  "What'sNewDetails10": "۞ Se añadieron más opciones a la pantalla de oración para que puedas elegir cómo se muestran los horarios de oración.\n۞ Se añadió una notificación persistente para mostrar la próxima oración.\n۞ Mejoras de rendimiento y estabilidad.",
+  "What'sNewDetails10": "۞ Se añadieron más opciones para compartir la hora de la próxima oración.\n۞ Se corrigió un problema al reprogramar las oraciones.\n۞ Mejoras de rendimiento y estabilidad.",
   "@What'sNewDetails10": {
     "type": "text",
     "placeholders": {}
@@ -1100,5 +1100,35 @@
   "prayerSettingsNotifications": "Notificaciones y recordatorios",
   "prayerSettingsNotificationsDesc": "Recordatorios, iqama y cuenta regresiva",
   "prayerSettingsSilent": "Modo silencioso",
-  "prayerSettingsSilentDesc": "Modo silencioso durante la oración y su duración"
+  "prayerSettingsSilentDesc": "Modo silencioso durante la oración y su duración",
+  "timeLeft": "Tiempo restante",
+  "@timeLeft": {
+    "description": "timeLeft",
+    "type": "text",
+    "placeholders": {}
+  },
+  "prayerTimesTitle": "Horarios de oración",
+  "@prayerTimesTitle": {
+    "description": "prayerTimesTitle",
+    "type": "text",
+    "placeholders": {}
+  },
+  "shareDesignClassic": "Clásico",
+  "@shareDesignClassic": {
+    "description": "shareDesignClassic",
+    "type": "text",
+    "placeholders": {}
+  },
+  "shareDesignTimetable": "Horario del día",
+  "@shareDesignTimetable": {
+    "description": "shareDesignTimetable",
+    "type": "text",
+    "placeholders": {}
+  },
+  "shareDesignStory": "Historia",
+  "@shareDesignStory": {
+    "description": "shareDesignStory",
+    "type": "text",
+    "placeholders": {}
+  }
 }

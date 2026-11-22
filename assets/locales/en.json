@@ -501,7 +501,7 @@
     "type": "text",
     "placeholders": {}
   },
-  "What'sNewDetails10": "۞ Added more options to the prayer screen so you can choose how prayer times are displayed.\n۞ Added a persistent notification to show the upcoming prayer.\n۞ Performance and stability improvements.",
+  "What'sNewDetails10": "۞ Added more options for sharing the upcoming prayer time.\n۞ Fixed an issue with rescheduling prayers.\n۞ Performance and stability improvements.",
   "@What'sNewDetails10": {
     "type": "text",
     "placeholders": {}
@@ -1219,5 +1219,35 @@
   "prayerSettingsNotifications": "Notifications and reminders",
   "prayerSettingsNotificationsDesc": "Prayer reminders, iqama and countdown notifications",
   "prayerSettingsSilent": "Silent mode",
-  "prayerSettingsSilentDesc": "Silent mode during prayer and its duration"
+  "prayerSettingsSilentDesc": "Silent mode during prayer and its duration",
+  "timeLeft": "Time left",
+  "@timeLeft": {
+    "description": "timeLeft",
+    "type": "text",
+    "placeholders": {}
+  },
+  "prayerTimesTitle": "Prayer times",
+  "@prayerTimesTitle": {
+    "description": "prayerTimesTitle",
+    "type": "text",
+    "placeholders": {}
+  },
+  "shareDesignClassic": "Classic",
+  "@shareDesignClassic": {
+    "description": "shareDesignClassic",
+    "type": "text",
+    "placeholders": {}
+  },
+  "shareDesignTimetable": "Day schedule",
+  "@shareDesignTimetable": {
+    "description": "shareDesignTimetable",
+    "type": "text",
+    "placeholders": {}
+  },
+  "shareDesignStory": "Story",
+  "@shareDesignStory": {
+    "description": "shareDesignStory",
+    "type": "text",
+    "placeholders": {}
+  }
 }

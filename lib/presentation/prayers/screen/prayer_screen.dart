@@ -46,7 +46,7 @@ class PrayerScreen extends StatelessWidget {
                           containerColor:
                               context.theme.colorScheme.primaryContainer,
                           textTitle: 'sharePrayerTime',
-                          child: ShareOptionsWidget(),
+                          child: const ShareOptionsWidget(),
                         ),
                         width: 40,
                         iconSize: 28,

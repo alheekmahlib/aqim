@@ -10,6 +10,10 @@ class AdhanController extends GetxController {
   int _lastCurrentPrayerIndex = -1;
   Timer? _currentPrayerTimer;
 
+  /// ضمانة تشغيل واحد: إعادة جدولة الإشعارات عند أول جهوزية للبيانات فقط
+  /// (ما عداها من إعادة تهيئة تستدعيها صراحةً عند تغيير الإعدادات/الموقع).
+  bool _prayerNotificationsBootstrapped = false;
+
   @override
   Future<void> onInit() async {
     super.onInit();
@@ -22,9 +26,6 @@ class AdhanController extends GetxController {
       //   geo.setLocaleIdentifier('en');
       // }
       getShared;
-      // بعد تحديث نظام IDs للإشعارات: ألغِ IDs القديمة مرة واحدة لتفادي إشعارات مزدوجة.
-      await PrayersNotificationsCtrl.instance
-          .cancelLegacyPrayerNotificationsIfNeeded();
 
       // ✅ FIX (race condition): انتظر تحميل بيانات الأذان من الكاش/الحساب
       // قبل بدء أي مؤقت يعتمد على state.prayerTimes. previously كانت المؤقتات
@@ -36,6 +37,17 @@ class AdhanController extends GetxController {
     }
   }
 
+  /// إعادة جدولة الإقلاع: تنتظر أول فريم مرسوم ثم مهلة تتجاوز مدة السبلاش
+  /// (4.3 ثانية + التنقل) قبل بدء العمل الثقيل كي لا يزاحم الرسم.
+  Future<void> _bootstrapPrayerNotificationsAfterSplash() async {
+    try {
+      await WidgetsBinding.instance.waitUntilFirstFrameRasterized;
+    } catch (_) {}
+    await Future<void>.delayed(const Duration(seconds: 5));
+    if (BGServices.isHeadless) return;
+    await PrayersNotificationsCtrl.instance.reschedulePrayers();
+  }
+
   /// يبدأ المؤقتات الدورية فقط بعد أن تصبح بيانات الصلاة جاهزة.
   /// إذا لم تكن جاهزة بعد، يعيد المحاولة بعد ثانيتين (لمدة محدودة).
   void _startTimersWhenReady({int retries = 15}) {
@@ -44,10 +56,9 @@ class AdhanController extends GetxController {
       // لا نستدعي initializeStoredAdhan هنا — _activateLocation في
       // GeneralController تستدعيها بالفعل مع await. الاستدعاء المزدوج
       // كان يسبب سباق (race condition) يؤدي لبيانات خاطئة في الويدجت.
-      Future.delayed(
-        const Duration(seconds: 8),
-        () async => await PrayersNotificationsCtrl.instance.reschedulePrayers(),
-      );
+      // إعادة جدولة الإشعارات تنطلق من _finalizePrayerTimeInitialization
+      // فور جهوزية البيانات — لا مهلة 8 ثوانٍ كانت تضيع إذا أُغلق التطبيق
+      // قبل انقضائها.
       updateProgressBar();
       // Start periodic watcher after initial data likely loaded
       Future.delayed(const Duration(seconds: 10), () {
@@ -352,6 +363,14 @@ class AdhanController extends GetxController {
   Future<void> _finalizePrayerTimeInitialization() async {
     await initTimes();
     state.isPrayerTimesInitialized.value = true;
+
+    // إعادة جدولة إشعارات الإقلاع مؤجلة حتى ما بعد السبلاش: سلاسل الجدولة
+    // الطويلة كانت تزاحم رسمه فتقطّع الفتح. البناء-فوق-الموجود يجعل التأجيل
+    // آمنًا — إشعارات الفتح السابق تبقى صالحة حتى انطلاق هذه.
+    if (!BGServices.isHeadless && !_prayerNotificationsBootstrapped) {
+      _prayerNotificationsBootstrapped = true;
+      unawaited(_bootstrapPrayerNotificationsAfterSplash());
+    }
 
     // إيقاف حالة التحميل
     state.isLoadingPrayerData.value = false;

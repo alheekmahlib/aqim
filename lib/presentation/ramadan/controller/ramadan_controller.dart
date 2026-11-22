@@ -38,6 +38,10 @@ class RamadanController extends GetxController {
       ? Get.find<RamadanController>()
       : Get.put<RamadanController>(RamadanController());
 
+  /// علم GetStorage يوثق وجود تنبيهات صيام مجدولة فعليًا.
+  static const String _kFastingNotificationsScheduledFlag =
+      'ramadan_fasting_notifications_scheduled';
+
   final _box = GetStorage();
   late HijriDate hijriNow;
 
@@ -361,14 +365,25 @@ class RamadanController extends GetxController {
 
   /// إعادة جدولة جميع تنبيهات الصيام
   Future<void> rescheduleFastingNotifications() async {
+    // خارج رمضان: إلغاء فقط إن سبقت جدولة (يمنع إلغاءات عبثية كل تشغيل).
+    final previouslyScheduled =
+        _box.read<bool>(_kFastingNotificationsScheduledFlag) ?? false;
+    if (!isRamadan) {
+      if (previouslyScheduled) {
+        await _cancelAllFastingNotifications();
+        await _box.write(_kFastingNotificationsScheduledFlag, false);
+        log(
+          'Fasting notifications cancelled (outside Ramadan)',
+          name: 'RamadanController',
+        );
+      }
+      return;
+    }
+
     log('Rescheduling fasting notifications...', name: 'RamadanController');
 
     // إلغاء جميع الإشعارات
-    await Future.wait([
-      _cancelNotifications(_FastingNotificationType.suhoor),
-      _cancelNotifications(_FastingNotificationType.iftar),
-      _cancelNotifications(_FastingNotificationType.lastTen),
-    ]);
+    await _cancelAllFastingNotifications();
 
     // إعادة الجدولة
     final futures = <Future<void>>[];
@@ -383,7 +398,16 @@ class RamadanController extends GetxController {
     }
     await Future.wait(futures);
 
+    await _box.write(_kFastingNotificationsScheduledFlag, true);
     log('Fasting notifications rescheduled', name: 'RamadanController');
+  }
+
+  Future<void> _cancelAllFastingNotifications() async {
+    await Future.wait([
+      _cancelNotifications(_FastingNotificationType.suhoor),
+      _cancelNotifications(_FastingNotificationType.iftar),
+      _cancelNotifications(_FastingNotificationType.lastTen),
+    ]);
   }
 
   // ==================== المساعدات ====================

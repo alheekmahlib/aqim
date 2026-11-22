@@ -501,7 +501,7 @@
     "type": "text",
     "placeholders": {}
   },
-  "What'sNewDetails10": "۞ Nagdagdag ng mas maraming opsyon sa prayer screen para mapili mo kung paano ipapakita ang mga oras ng panalangin.\n۞ Nagdagdag ng persistent na notification para ipakita ang susunod na panalangin.\n۞ Mga pagpapabuti sa performance at stability.",
+  "What'sNewDetails10": "۞ Nagdagdag ng mas maraming opsyon para sa pagbabahagi ng oras ng susunod na panalangin.\n۞ Naayos ang isyu sa muling pag-iskedyul ng mga panalangin.\n۞ Mga pagpapabuti sa performance at stability.",
   "@What'sNewDetails10": {
     "type": "text",
     "placeholders": {}
@@ -1100,5 +1100,35 @@
   "prayerSettingsNotifications": "Mga abiso at paalala",
   "prayerSettingsNotificationsDesc": "Paalala sa panalangin, iqama at countdown",
   "prayerSettingsSilent": "Silent mode",
-  "prayerSettingsSilentDesc": "Silent mode habang nagdarasal at tagal nito"
+  "prayerSettingsSilentDesc": "Silent mode habang nagdarasal at tagal nito",
+  "timeLeft": "Natitirang oras",
+  "@timeLeft": {
+    "description": "timeLeft",
+    "type": "text",
+    "placeholders": {}
+  },
+  "prayerTimesTitle": "Mga oras ng dasal",
+  "@prayerTimesTitle": {
+    "description": "prayerTimesTitle",
+    "type": "text",
+    "placeholders": {}
+  },
+  "shareDesignClassic": "Klasiko",
+  "@shareDesignClassic": {
+    "description": "shareDesignClassic",
+    "type": "text",
+    "placeholders": {}
+  },
+  "shareDesignTimetable": "Araw-araw na iskedyul",
+  "@shareDesignTimetable": {
+    "description": "shareDesignTimetable",
+    "type": "text",
+    "placeholders": {}
+  },
+  "shareDesignStory": "Story",
+  "@shareDesignStory": {
+    "description": "shareDesignStory",
+    "type": "text",
+    "placeholders": {}
+  }
 }

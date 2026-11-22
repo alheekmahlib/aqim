@@ -501,7 +501,7 @@
     "type": "text",
     "placeholders": {}
   },
-  "What'sNewDetails10": "۞ إضافة المزيد من الخيارات لشاشة الصلاة بحيث يمكن للمستخدم اختيار طريقة عرض مواقيت الصلاة.\n۞ إضافة الإشعار الدائم لعرض الصلاة القادمة.\n۞ تحسينات على الأداء والاستقرار.",
+  "What'sNewDetails10": "۞ إضافة المزيد من الخيارات لمشاركة وقت الصلاة القادمة.\n۞ إصلاح مشكلة إعادة جدولة الصلوات.\n۞ تحسينات على الأداء والاستقرار.",
   "@What'sNewDetails10": {
     "type": "text",
     "placeholders": {}
@@ -1371,5 +1371,35 @@
   "prayerSettingsNotifications": "التنبيهات والتذكيرات",
   "prayerSettingsNotificationsDesc": "التذكير قبل الصلاة وإشعارات الإقامة والعد التنازلي",
   "prayerSettingsSilent": "الوضع الصامت",
-  "prayerSettingsSilentDesc": "الوضع الصامت أثناء الصلاة ومدته"
+  "prayerSettingsSilentDesc": "الوضع الصامت أثناء الصلاة ومدته",
+  "timeLeft": "الوقت المتبقي",
+  "@timeLeft": {
+    "description": "timeLeft",
+    "type": "text",
+    "placeholders": {}
+  },
+  "prayerTimesTitle": "أوقات الصلاة",
+  "@prayerTimesTitle": {
+    "description": "prayerTimesTitle",
+    "type": "text",
+    "placeholders": {}
+  },
+  "shareDesignClassic": "كلاسيكي",
+  "@shareDesignClassic": {
+    "description": "shareDesignClassic",
+    "type": "text",
+    "placeholders": {}
+  },
+  "shareDesignTimetable": "جدول اليوم",
+  "@shareDesignTimetable": {
+    "description": "shareDesignTimetable",
+    "type": "text",
+    "placeholders": {}
+  },
+  "shareDesignStory": "ستوري",
+  "@shareDesignStory": {
+    "description": "shareDesignStory",
+    "type": "text",
+    "placeholders": {}
+  }
 }

@@ -54,3 +54,7 @@ const String FIRST_LAUNCH = 'FIRST_LAUNCH';
 
 // Cities feature
 const String SAVED_CITIES = 'SAVED_CITIES';
+
+/// تصميم بطاقة المشاركة المختار من المستخدم.
+/// Share card design selected by the user.
+const String SHARE_CARD_DESIGN = 'SHARE_CARD_DESIGN';

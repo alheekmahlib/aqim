@@ -501,7 +501,7 @@
     "type": "text",
     "placeholders": {}
   },
-  "What'sNewDetails10": "۞ نماز کی اسکرین میں مزید اختیارات شامل کیے گئے ہیں تاکہ آپ نماز کے اوقات کی نمائش کا طریقہ منتخب کر سکیں۔\n۞ آنے والی نماز دکھانے کے لیے مستقل نوٹیفکیشن شامل کیا گیا ہے۔\n۞ کارکردگی اور استحکام میں بہتری۔",
+  "What'sNewDetails10": "۞ آنے والی نماز کے وقت کو شیئر کرنے کے مزید اختیارات شامل کیے گئے۔\n۞ نمازوں کی دوبارہ شیڈولنگ کے مسئلے کی اصلاح۔\n۞ کارکردگی اور استحکام میں بہتری۔",
   "@What'sNewDetails10": {
     "type": "text",
     "placeholders": {}
@@ -1100,5 +1100,35 @@
   "prayerSettingsNotifications": "اطلاعات اور یاد دہانیاں",
   "prayerSettingsNotificationsDesc": "نماز کی یاد دہانی، اقامت اور کاؤنٹ ڈاؤن",
   "prayerSettingsSilent": "خاموش موڈ",
-  "prayerSettingsSilentDesc": "نماز کے دوران خاموش موڈ اور اس کا دورانیہ"
+  "prayerSettingsSilentDesc": "نماز کے دوران خاموش موڈ اور اس کا دورانیہ",
+  "timeLeft": "باقی وقت",
+  "@timeLeft": {
+    "description": "timeLeft",
+    "type": "text",
+    "placeholders": {}
+  },
+  "prayerTimesTitle": "نماز کے اوقات",
+  "@prayerTimesTitle": {
+    "description": "prayerTimesTitle",
+    "type": "text",
+    "placeholders": {}
+  },
+  "shareDesignClassic": "کلاسیکی",
+  "@shareDesignClassic": {
+    "description": "shareDesignClassic",
+    "type": "text",
+    "placeholders": {}
+  },
+  "shareDesignTimetable": "دن کا شیڈول",
+  "@shareDesignTimetable": {
+    "description": "shareDesignTimetable",
+    "type": "text",
+    "placeholders": {}
+  },
+  "shareDesignStory": "اسٹوری",
+  "@shareDesignStory": {
+    "description": "shareDesignStory",
+    "type": "text",
+    "placeholders": {}
+  }
 }

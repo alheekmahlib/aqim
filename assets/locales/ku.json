@@ -501,7 +501,7 @@
     "type": "text",
     "placeholders": {}
   },
-  "What'sNewDetails10": "۞ زیاتر هەڵبژاردە بۆ شاشەی نوێژ زیادکرا بۆ ئەوەی بتوانیت شێوازی پیشاندانی کاتەکانی نوێژ هەڵبژێریت.\n۞ ئاگادارکردنەوەی بەردەوام زیادکرا بۆ پیشاندانی نوێژی داهاتوو.\n۞ باشترکردنی کارایی و جێگیری.",
+  "What'sNewDetails10": "۞ زیاتر هەڵبژاردە بۆ هاوبەشکردنی کاتی نوێژی داهاتوو زیادکرا.\n۞ چارەسەرکردنی کێشەی دووبارە خشتەکردنی نوێژەکان.\n۞ باشترکردنی کارایی و جێگیری.",
   "@What'sNewDetails10": {
     "type": "text",
     "placeholders": {}
@@ -1100,5 +1100,35 @@
   "prayerSettingsNotifications": "ئاگادارکردنەوە و بیرخستنەوە",
   "prayerSettingsNotificationsDesc": "بیرخستنەوەی نوێژ، قامەت و کاتژمێری پاشەوە",
   "prayerSettingsSilent": "دۆخی بێدەنگ",
-  "prayerSettingsSilentDesc": "دۆخی بێدەنگ لە کاتی نوێژ و ماوەکەی"
+  "prayerSettingsSilentDesc": "دۆخی بێدەنگ لە کاتی نوێژ و ماوەکەی",
+  "timeLeft": "کاتەوەک",
+  "@timeLeft": {
+    "description": "timeLeft",
+    "type": "text",
+    "placeholders": {}
+  },
+  "prayerTimesTitle": "کاتەکانی بانگدان",
+  "@prayerTimesTitle": {
+    "description": "prayerTimesTitle",
+    "type": "text",
+    "placeholders": {}
+  },
+  "shareDesignClassic": "کلاسیکی",
+  "@shareDesignClassic": {
+    "description": "shareDesignClassic",
+    "type": "text",
+    "placeholders": {}
+  },
+  "shareDesignTimetable": "پلانی ڕۆژانە",
+  "@shareDesignTimetable": {
+    "description": "shareDesignTimetable",
+    "type": "text",
+    "placeholders": {}
+  },
+  "shareDesignStory": "ستۆری",
+  "@shareDesignStory": {
+    "description": "shareDesignStory",
+    "type": "text",
+    "placeholders": {}
+  }
 }

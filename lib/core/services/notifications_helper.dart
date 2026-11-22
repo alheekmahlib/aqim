@@ -206,7 +206,21 @@ class NotifyHelper {
     if (Platform.isAndroid) {
       await AdhanAlarmsScheduler.cancel([reminderId]);
     }
-    return LocalNotificationsService.instance.cancel(reminderId);
+    try {
+      await LocalNotificationsService.instance.cancel(reminderId);
+    } catch (e) {
+      // فشل إلغاء واحد لا يُجهض سلسلة إعادة الجدولة كاملة.
+      log(
+        'Failed cancelling notification $reminderId: $e',
+        name: 'NotifyHelper',
+      );
+    }
+  }
+
+  /// معرفات الإشعارات المؤجلة حاليًا؛ null إن تعذر قراءتها من المنصة.
+  Future<Set<int>?> pendingNotificationIds() async {
+    if (!_initialized) await ensureInitialized();
+    return LocalNotificationsService.instance.pendingNotificationIds();
   }
 
   /// طلب صلاحيات الإشعارات لكل المنصات. تُرجع true إذا مُنحت.

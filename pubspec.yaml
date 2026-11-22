@@ -3,7 +3,7 @@ description: "A Prayer and qibla application."
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 1.4.1+28
+version: 1.4.3+30
 
 environment:
   sdk: '>=3.12.2 <4.0.0'
@@ -11,8 +11,8 @@ environment:
 dependencies:
   adhan: ^2.0.0+1
   arabic_justified_text: ^1.0.4
-  archive: ^4.6.0
-  background_fetch: ^1.7.0
+  archive: ^4.7.1
+  background_fetch: ^2.0.1
   badges: ^4.0.1
   bot_toast: ^4.1.3
   bubble_lens: ^2.0.0
@@ -28,7 +28,7 @@ dependencies:
       ref: master
       url: https://github.com/alheekmahlib/drawing_animation.git
   either_dart: ^1.0.0
-  file_picker: ^13.3.2
+  file_picker: ^13.4.1
   floating_menu_expendable: ^1.1.1
   floatica: ^1.2.1
     # git:
@@ -42,14 +42,14 @@ dependencies:
       ref: v4.0.0
   flutter_cache_manager: ^3.5.0
   flutter_launcher_icons: ^0.14.4
-  flutter_local_notifications: ^23.0.0
+  flutter_local_notifications: ^23.0.3
   flutter_localizations:
     sdk: flutter
   flutter_map: ^8.3.2
   flutter_native_splash: ^2.4.8
   flutter_rounded_progress_bar: ^0.3.2
   flutter_screenutil: ^5.9.3
-  flutter_svg: ^2.3.2
+  flutter_svg: ^2.5.0
   flutter_timezone: ^5.1.1
   gap: ^3.1.0
   gauge_indicator: ^0.6.0

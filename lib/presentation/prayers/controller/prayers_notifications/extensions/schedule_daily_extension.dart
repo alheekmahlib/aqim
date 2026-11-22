@@ -3,8 +3,6 @@ part of '../../../prayers.dart';
 const int _kPrayerNotificationsBaseId = 20000;
 const int _kPrayerNotificationsDayStride = 10;
 const int _kPrayerOpenAppReminderBaseId = 21000;
-const String _kLegacyPrayerNotificationsCancelledFlag =
-    'legacy_prayer_notifications_cancelled_v2';
 
 /// علم GetStorage يوثق وجود تذكيرات مجدولة فعليًا؛ يمنع تكرار الإلغاء
 /// الدوري للميزة المعطلة دون حاجة.
@@ -193,6 +191,8 @@ LocalPrayerReminderScheduler _reminderScheduler() =>
       prayerTimeFor: _reminderPrayerTime,
       daysToSchedule: IqamaSchedulePolicy.reminderDaysToSchedule,
       maxDaysToCancel: IqamaSchedulePolicy.maxReminderDaysToCancel,
+      yieldBetweenOps: _yieldToUi,
+      pendingIds: () => NotifyHelper().pendingNotificationIds(),
       schedule:
           ({
             required id,
@@ -246,47 +246,26 @@ LocalPrayerSilenceScheduler _silenceScheduler() => LocalPrayerSilenceScheduler(
 /// فيُلغى دائمًا على أقصى مدى ممكن لكل منصة.
 int _maxDaysToCancel() => Platform.isAndroid ? 30 : 10;
 
-Future<void> _cancelLegacyPrayerNotificationsForPrayerIndex(
-  int prayerIndex,
-) async {
-  // النظام القديم كان يعتمد: baseId ثم +5 لكل يوم.
-  final dayLength = Platform.isAndroid ? 61 : 10;
-  for (int i = 0; i < dayLength; i++) {
-    final legacyBaseId = prayerIndex + (5 * i);
-    await NotifyHelper().cancelNotification(legacyBaseId);
+/// سلسلة تنفيذ متسلسلة لكل عمليات مزامنة إشعارات الصلوات: الاستدعاءات
+/// المتوازية (فتح التطبيق، مهمة الخلفية، تغيير الإعدادات) تنتظر دورها
+/// بدل أن يتقاطع إلغاءُ مسارٍ مع جدولة مسارٍ موازٍ — وهو ما كان يمسح
+/// إشعاراتٍ جُدولت للتو دون تعويض.
+Future<void> _notificationsSyncChain = Future<void>.value();
 
-    // في بعض الإصدارات كان iOS يرسل "الأذان الكامل" عبر عدة إشعارات متتالية.
-    if (Platform.isIOS) {
-      for (int offset = 1; offset <= 6; offset++) {
-        await NotifyHelper().cancelNotification(legacyBaseId + offset);
-      }
-    }
-  }
-
-  // تذكير "افتح التطبيق" في النظام القديم كان: 1000 + (baseId + 5*n)
-  // (نبدأ من 1 لتجنب المساس بـ 1000/1001 الخاصين برمضان).
-  for (int n = 1; n <= dayLength; n++) {
-    await NotifyHelper().cancelNotification(1000 + prayerIndex + (5 * n));
-  }
+Future<void> _runNotificationsSync(Future<void> Function() action) {
+  final run = _notificationsSyncChain.then((_) => action());
+  // فشل خطوة لا يُجهض الخطوات اللاحقة في السلسلة.
+  _notificationsSyncChain = run.then((_) {}, onError: (_) {});
+  return run;
 }
 
-Future<void> _cancelLegacyPrayerNotificationsIfNeeded() async {
-  final storage = GetStorage();
-  final alreadyCancelled =
-      storage.read<bool>(_kLegacyPrayerNotificationsCancelledFlag) ?? false;
-  if (alreadyCancelled) return;
+/// إتاحة دورة الأحداث بين عمليات الجدولة/الإلغاء المتتالية: يستعيد
+/// الـ UI thread فرصته لخدمة الإطحات فلا تُقطّع السلاسلُ الطويلة الرسم.
+Future<void> _yieldToUi() => Future<void>.delayed(Duration.zero);
 
-  const prayerIndexes = <int>[0, 2, 3, 4, 5];
-  for (final prayerIndex in prayerIndexes) {
-    await _cancelLegacyPrayerNotificationsForPrayerIndex(prayerIndex);
-  }
-
-  await storage.write(_kLegacyPrayerNotificationsCancelledFlag, true);
-  log(
-    'Legacy prayer notification IDs cancelled (migration)',
-    name: 'ScheduleDailyExtension',
-  );
-}
+/// علم GetStorage يوثق وجود إشعارات إقامة مجدولة فعليًا؛ يمنع الإلغاء
+/// الدوري للميزة المعطلة دون جدولة سابقة (~50 إلغاءً عبثيًا كل تشغيل).
+const String _kIqamaScheduledFlag = 'iqama_notifications_scheduled';
 
 extension ScheduleDailyExtension on PrayersNotificationsCtrl {
   Future<void> scheduleDailyNotificationsForPrayer(
@@ -412,6 +391,7 @@ extension ScheduleDailyExtension on PrayersNotificationsCtrl {
       // log('موعد صلاة ${DateFormatter.formatPrayerTime(prayerTime).tr}');
 
       lastPrayerTime = prayerTime;
+      await _yieldToUi();
     }
 
     if (lastPrayerTime != null) {
@@ -428,6 +408,16 @@ extension ScheduleDailyExtension on PrayersNotificationsCtrl {
 
       log('تم جدولة تذكير بعد آخر صلاة بـ ٥ دقائق');
       // log('موعد التذكير ${DateFormatter.formatPrayerTime(reminderTime)}');
+    }
+
+    // تقليم ما خرج عن الأفق الحالي (قد يتقلص على iOS بعد توسيع سابق) —
+    // بعد البناء لا قبله كي لا يبقى فراغ إن قُطعت العملية في المنتصف.
+    final maxDays = _maxDaysToCancel();
+    for (int day = daysToSchedule; day < maxDays; day++) {
+      await NotifyHelper().cancelNotification(
+        _scheduledPrayerNotificationId(prayerKey: prayerKey, day: day),
+      );
+      await _yieldToUi();
     }
   }
 
@@ -461,8 +451,11 @@ extension ScheduleDailyExtension on PrayersNotificationsCtrl {
       return;
     }
 
-    await cancelAllIqamaNotifications();
+    await _runNotificationsSync(_scheduleIqamaNotificationsNow);
+  }
 
+  Future<void> _scheduleIqamaNotificationsNow() async {
+    final athanCtrl = AdhanController.instance;
     final days = IqamaSchedulePolicy.iqamaDaysToSchedule();
     final now = DateTime.now();
     final iqamaOffsets = athanCtrl.state.iqamaOffsets;
@@ -513,12 +506,28 @@ extension ScheduleDailyExtension on PrayersNotificationsCtrl {
           payload: {'sound_type': 'bell'},
         );
 
+        await _yieldToUi();
+
         log(
           'تم جدولة إقامة $prayerName ($day): $iqamaTime',
           name: 'ScheduleDailyExtension',
         );
       }
     }
+
+    // تقليم ما خرج عن النافذة الحالية (قد تتقلص على iOS) — بعد البناء
+    // لا قبله كي لا يبقى فراغ إن قُطعت العملية.
+    final maxDays = _maxDaysToCancel();
+    for (int day = days; day < maxDays; day++) {
+      for (int prayerKey = 0; prayerKey < 5; prayerKey++) {
+        await NotifyHelper().cancelNotification(
+          _scheduledIqamaNotificationId(prayerKey: prayerKey, day: day),
+        );
+        await _yieldToUi();
+      }
+    }
+
+    await GetStorage().write(_kIqamaScheduledFlag, true);
   }
 
   /// إلغاء جميع إشعارات الإقامة (خانات 5-9 في كل كتلة يوم).
@@ -529,19 +538,45 @@ extension ScheduleDailyExtension on PrayersNotificationsCtrl {
         await NotifyHelper().cancelNotification(
           _scheduledIqamaNotificationId(prayerKey: prayerKey, day: day),
         );
+        await _yieldToUi();
       }
     }
     log('تم إلغاء جميع إشعارات الإقامة.', name: 'ScheduleDailyExtension');
   }
 
   Future<void> reschedulePrayers() async {
+    // شرط مسبق قبل أي عمل: بلا مواقيت جاهزة كان الإلغاء الشامل السابق
+    // يمسح كل الإشعارات ثم تتخطى الجدولة بصمت — فلا تبقى إشعارات أصلًا.
+    final athanCtrl = AdhanController.instance;
+    if (athanCtrl.state.prayerTimes == null ||
+        athanCtrl.state.sunnahTimes == null) {
+      log(
+        'reschedulePrayers skipped: prayer data not ready yet',
+        name: 'ScheduleDailyExtension',
+      );
+      return;
+    }
+
+    try {
+      await _runNotificationsSync(() => _reschedulePrayersNow());
+    } catch (e, stackTrace) {
+      log(
+        'reschedulePrayers failed: $e',
+        error: e,
+        stackTrace: stackTrace,
+        name: 'ScheduleDailyExtension',
+      );
+    }
+  }
+
+  /// ابنِ ثم قلّم: إعادة جدولة نفس المعرف تستبدله، فلا مسح شامل يسبق
+  /// البناء — إن قُطعت العملية في أي لحظة تبقى الإشعارات السابقة صالحة.
+  Future<void> _reschedulePrayersNow({bool allowHealthRetry = true}) async {
     log(
       'إعادة جدولة إشعارات الصلوات اليومية...',
       name: 'ScheduleDailyExtension',
     );
 
-    // تنظيف IDs القديمة مرة واحدة بعد التحديث لتفادي الإشعارات المكررة.
-    await _cancelLegacyPrayerNotificationsIfNeeded();
     final adhanStorage = GetStorage('AdhanSounds');
     const prayers = <({int index, String name})>[
       (index: 0, name: 'Fajr'),
@@ -550,8 +585,6 @@ extension ScheduleDailyExtension on PrayersNotificationsCtrl {
       (index: 4, name: 'Maghrib'),
       (index: 5, name: 'Isha'),
     ];
-
-    await cancelAllPrayerNotifications();
 
     for (final prayer in prayers) {
       final prayerName = prayer.name;
@@ -567,30 +600,91 @@ extension ScheduleDailyExtension on PrayersNotificationsCtrl {
               prayerName,
               notificationType,
             );
+      } else {
+        // معطلة الآن → قلّم جدولها القديم وحده.
+        await cancelPrayerNotificationsForAllDay(prayer.index);
       }
     }
 
     // إشعارات الإقامة: تُجدول إن كانت مفعلة (وتُلغى إن كانت معطلة).
     if (AdhanController.instance.state.iqamaNotificationsEnabled.value) {
-      await scheduleIqamaNotifications();
+      await _scheduleIqamaNotificationsNow();
     } else {
-      await cancelAllIqamaNotifications();
+      // معطلة: إلغاء فقط إن سبقت جدولتها (يمنع إلغاءات عبثية كل تشغيل).
+      // null تُعامل كمجدولة سابقًا — إلغاء أمان مرة واحدة بعد التحديث.
+      if (GetStorage().read<bool>(_kIqamaScheduledFlag) ?? true) {
+        await cancelAllIqamaNotifications();
+        await GetStorage().write(_kIqamaScheduledFlag, false);
+      }
     }
 
     // تذكيرات ما قبل الصلاة (المرحلة الثانية): مزامنة مع الإعدادات الحالية.
-    await synchronizePrayerReminders();
+    await _synchronizePrayerRemindersNow();
 
     // فترات التصميت (المرحلة الثالثة): مزامنة مع الإعدادات والإقامات.
-    await synchronizePrayerSilence();
+    await _synchronizePrayerSilenceNow();
 
     // إعادة جدولة إشعارات الصيام (السحور/الإفطار/العشر الأواخر)
     await RamadanController.instance.rescheduleFastingNotifications();
+
+    // شفاء ذاتي: صلاة مفعلة بلا أي إشعار مؤجل بعد الجدولة → محاولة أخيرة.
+    if (allowHealthRetry && !await _prayerNotificationsHealthy()) {
+      log(
+        'Prayer notifications missing after reschedule — retrying once',
+        name: 'ScheduleDailyExtension',
+      );
+      await _reschedulePrayersNow(allowHealthRetry: false);
+    }
+  }
+
+  /// تحقق ما بعد الجدولة: كل صلاة مفعلة يجب أن تملك إشعارًا مؤجلًا واحدًا
+  /// على الأقل. فشل قراءة المؤجلات (null) لا يُعد خللًا مؤكدًا.
+  Future<bool> _prayerNotificationsHealthy() async {
+    final pendingIds = await NotifyHelper().pendingNotificationIds();
+    if (pendingIds == null) return true;
+
+    final adhanStorage = GetStorage('AdhanSounds');
+    const enabledPrayers = <({int key, String name})>[
+      (key: 0, name: 'Fajr'),
+      (key: 1, name: 'Dhuhr'),
+      (key: 2, name: 'Asr'),
+      (key: 3, name: 'Maghrib'),
+      (key: 4, name: 'Isha'),
+    ];
+
+    var healthy = true;
+    for (final prayer in enabledPrayers) {
+      final type = adhanStorage.read<String?>('scheduledAdhan_${prayer.name}');
+      if (type == null || type == 'nothing') continue;
+
+      var hasPending = false;
+      for (var day = 0; day < _maxDaysToCancel(); day++) {
+        if (pendingIds.contains(
+          _scheduledPrayerNotificationId(prayerKey: prayer.key, day: day),
+        )) {
+          hasPending = true;
+          break;
+        }
+      }
+      if (!hasPending) {
+        healthy = false;
+        log(
+          'No pending notification for ${prayer.name} after reschedule',
+          name: 'ScheduleDailyExtension',
+        );
+      }
+    }
+    return healthy;
   }
 
   /// مزامنة تذكيرات ما قبل الصلاة مع إعدادات المميزات الحالية:
-  /// إلغاء شامل ثم جدولة النافذة النشطة؛ لا تفعل شيئًا متى كانت الميزة
-  /// معطلة دون تذكيرات سابقة (يمنع الإلغاء الدوري عبثًا).
+  /// جدولة الخطة النشطة ثم تقليم ما خرج عنها؛ لا تفعل شيئًا متى كانت
+  /// الميزة معطلة دون تذكيرات سابقة (يمنع الإلغاء الدوري عبثًا).
   Future<void> synchronizePrayerReminders() async {
+    await _runNotificationsSync(_synchronizePrayerRemindersNow);
+  }
+
+  Future<void> _synchronizePrayerRemindersNow() async {
     try {
       final preferences = StoredPrayerFeatureSettings(
         GetStorage(),
@@ -617,6 +711,10 @@ extension ScheduleDailyExtension on PrayersNotificationsCtrl {
   /// مزامنة فترات التصميت مع إعدادات المميزات الحالية؛ لا تنفذ شيئًا
   /// على غير أندرويد، ولا تكرر الإلغاء متى كانت الميزة معطلة بلا جدولة.
   Future<void> synchronizePrayerSilence() async {
+    await _runNotificationsSync(_synchronizePrayerSilenceNow);
+  }
+
+  Future<void> _synchronizePrayerSilenceNow() async {
     try {
       final preferences = StoredPrayerFeatureSettings(
         GetStorage(),
@@ -643,52 +741,17 @@ extension ScheduleDailyExtension on PrayersNotificationsCtrl {
     }
   }
 
-  Future<void> cancelAllPrayerNotifications() async {
-    const prayerIndexes = <int>[0, 2, 3, 4, 5];
-
-    // تنظيف الجداول القديمة (مرة واحدة) لتفادي تداخل الإصدارات.
-    await _cancelLegacyPrayerNotificationsIfNeeded();
-
-    final daysToCancel = _maxDaysToCancel();
-    for (int day = 0; day < daysToCancel; day++) {
-      for (final prayerIndex in prayerIndexes) {
-        final prayerKey = _prayerKeyFromIndex(prayerIndex);
-        final id = _scheduledPrayerNotificationId(
-          prayerKey: prayerKey,
-          day: day,
-        );
-        await NotifyHelper().cancelNotification(id);
-      }
-    }
-
-    for (int prayerKey = 0; prayerKey < 5; prayerKey++) {
-      await NotifyHelper().cancelNotification(
-        _openAppReminderIdForPrayer(prayerKey),
-      );
-    }
-
-    // تشمل إشعارات الإقامة (خانات 5-9 في كل كتلة يوم).
-    await cancelAllIqamaNotifications();
-
-    // تشمل تذكيرات ما قبل الصلاة (معرفات 21100 فأعلى).
-    await cancelAllPrayerReminders();
-
-    log('تم إلغاء جميع إشعارات الصلاة.', name: 'ScheduleDailyExtension');
-  }
-
   Future<void> cancelPrayerNotificationsForAllDay(
     int prayerNotificationId,
   ) async {
     final originalPrayerIndex = prayerNotificationId;
-
-    // تنظيف من النظام القديم.
-    await _cancelLegacyPrayerNotificationsForPrayerIndex(originalPrayerIndex);
 
     final prayerKey = _prayerKeyFromIndex(originalPrayerIndex);
     final daysToCancel = _maxDaysToCancel();
     for (int day = 0; day < daysToCancel; day++) {
       final id = _scheduledPrayerNotificationId(prayerKey: prayerKey, day: day);
       await NotifyHelper().cancelNotification(id);
+      await _yieldToUi();
     }
     await NotifyHelper().cancelNotification(
       _openAppReminderIdForPrayer(prayerKey),
@@ -698,10 +761,5 @@ extension ScheduleDailyExtension on PrayersNotificationsCtrl {
       'تم إلغاء جميع إشعارات صلاة $originalPrayerIndex.',
       name: 'ScheduleDailyExtension',
     );
-  }
-
-  /// إلغاء IDs القديمة مرة واحدة بعد التحديث.
-  Future<void> cancelLegacyPrayerNotificationsIfNeeded() async {
-    await _cancelLegacyPrayerNotificationsIfNeeded();
   }
 }

@@ -501,7 +501,7 @@
     "type": "text",
     "placeholders": {}
   },
-  "What'sNewDetails10": "۞ Namaz ekranına, namaz vakitlerinin nasıl görüntüleneceğini seçebileceğiniz daha fazla seçenek eklendi.\n۞ Gelecek namazı gösteren kalıcı bir bildirim eklendi.\n۞ Performans ve kararlılık iyileştirmeleri.",
+  "What'sNewDetails10": "۞ Yaklaşan namaz vaktini paylaşmak için daha fazla seçenek eklendi.\n۞ Namazların yeniden planlanmasıyla ilgili bir sorun giderildi.\n۞ Performans ve kararlılık iyileştirmeleri.",
   "@What'sNewDetails10": {
     "type": "text",
     "placeholders": {}
@@ -1100,5 +1100,35 @@
   "prayerSettingsNotifications": "Bildirimler ve hatırlatıcılar",
   "prayerSettingsNotificationsDesc": "Namaz hatırlatıcıları, kamet ve geri sayım",
   "prayerSettingsSilent": "Sessiz mod",
-  "prayerSettingsSilentDesc": "Namaz sırasında sessiz mod ve süresi"
+  "prayerSettingsSilentDesc": "Namaz sırasında sessiz mod ve süresi",
+  "timeLeft": "Kalan süre",
+  "@timeLeft": {
+    "description": "timeLeft",
+    "type": "text",
+    "placeholders": {}
+  },
+  "prayerTimesTitle": "Namaz vakitleri",
+  "@prayerTimesTitle": {
+    "description": "prayerTimesTitle",
+    "type": "text",
+    "placeholders": {}
+  },
+  "shareDesignClassic": "Klasik",
+  "@shareDesignClassic": {
+    "description": "shareDesignClassic",
+    "type": "text",
+    "placeholders": {}
+  },
+  "shareDesignTimetable": "Günlük program",
+  "@shareDesignTimetable": {
+    "description": "shareDesignTimetable",
+    "type": "text",
+    "placeholders": {}
+  },
+  "shareDesignStory": "Hikaye",
+  "@shareDesignStory": {
+    "description": "shareDesignStory",
+    "type": "text",
+    "placeholders": {}
+  }
 }

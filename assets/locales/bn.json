@@ -501,7 +501,7 @@
     "type": "text",
     "placeholders": {}
   },
-  "What'sNewDetails10": "۞ নামাজের স্ক্রিনে আরও বিকল্প যোগ করা হয়েছে, যাতে আপনি নামাজের সময় কীভাবে দেখানো হবে তা বেছে নিতে পারেন।\n۞ আসন্ন নামাজ দেখানোর জন্য একটি স্থায়ী নোটিফিকেশন যোগ করা হয়েছে।\n۞ কর্মক্ষমতা ও স্থিতিশীলতার উন্নতি।",
+  "What'sNewDetails10": "۞ আসন্ন নামাজের সময় শেয়ার করার জন্য আরও বিকল্প যোগ করা হয়েছে।\n۞ নামাজ পুনরায় নির্ধারণের সমস্যা সংশোধন করা হয়েছে।\n۞ কর্মক্ষমতা ও স্থিতিশীলতার উন্নতি।",
   "@What'sNewDetails10": {
     "type": "text",
     "placeholders": {}
@@ -1100,5 +1100,35 @@
   "prayerSettingsNotifications": "বিজ্ঞপ্তি ও স্মরণিকা",
   "prayerSettingsNotificationsDesc": "নামাজের স্মরণিকা, ইকামত ও কাউন্টডাউন",
   "prayerSettingsSilent": "নীরব মোড",
-  "prayerSettingsSilentDesc": "নামাজের সময় নীরব মোড ও তার সময়কাল"
+  "prayerSettingsSilentDesc": "নামাজের সময় নীরব মোড ও তার সময়কাল",
+  "timeLeft": "বাকি সময়",
+  "@timeLeft": {
+    "description": "timeLeft",
+    "type": "text",
+    "placeholders": {}
+  },
+  "prayerTimesTitle": "নামাজের সময়",
+  "@prayerTimesTitle": {
+    "description": "prayerTimesTitle",
+    "type": "text",
+    "placeholders": {}
+  },
+  "shareDesignClassic": "ক্লাসিক",
+  "@shareDesignClassic": {
+    "description": "shareDesignClassic",
+    "type": "text",
+    "placeholders": {}
+  },
+  "shareDesignTimetable": "দৈনিক সূচি",
+  "@shareDesignTimetable": {
+    "description": "shareDesignTimetable",
+    "type": "text",
+    "placeholders": {}
+  },
+  "shareDesignStory": "স্টোরি",
+  "@shareDesignStory": {
+    "description": "shareDesignStory",
+    "type": "text",
+    "placeholders": {}
+  }
 }

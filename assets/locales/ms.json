@@ -501,7 +501,7 @@
     "type": "text",
     "placeholders": {}
   },
-  "What'sNewDetails10": "۞ Ditambah lebih banyak pilihan pada skrin solat supaya anda boleh memilih cara memaparkan waktu solat.\n۞ Ditambah pemberitahuan kekal untuk memaparkan solat seterusnya.\n۞ Penambahbaikan prestasi dan kestabilan.",
+  "What'sNewDetails10": "۞ Ditambah lebih banyak pilihan untuk berkongsi waktu solat yang akan datang.\n۞ Dibetulkan isu penjadualan semula solat.\n۞ Penambahbaikan prestasi dan kestabilan.",
   "@What'sNewDetails10": {
     "type": "text",
     "placeholders": {}
@@ -1100,5 +1100,35 @@
   "prayerSettingsNotifications": "Pemberitahuan dan peringatan",
   "prayerSettingsNotificationsDesc": "Peringatan solat, iqamah dan kira detik",
   "prayerSettingsSilent": "Mod senyap",
-  "prayerSettingsSilentDesc": "Mod senyap ketika solat dan tempohnya"
+  "prayerSettingsSilentDesc": "Mod senyap ketika solat dan tempohnya",
+  "timeLeft": "Baki masa",
+  "@timeLeft": {
+    "description": "timeLeft",
+    "type": "text",
+    "placeholders": {}
+  },
+  "prayerTimesTitle": "Waktu solat",
+  "@prayerTimesTitle": {
+    "description": "prayerTimesTitle",
+    "type": "text",
+    "placeholders": {}
+  },
+  "shareDesignClassic": "Klasik",
+  "@shareDesignClassic": {
+    "description": "shareDesignClassic",
+    "type": "text",
+    "placeholders": {}
+  },
+  "shareDesignTimetable": "Jadual harian",
+  "@shareDesignTimetable": {
+    "description": "shareDesignTimetable",
+    "type": "text",
+    "placeholders": {}
+  },
+  "shareDesignStory": "Story",
+  "@shareDesignStory": {
+    "description": "shareDesignStory",
+    "type": "text",
+    "placeholders": {}
+  }
 }

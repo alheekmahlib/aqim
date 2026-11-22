@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 
 import '../../../../../../core/widgets/container_button_widget.dart';
@@ -207,7 +208,7 @@ class _CustomAdhanTile extends StatelessWidget {
                 autofocus: true,
                 decoration: InputDecoration(hintText: 'customAdhanNameHint'.tr),
               ),
-              const SizedBox(height: 12),
+              const Gap(12),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
@@ -244,7 +245,7 @@ class _CustomAdhanTile extends StatelessWidget {
                 'customAdhanDeleteConfirm'.trParams({'name': audio.name}),
                 style: const TextStyle(fontFamily: 'cairo', fontSize: 15),
               ),
-              const SizedBox(height: 12),
+              const Gap(12),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [

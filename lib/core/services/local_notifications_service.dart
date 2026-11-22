@@ -542,6 +542,22 @@ class LocalNotificationsService {
     log('Cancelled all notifications', name: 'LocalNotifications');
   }
 
+  /// معرفات الإشعارات المؤجلة حاليًا لدى المنصة؛ null إن تعذر قراءتها
+  /// (يستخدمها التحقق الذاتي بعد إعادة الجدولة).
+  Future<Set<int>?> pendingNotificationIds() async {
+    try {
+      await initialize(onTap: _onTap ?? (_) {});
+      final requests = await _plugin.pendingNotificationRequests();
+      return requests.map((request) => request.id).toSet();
+    } catch (e) {
+      log(
+        'Failed reading pending notifications: $e',
+        name: 'LocalNotifications',
+      );
+      return null;
+    }
+  }
+
   // ─── معالجة النقر ───
 
   Future<void> _onForegroundResponse(NotificationResponse response) async {

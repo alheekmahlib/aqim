@@ -1,24 +1,25 @@
 part of '../../prayers.dart';
 
-class _ShareCard extends StatelessWidget {
-  final share = ShareController.instance;
-  final adhan = AdhanController.instance;
+// ---------------------------------------------------------------------------
+// Design 1 — كلاسيكي (التصميم الأصلي)
+// ---------------------------------------------------------------------------
+
+class _ClassicShareCard extends StatelessWidget {
+  final ShareCardData data;
+
+  const _ClassicShareCard({required this.data});
 
   @override
   Widget build(BuildContext context) {
-    final gradient = adhan.getTimeNowColor();
     return Container(
-      decoration: BoxDecoration(
-        gradient: gradient,
-      ),
+      decoration: BoxDecoration(gradient: data.gradient),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(16),
-              // Inner overlay to ensure text contrast
               color: Colors.black.withValues(alpha: .15),
               border: Border.all(
                 color: Colors.white.withValues(alpha: .1),
@@ -28,10 +29,7 @@ class _ShareCard extends StatelessWidget {
             child: Stack(
               alignment: Alignment.topCenter,
               children: [
-                HijriDateWidget(
-                  alignment: Alignment.center,
-                  fontColor: context.theme.canvasColor,
-                ),
+                _HijriCrescent(month: data.hijriMonth),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   mainAxisSize: MainAxisSize.min,
@@ -42,10 +40,10 @@ class _ShareCard extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Next prayer
                             Text(
-                              'nextPrayer'.tr,
+                              data.nextPrayerLabel,
                               style: TextStyle(
                                 fontSize: 14,
                                 fontFamily: 'cairo',
@@ -56,7 +54,7 @@ class _ShareCard extends StatelessWidget {
                             ),
                             const Gap(4),
                             Text(
-                              share.nextPrayerName.tr,
+                              data.prayerName,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
@@ -69,9 +67,9 @@ class _ShareCard extends StatelessWidget {
                             ),
                           ],
                         ),
-                        const Gap(8),
+                        const SizedBox(width: 8),
                         Text(
-                          share.formattedNextPrayerTime,
+                          data.prayerTime,
                           style: const TextStyle(
                             fontSize: 20,
                             fontFamily: 'cairo',
@@ -82,56 +80,27 @@ class _ShareCard extends StatelessWidget {
                         ),
                       ],
                     ),
-
                     const Gap(12),
-                    // Progress bar (from fajr to isha)
-                    Obx(() => RoundedProgressBar(
-                          height: 25,
-                          style: RoundedProgressBarStyle(
-                            borderWidth: 5,
-                            widthShadow: 5,
-                            backgroundProgress: Theme.of(context)
-                                .colorScheme
-                                .onSurface
-                                .withValues(alpha: 0.1),
-                            colorProgress: Theme.of(context).canvasColor,
-                            colorProgressDark: Theme.of(context)
-                                .colorScheme
-                                .inversePrimary
-                                .withValues(alpha: 0.1),
-                            colorBorder: Theme.of(context)
-                                .canvasColor
-                                .withValues(alpha: 0.1),
-                            colorBackgroundIcon: Colors.transparent,
-                          ),
-                          // margin: EdgeInsets.symmetric(vertical: 16),
-                          borderRadius: BorderRadius.circular(10),
-                          percent: adhan
-                              .getIntervalPercentageOfDayBetweenPrayerAndNextByIndex(
-                                  adhan.getCurrentPrayerByDateTime())
-                              .value,
-                        )),
-
-                    // Time left chip
+                    ShareProgressBar(progress: data.progress),
                     Center(
                       child: Text(
-                        '${'timeLeft:'.tr} ${share.timeLeftLabel.convertNumbers(Get.locale!.languageCode)}',
+                        '${data.timeLeftTitle} ${data.timeLeftValue}',
                         style: TextStyle(
                           fontSize: 14,
                           fontFamily: 'cairo',
-                          color:
-                              context.theme.canvasColor.withValues(alpha: .8),
+                          color: Colors.white.withValues(alpha: .8),
                           fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
                     const Gap(8),
-                    // Hijri + Place
                     Row(
                       children: [
                         Expanded(
                           child: Text(
-                            share.hijriDateText,
+                            data.hijriDate,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
                               fontSize: 16,
                               fontFamily: 'cairo',
@@ -141,13 +110,16 @@ class _ShareCard extends StatelessWidget {
                             ),
                           ),
                         ),
-                        const Spacer(),
-                        const Icon(Icons.place_rounded,
-                            color: Colors.white, size: 18),
-                        const Gap(8),
+                        const SizedBox(width: 8),
+                        const Icon(
+                          Icons.place_rounded,
+                          color: Colors.white,
+                          size: 18,
+                        ),
+                        const SizedBox(width: 8),
                         Flexible(
                           child: Text(
-                            AdhanController.instance.state.location,
+                            data.location,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
@@ -163,27 +135,23 @@ class _ShareCard extends StatelessWidget {
                       ],
                     ),
                     const Gap(12),
-                    customSvgWithCustomColor(
-                      SvgPath.svgLogoAqemLogo,
-                      color: context.theme.canvasColor,
-                      height: 20,
-                    ),
+                    const _ShareLogo(color: Colors.white, height: 20),
                   ],
                 ),
               ],
             ),
           ),
-          // App brand / title
+          const Gap(3),
           Text(
-            'appName'.tr,
+            data.appName,
             style: TextStyle(
               fontSize: 12,
               fontFamily: 'cairo',
-              color: context.theme.canvasColor.withValues(alpha: .7),
+              color: Colors.white.withValues(alpha: .7),
               fontWeight: FontWeight.w700,
             ),
           ),
-          const Gap(8),
+          const Gap(5),
         ],
       ),
     );
